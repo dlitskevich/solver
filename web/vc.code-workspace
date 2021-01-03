@@ -1,0 +1,14 @@
+{
+  "folders": [
+    {
+      "path": "."
+    },
+    {
+      "path": "../arrmatura"
+    },
+    {
+      "path": "../aimd-programs"
+    }
+  ],
+  "settings": {}
+}

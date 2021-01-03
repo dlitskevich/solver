@@ -1,0 +1,40 @@
+<component id="Cell">
+  <div class="column col-sm-4 cell-box">
+    <div class="cell cell-{value}" click="->store.step" data-col={col} data-row={row}
+         data-value={value}>
+      <!-- {value|or:0} -->
+    </div>
+  </div>
+</component>
+
+<component id="Board">
+  <h6> State: {finished} </h6>
+  <p>Star {data[1]}</p>
+  <div class="container">
+    <div class="columns" ui:for="row of board">
+      <Cell ui:for="col of row.cols" col={col.id} row={row.id} value={col.value} />
+    </div>
+  </div>
+</component>
+
+<component id="TicTacToe">
+  <div class="container">
+    <div class="columns">
+      <div class="column col-6">
+        <Board board="<- store.board" finished="<- store.finished" data=":gameState" />
+      </div>
+      <div class="column col-3">
+        <button class="btn" click="->">Step: {sstep} </button>
+        <button class="btn btn-error" click="->store.reset">Reset</button>
+      </div>
+    </div>
+  </div>
+</component>
+
+<component id="TictactoePage">
+  <h4>TicTacToe</h4>
+
+  <h5>С ЦВЕТОВЫМ И ЭНЕРГЕТИЧЕСКИМ ДОППЛЕРОВСКИМ КАРТИРОВАНИЕМ</h5>
+  <TTTStore ui:ref="store" />
+  <TicTacToe sstep="<-store.step" />
+</component>

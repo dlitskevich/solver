@@ -1,0 +1,26 @@
+.cell {
+    background-color: lightgrey;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 98%;
+    height: 98%;
+    margin: 1%;
+}
+/* .cell-0 {
+    background-color: grey;
+} */
+.cell-1 {
+    background-color: red;
+}
+.cell-2 {
+    background-color: white;
+}
+
+.cell-box {
+    background-color: black;
+    height: 0;
+    overflow: hidden;
+    padding-top: 33%;
+    position: relative;
+}

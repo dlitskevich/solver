@@ -1,0 +1,81 @@
+<component id="App">
+  <NavigationService ui:ref="nav" />
+  <ViewPort caption=":top.title" sidebarWidth="300">
+    <ViewPort:aside>
+      <NavTree data=":top.sitemap" />
+    </ViewPort:aside>
+    <PageRouter ui:props="<- nav.route" />
+  </ViewPort>
+</component>
+
+<component id="Navbar">
+  <header class="navbar bg-primary" style="min-height: 48px">
+    <section class="navbar-section mx-2">
+      <h4 class="m-1" style="vertical-align: middle" ui:if="{caption}">
+        {caption}
+      </h4>
+      <ui:slot />
+    </section>
+    <section class="navbar-center" ui:if="{logo}">
+      <img src="{logo}" alt="" height="40" width="140" />
+    </section>
+    <section class="navbar-section mx-2">
+      <ui:slot id="right" />
+      <UserAvatar ui:props="{user}" ui:if="{user}" />
+    </section>
+  </header>
+</component>
+
+<component id="SimpleList">
+  <ul class="nav">
+    <li class="nav-item {item.class}" ui:for="item of data">
+      <span>{item.name}</span>
+    </li>
+  </ul>
+</component>
+
+<component id="NavTree">
+  <ul class="nav">
+    <li class="nav-item {item.class}" ui:for="item of data">
+      <NavLink href="{item.id}">
+        <span>{item.name}</span>
+        <span ui:if="{item.label}" class="label label-error">{item.label}</span>
+      </NavLink>
+      <NavTree ui:if="{item.subs}" data="{item.subs}" />
+    </li>
+  </ul>
+</component>
+
+<component id="MainPage">
+  <Navbar caption="Gallery" />
+  <Panel caption="Icons">
+    <LoadingIndicator />
+    Using Font
+    <Icon type="cog" />
+  </Panel>
+  <Panel caption="Buttons">
+    <Button caption="Default" trackId="action1" />
+    <Button
+            icon="cog"
+            caption="Large primary with icon"
+            primary
+            large
+            class="m-2" />
+    <Button icon="123" caption="Link" link />
+  </Panel>
+  <Panel caption="Panel" hint="with hint"> here... </Panel>
+
+  <button click="->" data-clicked={clicked|inc}>Clicked {clicked|or:0}</button>
+
+</component>
+
+<component id="ArrowsPage">
+  <Navbar caption="Arrows" />
+  <Panel caption="Subscribe and Action">
+    <Tabs value="<- store.tab" items=":top.sitemap" action="-> store.select" />
+    <Button
+            caption="<- store.tab|or:none|str.capitalize"
+            data-id="other"
+            action="-> store.select" />
+  </Panel>
+</component>
