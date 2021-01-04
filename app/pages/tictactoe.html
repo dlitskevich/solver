@@ -7,12 +7,11 @@
   </div>
 </component>
 
-<component id="Board">
-  <h6> State: {finished} </h6>
-  <p>Star {data[1]}</p>
+<component id="Board">  
+  <h6>{:gameStates|gameState:@finished:@step} </h6>
   <div class="container">
     <div class="columns" ui:for="row of board">
-      <Cell ui:for="col of row.cols" col={col.id} row={row.id} value={col.value} />
+      <Cell ui:for="col of row.cols" col={col.id} row={row.id} value={col.value}/>
     </div>
   </div>
 </component>
@@ -21,11 +20,11 @@
   <div class="container">
     <div class="columns">
       <div class="column col-6">
-        <Board board="<- store.board" finished="<- store.finished" data=":gameState" />
+        <Board board="<- store.board" step="<- store.step" finished="<- store.finished" />
       </div>
+      <div class="column col-1"></div>
       <div class="column col-3">
-        <button class="btn" click="->">Step: {sstep} </button>
-        <button class="btn btn-error" click="->store.reset">Reset</button>
+        <button class="btn btn-error control" click="->store.reset">Reset</button>
       </div>
     </div>
   </div>
@@ -34,7 +33,6 @@
 <component id="TictactoePage">
   <h4>TicTacToe</h4>
 
-  <h5>С ЦВЕТОВЫМ И ЭНЕРГЕТИЧЕСКИМ ДОППЛЕРОВСКИМ КАРТИРОВАНИЕМ</h5>
   <TTTStore ui:ref="store" />
-  <TicTacToe sstep="<-store.step" />
+  <TicTacToe />
 </component>

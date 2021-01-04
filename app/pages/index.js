@@ -1,7 +1,7 @@
-import uziPeqen from './uzi_peqen.html'
 import ticTacToe from './tictactoe.html'
+import ultTicTacToe from './ulttictactoe.html'
 
 export default [
-  uziPeqen,
-  ticTacToe
+  ticTacToe,
+  ultTicTacToe
 ]

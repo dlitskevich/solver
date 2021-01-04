@@ -1,47 +1,13 @@
 /* eslint-disable space-before-function-paren */
-export class TTTStore {
-  init() {
-    const size = [1, 2, 3]
+function reset(){
+  const size = [1, 2, 3]
 
-    return {
-      board: size.map(row => ({ id: row, cols: size.map(col => ({ id: col, value: 0 })) })),
-      step: 0,
-      finished: false
-    }
+  return {
+    board: size.map(row => ({ id: row, cols: size.map(col => ({ id: col, value: 0 })) })),
+    step: 0,
+    finished: false
   }
-
-  onStep({ col, row, value }, { board, step, finished }) {
-    if (!value && !finished) {
-      board[row - 1].cols[col - 1].value = 1 + step % 2
-      finished = checkFinished(board, step)
-      return { board: [...board], step: step + 1, finished: finished }
-    }
-  }
-
-  // setBoard(v) {
-  //   this.board = v
-  // }
-
-  onReset(_, { board }) {
-    // const size = [1, 2, 3]
-    // var board = size.map(row => ({ id: row, cols: size.map(col => ({ id: col, value: 0 })) }))
-
-    // return {
-    //   board: [...board],
-    //   step: 0
-    // }
-    for (let row = 0; row < 3; row++) {
-      for (let col = 0; col < 3; col++) {
-        board[row].cols[col].value = 0
-      }
-    }
-    return {
-      board: [...board],
-      step: 0,
-      finished: false
-    }
-  }
-};
+}
 
 function checkFinished(board, step) {
   if (step < 4) {
@@ -79,3 +45,34 @@ function checkFinished(board, step) {
   }
   return false
 }
+
+export class TTTStore {
+  init() {
+    return reset()
+  }
+
+  onStep({ col, row, value }, { board, step, finished }) {
+    if (!value && !finished) {
+      board[row - 1].cols[col - 1].value = 1 + step % 2
+      finished = checkFinished(board, step)
+      return { board: [...board], step: step + 1, finished: finished }
+    }
+  }
+
+  // setBoard(v) {
+  //   this.board = v
+  // }
+
+  onReset(_,{board}) {
+    for (let row = 0; row < 3; row++) {
+      for (let col = 0; col < 3; col++) {
+        board[row].cols[col].value = 0
+      }
+    }
+    return {
+      board: [...board],
+      step: 0,
+      finished: false
+    }
+  }
+};

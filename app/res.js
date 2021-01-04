@@ -3,13 +3,13 @@ export default {
     title: 'TicTacToe',
     sitemap: [
       { id: 'main', name: 'Info', icon2: 'home' },
-      { id: 'tictactoe', name: 'TicTacToe', icon: 'work' }
+      { id: 'tictactoe', name: 'TicTacToe', icon: 'work' },
+      { id: 'ulttictactoe', name: 'UltimateTicTacToe', icon: 'work' }
     ]
   },
-  gameState: [
-    { winner: 'cross', icon: 'ic' },
-    { winner: 'circle', icon: 'ic' },
-    { winner: 'draw', icon: 'ic' }
-  ]
+  gameStates:{
+    gameWinner: ['Red won','White won','Draw'],
+    gameTurn: ['Red turn', 'White turn']
+  }
 
 }

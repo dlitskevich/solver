@@ -1,0 +1,56 @@
+<component id="UCell">
+  <div class="column col-4 cell-box">
+    <div class="ucell cell-{value}" click="->ustore.stepcell" 
+         data-col={col} data-row={row}
+         data-subcol={subcol} data-subrow={subrow}
+         data-value={value}>         
+    </div>
+  </div>
+</component>
+
+<component id="USubBoard">  
+  <div class="column col-4 subBoard subBoard-{available} subWin-{finished}">  
+    <div class="hider"></div>
+    <div class="columns" ui:for="row of board">      
+      <UCell ui:for="col of row.cols" col={col.id} row={row.id} value={col.value} subcol={subcol} subrow={subrow} />      
+    </div>
+    
+  </div>
+</component>
+
+<component id="UBoard">  
+  <h6>{:gameStates|gameState:@finished:@step} </h6>
+  <div class="container">
+    <div class="columns" ui:for="row of board">
+      <USubBoard 
+        ui:for="col of row.cols" 
+        board="{board|subBoard:@row.id:@col.id}" 
+        subcol={col.id}
+        subrow={row.id} 
+        available={col.available}
+        finished={col.finished}
+        uvalue={col.value} />
+    </div>
+  </div>
+</component>
+
+<component id="UTicTacToe">
+  <div class="container">
+    <div class="columns">
+      <div class="column col-9">
+        <UBoard board="<- ustore.board" step="<- ustore.step" finished="<- ustore.finished" />
+      </div>
+      <div class="column col-1"></div>
+      <div class="column col-2">
+        <button class="btn btn-error control" click="->ustore.reset">Reset</button>
+      </div>
+    </div>
+  </div>
+</component> 
+
+<component id="UlttictactoePage">
+  <h4>UltimateTicTacToe</h4>
+
+  <UTTT ui:ref="ustore" />
+  <UTicTacToe />
+</component>
