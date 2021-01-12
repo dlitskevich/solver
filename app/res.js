@@ -7,8 +7,8 @@ export default {
       { id: 'ulttictactoe', name: 'UltimateTicTacToe', icon: 'work' }
     ]
   },
-  gameStates:{
-    gameWinner: ['Red won','White won','Draw'],
+  gameStates: {
+    gameWinner: ['Red won', 'White won', 'Draw'],
     gameTurn: ['Red turn', 'White turn']
   }
 

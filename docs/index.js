@@ -1034,8 +1034,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _app_html__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./app.html */ "./app/app.html");
 /* harmony import */ var _pages__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./pages */ "./app/pages/index.js");
 /* harmony import */ var _res__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./res */ "./app/res.js");
-/* harmony import */ var _stores_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./stores.js */ "./app/stores.js");
-/* harmony import */ var _uttt_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./uttt.js */ "./app/uttt.js");
+/* harmony import */ var _ttt_store_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./ttt_store.js */ "./app/ttt_store.js");
+/* harmony import */ var _uttt_store_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./uttt_store.js */ "./app/uttt_store.js");
 /* harmony import */ var ultimus__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ultimus */ "./node_modules/ultimus/dist/main.js");
 /* harmony import */ var ultimus__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(ultimus__WEBPACK_IMPORTED_MODULE_7__);
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
@@ -1060,7 +1060,7 @@ function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
 
 
-var types = [].concat(_toConsumableArray(_commons__WEBPACK_IMPORTED_MODULE_1__["default"]), [_app_html__WEBPACK_IMPORTED_MODULE_2__["default"]], _toConsumableArray(_pages__WEBPACK_IMPORTED_MODULE_3__["default"]), [_stores_js__WEBPACK_IMPORTED_MODULE_5__["TTTStore"], _uttt_js__WEBPACK_IMPORTED_MODULE_6__["UTTT"]]);
+var types = [].concat(_toConsumableArray(_commons__WEBPACK_IMPORTED_MODULE_1__["default"]), [_app_html__WEBPACK_IMPORTED_MODULE_2__["default"]], _toConsumableArray(_pages__WEBPACK_IMPORTED_MODULE_3__["default"]), [_ttt_store_js__WEBPACK_IMPORTED_MODULE_5__["TTTStore"], _uttt_store_js__WEBPACK_IMPORTED_MODULE_6__["UTTT"]]);
 Object(arrmatura__WEBPACK_IMPORTED_MODULE_0__["launch"])({
   template: '<App />',
   types: types,
@@ -1095,7 +1095,7 @@ Object(arrmatura__WEBPACK_IMPORTED_MODULE_0__["launch"])({
       }
     },
     subBoard: function subBoard(board, r, c) {
-      return board[r - 1].cols[c - 1].board;
+      return board[r].cols[c].board;
     }
   })
 });
@@ -1141,7 +1141,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("<component id=\"UCell\">\n  <div class=\"column col-4 cell-box\">\n    <div class=\"ucell cell-{value}\" click=\"->ustore.stepcell\" \n         data-col={col} data-row={row}\n         data-subcol={subcol} data-subrow={subrow}\n         data-value={value}>         \n    </div>\n  </div>\n</component>\n\n<component id=\"USubBoard\">  \n  <div class=\"column col-4 subBoard subBoard-{available} subWin-{finished}\">  \n    <div class=\"hider\"></div>\n    <div class=\"columns\" ui:for=\"row of board\">      \n      <UCell ui:for=\"col of row.cols\" col={col.id} row={row.id} value={col.value} subcol={subcol} subrow={subrow} />      \n    </div>\n    \n  </div>\n</component>\n\n<component id=\"UBoard\">  \n  <h6>{:gameStates|gameState:@finished:@step} </h6>\n  <div class=\"container\">\n    <div class=\"columns\" ui:for=\"row of board\">\n      <USubBoard \n        ui:for=\"col of row.cols\" \n        board=\"{board|subBoard:@row.id:@col.id}\" \n        subcol={col.id}\n        subrow={row.id} \n        available={col.available}\n        finished={col.finished}\n        uvalue={col.value} />\n    </div>\n  </div>\n</component>\n\n<component id=\"UTicTacToe\">\n  <div class=\"container\">\n    <div class=\"columns\">\n      <div class=\"column col-9\">\n        <UBoard board=\"<- ustore.board\" step=\"<- ustore.step\" finished=\"<- ustore.finished\" />\n      </div>\n      <div class=\"column col-1\"></div>\n      <div class=\"column col-2\">\n        <button class=\"btn btn-error control\" click=\"->ustore.reset\">Reset</button>\n      </div>\n    </div>\n  </div>\n</component> \n\n<component id=\"UlttictactoePage\">\n  <h4>UltimateTicTacToe</h4>\n\n  <UTTT ui:ref=\"ustore\" />\n  <UTicTacToe />\n</component>");
+/* harmony default export */ __webpack_exports__["default"] = ("<component id=\"UCell\">\n  <div class=\"column col-4 cell-box\">\n    <div class=\"ucell cell-{value}\" click=\"->ustore.stepcell\" \n         data-col={col} data-row={row}\n         data-subcol={subcol} data-subrow={subrow}\n         data-value={value}>         \n    </div>\n  </div>\n</component>\n\n<component id=\"USubBoard\">  \n  <div class=\"column col-4 subBoard subBoard-{available} subWin-{finished}\">  \n    <div class=\"hider\"></div>\n    <div class=\"columns\" ui:for=\"row of board\">      \n      <UCell ui:for=\"col of row.cols\" col={col.id} row={row.id} value={col.value} subcol={subcol} subrow={subrow} />      \n    </div>\n    \n  </div>\n</component>\n\n<component id=\"UBoard\">  \n  <h6>{:gameStates|gameState:@finished:@step} </h6>\n  <div class=\"container\">\n    <div class=\"columns\" ui:for=\"row of board\">\n      <USubBoard \n        ui:for=\"col of row.cols\" \n        board=\"{board|subBoard:@row.id:@col.id}\" \n        subcol={col.id}\n        subrow={row.id} \n        available={col.available}\n        finished={col.finished}\n        uvalue={col.value} />\n    </div>\n  </div>\n</component>\n\n<component id=\"UTicTacToe\">\n  <div class=\"container\">\n    <div class=\"columns\">\n      <div class=\"column col-9 board\">\n        <UBoard board=\"<- ustore.board\" step=\"<- ustore.step\" finished=\"<- ustore.finished\" />\n      </div>\n      <div class=\"column col-1\"></div>\n      <div class=\"column col-2\">\n        <button class=\"btn btn-error control\" click=\"->ustore.reset\">Reset</button>\n      </div>\n    </div>\n  </div>\n</component> \n\n<component id=\"UlttictactoePage\">\n  <h4>UltimateTicTacToe</h4>\n\n  <UTTT ui:ref=\"ustore\" />\n  <UTicTacToe />\n</component>");
 
 /***/ }),
 
@@ -1179,10 +1179,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./app/stores.js":
-/*!***********************!*\
-  !*** ./app/stores.js ***!
-  \***********************/
+/***/ "./app/ttt_store.js":
+/*!**************************!*\
+  !*** ./app/ttt_store.js ***!
+  \**************************/
 /*! exports provided: TTTStore */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -1203,9 +1203,11 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 /* eslint-disable space-before-function-paren */
 function reset() {
-  var size = [1, 2, 3];
+  var size = [0, 1, 2];
   return {
     board: size.map(function (row) {
       return {
@@ -1221,30 +1223,51 @@ function reset() {
     step: 0,
     finished: false
   };
-}
+} // function checkWin(acc, cur){
+//   return (acc&&(cur.value==player))
+// }
+
 
 function checkFinished(board, step) {
   if (step < 4) {
     return false;
   }
 
-  var player = 1 + step % 2;
+  var player = 1 + step % 2; // board.map()
+
+  var _loop = function _loop(row) {
+    if (board[row].cols.reduce(function (acc, cur) {
+      return acc && cur.value === player;
+    }, true)) {
+      return {
+        v: player
+      };
+    }
+
+    if (board.reduce(function (acc, cur) {
+      return acc && cur.cols[row].value === player;
+    }, true)) {
+      return {
+        v: player
+      };
+    }
+  };
 
   for (var row = 0; row < 3; row++) {
-    if (board[row].cols[0].value === player && board[row].cols[1].value === player && board[row].cols[2].value === player) {
-      return player;
-    }
+    var _ret = _loop(row);
 
-    if (board[0].cols[row].value === player && board[1].cols[row].value === player && board[2].cols[row].value === player) {
-      return player;
-    }
+    if (_typeof(_ret) === "object") return _ret.v;
   }
 
-  if (board[0].cols[0].value === player && board[1].cols[1].value === player && board[2].cols[2].value === player) {
+  if (board.reduce(function (acc, cur, ind) {
+    return acc && cur.cols[ind].value === player;
+  }, true)) {
     return player;
   }
 
-  if (board[0].cols[2].value === player && board[1].cols[1].value === player && board[2].cols[0].value === player) {
+  if (board.reduce(function (acc, cur, ind) {
+    return acc && cur.cols[2 - ind].value === player;
+  }, true)) {
     return player;
   }
 
@@ -1278,7 +1301,7 @@ function () {
           finished = _ref2.finished;
 
       if (!value && !finished) {
-        board[row - 1].cols[col - 1].value = 1 + step % 2;
+        board[row].cols[col].value = 1 + step % 2;
         finished = checkFinished(board, step);
         return {
           board: _toConsumableArray(board),
@@ -1315,10 +1338,10 @@ function () {
 
 /***/ }),
 
-/***/ "./app/uttt.js":
-/*!*********************!*\
-  !*** ./app/uttt.js ***!
-  \*********************/
+/***/ "./app/uttt_store.js":
+/*!***************************!*\
+  !*** ./app/uttt_store.js ***!
+  \***************************/
 /*! exports provided: UTTT */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -1339,9 +1362,11 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 /* eslint-disable space-before-function-paren */
 function reset() {
-  var size = [1, 2, 3];
+  var size = [0, 1, 2];
   return {
     board: size.map(function (row) {
       return {
@@ -1380,21 +1405,39 @@ function checkFinished(board, ultstep, step) {
 
   var player = 1 + ultstep % 2;
 
-  for (var row = 0; row < 3; row++) {
-    if (board[row].cols[0].value === player && board[row].cols[1].value === player && board[row].cols[2].value === player) {
-      return player;
+  var _loop = function _loop(row) {
+    if (board[row].cols.reduce(function (acc, cur) {
+      return acc && cur.value === player;
+    }, true)) {
+      return {
+        v: player
+      };
     }
 
-    if (board[0].cols[row].value === player && board[1].cols[row].value === player && board[2].cols[row].value === player) {
-      return player;
+    if (board.reduce(function (acc, cur) {
+      return acc && cur.cols[row].value === player;
+    }, true)) {
+      return {
+        v: player
+      };
     }
+  };
+
+  for (var row = 0; row < 3; row++) {
+    var _ret = _loop(row);
+
+    if (_typeof(_ret) === "object") return _ret.v;
   }
 
-  if (board[0].cols[0].value === player && board[1].cols[1].value === player && board[2].cols[2].value === player) {
+  if (board.reduce(function (acc, cur, ind) {
+    return acc && cur.cols[ind].value === player;
+  }, true)) {
     return player;
   }
 
-  if (board[0].cols[2].value === player && board[1].cols[1].value === player && board[2].cols[0].value === player) {
+  if (board.reduce(function (acc, cur, ind) {
+    return acc && cur.cols[2 - ind].value === player;
+  }, true)) {
     return player;
   }
 
@@ -1404,8 +1447,7 @@ function checkFinished(board, ultstep, step) {
 
 
   if (step === -1) {
-    var numAvailable = 0;
-
+    // const numAvailable = 0
     for (var r = 0; r < 3; r++) {
       for (var c = 0; c < 3; c++) {
         if (board[r].cols[c].available !== false) {
@@ -1443,23 +1485,25 @@ function () {
       var board = _ref2.board,
           step = _ref2.step,
           finished = _ref2.finished;
+      var subboard = board[subrow].cols[subcol]; // console.log(subboard)
 
-      if (!value && !finished && board[subrow - 1].cols[subcol - 1].available === 1 && !board[subrow - 1].cols[subcol - 1].value && !board[subrow - 1].cols[subcol - 1].finished) {
-        board[subrow - 1].cols[subcol - 1].board[row - 1].cols[col - 1].value = 1 + step % 2;
-        board[subrow - 1].cols[subcol - 1].finished = checkFinished(board[subrow - 1].cols[subcol - 1].board, step, board[subrow - 1].cols[subcol - 1].step);
-        board[subrow - 1].cols[subcol - 1].step = 1 + board[subrow - 1].cols[subcol - 1].step;
+      if (!value && !finished && subboard.available === 1 && !subboard.value && !subboard.finished) {
+        subboard.board[row].cols[col].value = 1 + step % 2;
+        subboard.finished = checkFinished(subboard.board, step, subboard.step);
+        subboard.step = 1 + subboard.step;
+        board[subrow].cols[subcol] = subboard;
 
-        if (board[subrow - 1].cols[subcol - 1].finished) {
-          board[subrow - 1].cols[subcol - 1].value = board[subrow - 1].cols[subcol - 1].finished % 3;
-          board[subrow - 1].cols[subcol - 1].available = false;
+        if (subboard.finished) {
+          subboard.value = subboard.finished % 3;
+          subboard.available = false;
+          board[subrow].cols[subcol] = subboard;
           finished = checkFinished(board, step, -1);
         }
 
-        var avail = 1;
-        console.log(row);
-        console.log(col);
+        var avail = 1; // console.log(subrow)
+        // console.log(subcol)
 
-        if (board[row - 1].cols[col - 1].available !== false || finished) {
+        if (board[row].cols[col].available !== false || finished) {
           avail = 0;
         }
 
@@ -1472,7 +1516,7 @@ function () {
         }
 
         if (avail === 0 && !finished) {
-          board[row - 1].cols[col - 1].available = 1;
+          board[row].cols[col].available = 1;
         }
 
         return {
@@ -1481,47 +1525,19 @@ function () {
           finished: finished
         };
       }
-    }
-  }, {
-    key: "onStepSub",
-    value: function onStepSub(_ref3, _ref4) {
-      var col = _ref3.col,
-          row = _ref3.row,
-          value = _ref3.value;
-      var board = _ref4.board,
-          step = _ref4.step,
-          finished = _ref4.finished;
+    } // onStepSub({ col, row, value }, { board, step, finished }) {
+    //   if (!value && !finished) {
+    //     board[row].cols[col].value = 1 + step % 2
+    //     finished = checkFinished(board, step)
+    //     return { board: [...board], step: step + 1, finished: finished }
+    //   }
+    // }
 
-      if (!value && !finished) {
-        board[row - 1].cols[col - 1].value = 1 + step % 2;
-        finished = checkFinished(board, step);
-        return {
-          board: _toConsumableArray(board),
-          step: step + 1,
-          finished: finished
-        };
-      }
-    }
   }, {
     key: "onReset",
-    value: function onReset(_, _ref5) {
-      var board = _ref5.board;
-      return reset(); //   for (let row = 0; row < 3; row++) {
-      //     for (let col = 0; col < 3; col++) {
-      //       board[row].cols[col].value = 0
-      //       board[row].cols[col].finished = false
-      //       for (let row2 = 0; row < 3; row++) {
-      //         for (let col2 = 0; col < 3; col++) {
-      //           board[row].cols[col].board[row2].cols[col2].value = 0
-      //         }
-      //       }
-      //     }
-      //   }
-      //   return {
-      //     board: [...board],
-      //     step: 0,
-      //     finished: false
-      //   }
+    value: function onReset(_, _ref3) {
+      var board = _ref3.board;
+      return reset();
     }
   }]);
 

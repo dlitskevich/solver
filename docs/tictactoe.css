@@ -1,3 +1,7 @@
+.board {
+    max-width: 720px;
+    min-width: 320px;
+}
 .cell {
     background-color: rgb(240, 238, 238) ;
     position: absolute;
@@ -36,6 +40,7 @@
 
 .control{
     width: 100%;
+    min-width: 100px;
 }
 
 
