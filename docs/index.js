@@ -96,6 +96,501 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ({
 
+/***/ "./app/ai/mcts.js":
+/*!************************!*\
+  !*** ./app/ai/mcts.js ***!
+  \************************/
+/*! exports provided: MonteCarloTreeSearch */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MonteCarloTreeSearch", function() { return MonteCarloTreeSearch; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var MonteCarloTreeSearch =
+/*#__PURE__*/
+function () {
+  function MonteCarloTreeSearch() {
+    _classCallCheck(this, MonteCarloTreeSearch);
+  }
+
+  _createClass(MonteCarloTreeSearch, [{
+    key: "init",
+    value: function init() {
+      return {
+        scoreForWin: 10
+      };
+    }
+  }, {
+    key: "findNextmove",
+    value: function findNextmove(board, player) {
+      var opponent = 3 - player;
+      var tree = new Tree();
+      var rootNode = tree.root;
+      rootNode.state.board = board;
+      rootNode.state.player = opponent;
+      var startTime = Date.now();
+
+      while (Date.now() - startTime < 1000) {
+        var promisingNode = this.selectPromisingNode(rootNode);
+
+        if (promisingNode.state.board.checkWinner() === false) {
+          this.expandNode(promisingNode);
+        }
+
+        var nodeToExplore = promisingNode;
+
+        if (promisingNode.childs.length > 0) {
+          nodeToExplore = promisingNode.randomChild();
+        }
+
+        var playoutResult = this.simulateRandomPlayout(nodeToExplore, opponent);
+        this.backPropogation(nodeToExplore, playoutResult);
+      }
+
+      var winnerNode = rootNode.childs.reduce(function (acc, cur) {
+        return cur.state.visits > acc.state.visits ? cur : acc;
+      });
+      console.log(rootNode); // tree.root = winnerNode
+
+      return winnerNode.state.board;
+    }
+  }, {
+    key: "selectPromisingNode",
+    value: function selectPromisingNode(rootNode) {
+      var node = rootNode;
+
+      while (node.childs.length !== 0) {
+        node = UCT.findBestChild(node);
+      }
+
+      return node;
+    }
+  }, {
+    key: "expandNode",
+    value: function expandNode(node) {
+      var possibleStates = node.state.getPossibleStates();
+      possibleStates.forEach(function (state) {
+        var newNode = new Node(state, node);
+        newNode.state.player = 3 - node.state.player;
+        node.childs.push(newNode);
+      });
+    }
+  }, {
+    key: "simulateRandomPlayout",
+    value: function simulateRandomPlayout(nodeToExplore, opponent) {
+      var tempNode = new Node(nodeToExplore.state, nodeToExplore.parent);
+      var tempState = tempNode.state;
+      var winner = tempState.board.checkWinner(); // if (winner) {
+      //   console.log(winner, opponent)
+      //   console.log(tempState)
+      //   console.log(tempNode)
+      // }
+
+      if (winner === opponent) {
+        console.log(123, JSON.parse(JSON.stringify(nodeToExplore.state)));
+        console.log(123, JSON.parse(JSON.stringify(nodeToExplore.parent.state)));
+        console.log(JSON.parse(JSON.stringify(tempNode.state)));
+        tempNode.parent.state.score = Number.MIN_SAFE_INTEGER;
+        return winner;
+      }
+
+      tempNode.parent = null;
+
+      while (winner === false) {
+        tempState.togglePlayer();
+        tempState.randomMove();
+        winner = tempState.board.checkWinner();
+      }
+
+      return winner;
+    }
+  }, {
+    key: "backPropogation",
+    value: function backPropogation(nodeToExplore, winner) {
+      var tempNode = nodeToExplore;
+
+      while (tempNode !== null) {
+        tempNode.state.visits++;
+
+        if (tempNode.state.player === winner) {
+          tempNode.state.addScore(1);
+        }
+
+        tempNode = tempNode.parent;
+      }
+    }
+  }]);
+
+  return MonteCarloTreeSearch;
+}();
+var UCT = {
+  uctValue: function uctValue(totalVisit, nodeWinScore, nodeVisit) {
+    if (nodeVisit === 0) {
+      return Number.MAX_SAFE_INTEGER;
+    }
+
+    return nodeWinScore / nodeVisit + 1.41 * Math.sqrt(Math.log(totalVisit) / nodeVisit);
+  },
+  findBestChild: function findBestChild(node) {
+    var parentVisits = node.state.visits;
+    var values = node.childs.map(function (child) {
+      return UCT.uctValue(parentVisits, child.state.score, child.state.visits);
+    });
+    var id = values.reduce(function (iMax, cur, i, arr) {
+      return cur > arr[iMax] ? i : iMax;
+    }, 0);
+    return node.childs[id];
+  }
+};
+
+var Tree = function Tree(root) {
+  _classCallCheck(this, Tree);
+
+  this.root = new Node();
+};
+
+var Node =
+/*#__PURE__*/
+function () {
+  function Node() {
+    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new State();
+    var parent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+    var childs = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+
+    _classCallCheck(this, Node);
+
+    if (arguments.length === 1) {
+      this.state = new State(state);
+      this.parent = parent;
+      this.childs = childs;
+    } else if (arguments.length === 2) {
+      this.state = new State(state);
+      this.parent = parent;
+      this.childs = childs;
+    } else {
+      this.state = state;
+      this.parent = parent;
+      this.childs = childs;
+    }
+  }
+
+  _createClass(Node, [{
+    key: "randomChild",
+    value: function randomChild() {
+      return this.childs[Math.floor(Math.random() * this.childs.length)];
+    }
+  }]);
+
+  return Node;
+}();
+
+var State =
+/*#__PURE__*/
+function () {
+  function State(state) {
+    _classCallCheck(this, State);
+
+    if (arguments.length === 1) {
+      this.visits = state.visits;
+      this.score = state.score;
+      this.board = state.board.makeCopy();
+      this.player = state.player;
+    } else {
+      this.visits = 0;
+      this.score = 10;
+      this.board = null;
+      this.player = null;
+    }
+  }
+
+  _createClass(State, [{
+    key: "togglePlayer",
+    value: function togglePlayer() {
+      this.player = 3 - this.player;
+    }
+  }, {
+    key: "addScore",
+    value: function addScore(score) {
+      if (this.score !== Number.MIN_SAFE_INTEGER) {
+        this.score += score;
+      }
+    }
+  }, {
+    key: "getPossibleStates",
+    value: function getPossibleStates() {
+      var _this = this;
+
+      var availableMoves = this.board.getAvailableMoves();
+      return availableMoves.map(function (move) {
+        var newState = new State();
+        newState.board = _this.board.makeCopy();
+        newState.player = 3 - _this.player;
+        newState.board.performMove(move, newState.player);
+        return newState;
+      });
+    }
+  }, {
+    key: "randomMove",
+    value: function randomMove() {
+      var availableMoves = this.board.getAvailableMoves();
+      var randId = Math.floor(Math.random() * availableMoves.length);
+      this.board.performMove(availableMoves[randId], this.player);
+    }
+  }]);
+
+  return State;
+}();
+
+/***/ }),
+
+/***/ "./app/ai/uttt.js":
+/*!************************!*\
+  !*** ./app/ai/uttt.js ***!
+  \************************/
+/*! exports provided: UTTTBoard */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "UTTTBoard", function() { return UTTTBoard; });
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var UTTTBoard =
+/*#__PURE__*/
+function () {
+  function UTTTBoard() {
+    _classCallCheck(this, UTTTBoard);
+  }
+
+  _createClass(UTTTBoard, [{
+    key: "init",
+    value: function init() {
+      return this.reset();
+    }
+  }, {
+    key: "reset",
+    value: function reset() {
+      var size = [0, 1, 2];
+      return {
+        board: size.map(function (row) {
+          return {
+            id: row,
+            cols: size.map(function (col) {
+              return {
+                id: col,
+                board: size.map(function (row) {
+                  return {
+                    id: row,
+                    cols: size.map(function (col) {
+                      return {
+                        id: col,
+                        value: 0
+                      };
+                    })
+                  };
+                }),
+                value: 0,
+                step: 0,
+                finished: false,
+                available: 1
+              };
+            })
+          };
+        }),
+        step: 0,
+        finished: false,
+        cross: [1, 0],
+        circle: [1, 0]
+      };
+    }
+  }, {
+    key: "makeMove",
+    value: function makeMove(_ref, _ref2) {
+      var col = _ref.col,
+          row = _ref.row,
+          value = _ref.value,
+          subrow = _ref.subrow,
+          subcol = _ref.subcol;
+      var board = _ref2.board,
+          step = _ref2.step,
+          finished = _ref2.finished;
+      var subboard = board[subrow].cols[subcol]; // console.log(subboard)
+
+      if (!value && !finished && subboard.available === 1 && !subboard.value && !subboard.finished) {
+        subboard.board[row].cols[col].value = 1 + step % 2;
+        subboard.finished = this.checkFinished(subboard.board, step, subboard.step);
+        subboard.step = 1 + subboard.step;
+        board[subrow].cols[subcol] = subboard;
+
+        if (subboard.finished) {
+          subboard.value = subboard.finished % 3;
+          subboard.available = false;
+          board[subrow].cols[subcol] = subboard;
+          finished = this.checkFinished(board, step, -1);
+        }
+
+        var avail = 1; // console.log(subrow)
+        // console.log(subcol)
+
+        if (board[row].cols[col].available !== false || finished) {
+          avail = 0;
+        }
+
+        for (var r = 0; r < 3; r++) {
+          for (var c = 0; c < 3; c++) {
+            if (board[r].cols[c].available !== false) {
+              board[r].cols[c].available = avail;
+            }
+          }
+        }
+
+        if (avail === 0 && !finished) {
+          board[row].cols[col].available = 1;
+        }
+
+        return {
+          board: JSON.parse(JSON.stringify(board)),
+          step: step + 1,
+          finished: finished
+        };
+      }
+    }
+  }, {
+    key: "performMove",
+    value: function performMove(cell, player) {
+      var nextBoard = this.makeMove(cell, this);
+      this.step = nextBoard.step;
+      this.finished = nextBoard.finished;
+    }
+  }, {
+    key: "checkFinished",
+    value: function checkFinished(board, ultstep, step) {
+      if (step < 2 && step !== -1) {
+        return false;
+      }
+
+      var player = 1 + ultstep % 2;
+
+      var _loop = function _loop(row) {
+        if (board[row].cols.reduce(function (acc, cur) {
+          return acc && cur.value === player;
+        }, true)) {
+          return {
+            v: player
+          };
+        }
+
+        if (board.reduce(function (acc, cur) {
+          return acc && cur.cols[row].value === player;
+        }, true)) {
+          return {
+            v: player
+          };
+        }
+      };
+
+      for (var row = 0; row < 3; row++) {
+        var _ret = _loop(row);
+
+        if (_typeof(_ret) === "object") return _ret.v;
+      }
+
+      if (board.reduce(function (acc, cur, ind) {
+        return acc && cur.cols[ind].value === player;
+      }, true)) {
+        return player;
+      }
+
+      if (board.reduce(function (acc, cur, ind) {
+        return acc && cur.cols[2 - ind].value === player;
+      }, true)) {
+        return player;
+      }
+
+      if (step === 8) {
+        return 3;
+      } // ultimative case
+
+
+      if (step === -1) {
+        // const numAvailable = 0
+        for (var r = 0; r < 3; r++) {
+          for (var c = 0; c < 3; c++) {
+            if (board[r].cols[c].available !== false) {
+              return false;
+            }
+          }
+        }
+
+        return 3;
+      }
+
+      return false;
+    }
+  }, {
+    key: "checkWinner",
+    value: function checkWinner() {
+      return this.finished;
+    }
+  }, {
+    key: "makeCopy",
+    value: function makeCopy() {
+      var copy = new UTTTBoard();
+      copy.board = JSON.parse(JSON.stringify(this.board));
+      copy.step = this.step;
+      copy.finished = this.finished;
+      return copy;
+    }
+  }, {
+    key: "getAvailableMoves",
+    value: function getAvailableMoves() {
+      var moves = [];
+
+      for (var subrow = 0; subrow < 3; subrow++) {
+        for (var subcol = 0; subcol < 3; subcol++) {
+          var subboard = this.board[subrow].cols[subcol];
+
+          if (subboard.available !== 1) {
+            continue;
+          }
+
+          for (var row = 0; row < 3; row++) {
+            for (var col = 0; col < 3; col++) {
+              if (subboard.board[row].cols[col].value === 0) {
+                moves.push({
+                  col: col,
+                  row: row,
+                  value: 0,
+                  subrow: subrow,
+                  subcol: subcol
+                });
+              }
+            }
+          }
+        }
+      }
+
+      return moves;
+    }
+  }]);
+
+  return UTTTBoard;
+}();
+
+/***/ }),
+
 /***/ "./app/app.html":
 /*!**********************!*\
   !*** ./app/app.html ***!
@@ -105,7 +600,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("<component id=\"App\">\n  <NavigationService ui:ref=\"nav\" />\n  <ViewPort caption=\":top.title\" sidebarWidth=\"300\">\n    <ViewPort:aside>\n      <NavTree data=\":top.sitemap\" />\n    </ViewPort:aside>\n    <PageRouter ui:props=\"<- nav.route\" />\n  </ViewPort>\n</component>\n\n<component id=\"Navbar\">\n  <header class=\"navbar bg-primary\" style=\"min-height: 48px\">\n    <section class=\"navbar-section mx-2\">\n      <h4 class=\"m-1\" style=\"vertical-align: middle\" ui:if=\"{caption}\">\n        {caption}\n      </h4>\n      <ui:slot />\n    </section>\n    <section class=\"navbar-center\" ui:if=\"{logo}\">\n      <img src=\"{logo}\" alt=\"\" height=\"40\" width=\"140\" />\n    </section>\n    <section class=\"navbar-section mx-2\">\n      <ui:slot id=\"right\" />\n      <UserAvatar ui:props=\"{user}\" ui:if=\"{user}\" />\n    </section>\n  </header>\n</component>\n\n<component id=\"SimpleList\">\n  <ul class=\"nav\">\n    <li class=\"nav-item {item.class}\" ui:for=\"item of data\">\n      <span>{item.name}</span>\n    </li>\n  </ul>\n</component>\n\n<component id=\"NavTree\">\n  <ul class=\"nav\">\n    <li class=\"nav-item {item.class}\" ui:for=\"item of data\">\n      <NavLink href=\"{item.id}\">\n        <span>{item.name}</span>\n        <span ui:if=\"{item.label}\" class=\"label label-error\">{item.label}</span>\n      </NavLink>\n      <NavTree ui:if=\"{item.subs}\" data=\"{item.subs}\" />\n    </li>\n  </ul>\n</component>\n\n<component id=\"MainPage\">\n  <Navbar caption=\"Gallery\" />\n  <Panel caption=\"Icons\">\n    <LoadingIndicator />\n    Using Font\n    <Icon type=\"cog\" />\n  </Panel>\n  <Panel caption=\"Buttons\">\n    <Button caption=\"Default\" trackId=\"action1\" />\n    <Button\n            icon=\"cog\"\n            caption=\"Large primary with icon\"\n            primary\n            large\n            class=\"m-2\" />\n    <Button icon=\"123\" caption=\"Link\" link />\n  </Panel>\n  <Panel caption=\"Panel\" hint=\"with hint\"> here... </Panel>\n\n  <button click=\"->\" data-clicked={clicked|inc}>Clicked {clicked|or:0}</button>\n\n</component>\n\n<component id=\"ArrowsPage\">\n  <Navbar caption=\"Arrows\" />\n  <Panel caption=\"Subscribe and Action\">\n    <Tabs value=\"<- store.tab\" items=\":top.sitemap\" action=\"-> store.select\" />\n    <Button\n            caption=\"<- store.tab|or:none|str.capitalize\"\n            data-id=\"other\"\n            action=\"-> store.select\" />\n  </Panel>\n</component>");
+/* harmony default export */ __webpack_exports__["default"] = ("<component id=\"App\">\n  <NavigationService ui:ref=\"nav\" />\n  <ViewPort caption=\":top.title\" sidebarWidth=\"300\">\n    <ViewPort:aside>\n      <NavTree data=\":top.sitemap\" />\n    </ViewPort:aside>\n    <PageRouter ui:props=\"<- nav.route\" />\n  </ViewPort>\n</component>\n\n<component id=\"Navbar\">\n  <header class=\"navbar bg-primary\" style=\"min-height: 48px\">\n    <section class=\"navbar-section mx-2\">\n      <h4 class=\"m-1\" style=\"vertical-align: middle\" ui:if=\"{caption}\">\n        {caption}\n      </h4>\n      <ui:slot />\n    </section>\n    <section class=\"navbar-center\" ui:if=\"{logo}\">\n      <img src=\"{logo}\" alt=\"\" height=\"40\" width=\"140\" />\n    </section>\n    <section class=\"navbar-section mx-2\">\n      <ui:slot id=\"right\" />\n      <UserAvatar ui:props=\"{user}\" ui:if=\"{user}\" />\n    </section>\n  </header>\n</component>\n\n<component id=\"SimpleList\">\n  <ul class=\"nav\">\n    <li class=\"nav-item {item.class}\" ui:for=\"item of data\">\n      <span>{item.name}</span>\n    </li>\n  </ul>\n</component>\n\n<component id=\"NavTree\">\n  <ul class=\"nav\">\n    <li class=\"nav-item {item.class}\" ui:for=\"item of data\">\n      <NavLink href=\"{item.id}\">\n        <span>{item.name}</span>\n        <span ui:if=\"{item.label}\" class=\"label label-error\">{item.label}</span>\n      </NavLink>\n      <NavTree ui:if=\"{item.subs}\" data=\"{item.subs}\" />\n    </li>\n  </ul>\n</component>\n\n<component id=\"MainPage\">\n  <Navbar caption=\"Info\" />\n  <!-- <Panel caption=\"Icons\">\n    <LoadingIndicator />\n    Using Font\n    <Icon type=\"cog\" />\n  </Panel>\n  <Panel caption=\"Buttons\">\n    <Button caption=\"Default\" trackId=\"action1\" />\n    <Button\n            icon=\"cog\"\n            caption=\"Large primary with icon\"\n            primary\n            large\n            class=\"m-2\" />\n    <Button icon=\"123\" caption=\"Link\" link />\n  </Panel>\n  <Panel caption=\"Panel\" hint=\"with hint\"> here... </Panel> -->\n\n  <button click=\"->\" data-clicked={clicked|inc}>Clicked {clicked|or:0}</button>\n\n</component>\n\n<component id=\"ArrowsPage\">\n  <Navbar caption=\"Arrows\" />\n  <Panel caption=\"Subscribe and Action\">\n    <Tabs value=\"<- store.tab\" items=\":top.sitemap\" action=\"-> store.select\" />\n    <Button\n            caption=\"<- store.tab|or:none|str.capitalize\"\n            data-id=\"other\"\n            action=\"-> store.select\" />\n  </Panel>\n</component>");
 
 /***/ }),
 
@@ -1141,7 +1636,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("<component id=\"UCell\">\n  <div class=\"column col-4 cell-box\">\n    <div class=\"ucell cell-{value}\" click=\"->ustore.stepcell\" \n         data-col={col} data-row={row}\n         data-subcol={subcol} data-subrow={subrow}\n         data-value={value}>         \n    </div>\n  </div>\n</component>\n\n<component id=\"USubBoard\">  \n  <div class=\"column col-4 subBoard subBoard-{available} subWin-{finished}\">  \n    <div class=\"hider\"></div>\n    <div class=\"columns\" ui:for=\"row of board\">      \n      <UCell ui:for=\"col of row.cols\" col={col.id} row={row.id} value={col.value} subcol={subcol} subrow={subrow} />      \n    </div>\n    \n  </div>\n</component>\n\n<component id=\"UBoard\">  \n  <h6>{:gameStates|gameState:@finished:@step} </h6>\n  <div class=\"container\">\n    <div class=\"columns\" ui:for=\"row of board\">\n      <USubBoard \n        ui:for=\"col of row.cols\" \n        board=\"{board|subBoard:@row.id:@col.id}\" \n        subcol={col.id}\n        subrow={row.id} \n        available={col.available}\n        finished={col.finished}\n        uvalue={col.value} />\n    </div>\n  </div>\n</component>\n\n<component id=\"UTicTacToe\">\n  <div class=\"container\">\n    <div class=\"columns\">\n      <div class=\"column col-9 board\">\n        <UBoard board=\"<- ustore.board\" step=\"<- ustore.step\" finished=\"<- ustore.finished\" />\n      </div>\n      <div class=\"column col-1\"></div>\n      <div class=\"column col-2\">\n        <button class=\"btn btn-error control\" click=\"->ustore.reset\">Reset</button>\n      </div>\n    </div>\n  </div>\n</component> \n\n<component id=\"UlttictactoePage\">\n  <h4>UltimateTicTacToe</h4>\n\n  <UTTT ui:ref=\"ustore\" />\n  <UTicTacToe />\n</component>");
+/* harmony default export */ __webpack_exports__["default"] = ("<component id=\"UCell\">\n  <div class=\"column col-4 cell-box\">\n    <div class=\"ucell cell-{value}\" click=\"->ustore.stepcell\" \n         data-col={col} data-row={row}\n         data-subcol={subcol} data-subrow={subrow}\n         data-value={value}>         \n    </div>\n  </div>\n</component>\n\n<component id=\"USubBoard\">  \n  <div class=\"column col-4 subBoard subBoard-{available} subWin-{finished}\">  \n    <div class=\"hider\"></div>\n    <div class=\"columns\" ui:for=\"row of board\">      \n      <UCell ui:for=\"col of row.cols\" col={col.id} row={row.id} value={col.value} subcol={subcol} subrow={subrow} />      \n    </div>\n    \n  </div>\n</component>\n\n<component id=\"UBoard\">  \n  <h6>{:gameStates|gameState:@finished:@step} </h6>\n  <div class=\"container\">\n    <div class=\"columns\" ui:for=\"row of board\">\n      <USubBoard \n        ui:for=\"col of row.cols\" \n        board=\"{board|subBoard:@row.id:@col.id}\" \n        subcol={col.id}\n        subrow={row.id} \n        available={col.available}\n        finished={col.finished}\n        uvalue={col.value} />\n    </div>\n  </div>\n</component>\n\n<component id=\"TTTPlayer\">\n  <div>\n    <h6>Select {name}</h6>  \n    <button class=\"btn control\" data-player={player} data-type=\"1\" selected=\"{select|log}}\" click=\"->ustore.togglePlayer\">Player</button>\n    <button class=\"btn control\" data-player={player} data-type=\"2\" selected=\"{select[1]}\" click=\"->ustore.toggleai\">AI</button>\n  </div>\n</component>\n\n<component id=\"UTicTacToe\">\n  <div class=\"container\">\n    <div class=\"columns\">\n      <div class=\"column col-8 board\">\n        <UBoard board=\"<- ustore.board\" step=\"<- ustore.step\" finished=\"<- ustore.finished\" />\n      </div>\n      <!-- <div class=\"column col-1\"></div> -->\n      <div class=\"column col-2\">\n        <h6>Options</h6>\n        <button class=\"btn btn-error control\" click=\"->ustore.reset\">Reset</button>\n        <button class=\"btn btn-error control\" click=\"->ustore.airequest\">AI move</button>\n        <!-- <TTTPlayer player=\"1\" name=\"Cross\" select=\"<- ustore.cross\" />\n        <TTTPlayer player=\"2\" name=\"Circle\" select=\"<- ustore.circle\" />               -->\n      </div>\n    </div>\n  </div>\n</component> \n\n\n<component id=\"UlttictactoePage\">\n  <h4>UltimateTicTacToe</h4>\n\n  <UTTT ui:ref=\"ustore\" />\n  <UTicTacToe />\n</component>");
 
 /***/ }),
 
@@ -1348,13 +1843,15 @@ function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "UTTT", function() { return UTTT; });
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+/* harmony import */ var _ai_uttt_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ai/uttt.js */ "./app/ai/uttt.js");
+/* harmony import */ var _ai_mcts_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ai/mcts.js */ "./app/ai/mcts.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -1362,187 +1859,83 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 /* eslint-disable space-before-function-paren */
-function reset() {
-  var size = [0, 1, 2];
-  return {
-    board: size.map(function (row) {
-      return {
-        id: row,
-        cols: size.map(function (col) {
-          return {
-            id: col,
-            board: size.map(function (row) {
-              return {
-                id: row,
-                cols: size.map(function (col) {
-                  return {
-                    id: col,
-                    value: 0
-                  };
-                })
-              };
-            }),
-            value: 0,
-            step: 0,
-            finished: false,
-            available: 1
-          };
-        })
-      };
-    }),
-    step: 0,
-    finished: false
-  };
-}
 
-function checkFinished(board, ultstep, step) {
-  if (step < 2 && step !== -1) {
-    return false;
-  }
-
-  var player = 1 + ultstep % 2;
-
-  var _loop = function _loop(row) {
-    if (board[row].cols.reduce(function (acc, cur) {
-      return acc && cur.value === player;
-    }, true)) {
-      return {
-        v: player
-      };
-    }
-
-    if (board.reduce(function (acc, cur) {
-      return acc && cur.cols[row].value === player;
-    }, true)) {
-      return {
-        v: player
-      };
-    }
-  };
-
-  for (var row = 0; row < 3; row++) {
-    var _ret = _loop(row);
-
-    if (_typeof(_ret) === "object") return _ret.v;
-  }
-
-  if (board.reduce(function (acc, cur, ind) {
-    return acc && cur.cols[ind].value === player;
-  }, true)) {
-    return player;
-  }
-
-  if (board.reduce(function (acc, cur, ind) {
-    return acc && cur.cols[2 - ind].value === player;
-  }, true)) {
-    return player;
-  }
-
-  if (step === 8) {
-    return 3;
-  } // ultimative case
-
-
-  if (step === -1) {
-    // const numAvailable = 0
-    for (var r = 0; r < 3; r++) {
-      for (var c = 0; c < 3; c++) {
-        if (board[r].cols[c].available !== false) {
-          return false;
-        }
-      }
-    }
-
-    return 3;
-  }
-
-  return false;
-}
 
 var UTTT =
 /*#__PURE__*/
-function () {
+function (_UTTTBoard) {
+  _inherits(UTTT, _UTTTBoard);
+
   function UTTT() {
     _classCallCheck(this, UTTT);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(UTTT).apply(this, arguments));
   }
 
   _createClass(UTTT, [{
     key: "init",
     value: function init() {
-      return reset();
+      return this.reset();
     }
   }, {
     key: "onStepcell",
-    value: function onStepcell(_ref, _ref2) {
-      var col = _ref.col,
-          row = _ref.row,
-          value = _ref.value,
-          subrow = _ref.subrow,
-          subcol = _ref.subcol;
-      var board = _ref2.board,
-          step = _ref2.step,
-          finished = _ref2.finished;
-      var subboard = board[subrow].cols[subcol]; // console.log(subboard)
-
-      if (!value && !finished && subboard.available === 1 && !subboard.value && !subboard.finished) {
-        subboard.board[row].cols[col].value = 1 + step % 2;
-        subboard.finished = checkFinished(subboard.board, step, subboard.step);
-        subboard.step = 1 + subboard.step;
-        board[subrow].cols[subcol] = subboard;
-
-        if (subboard.finished) {
-          subboard.value = subboard.finished % 3;
-          subboard.available = false;
-          board[subrow].cols[subcol] = subboard;
-          finished = checkFinished(board, step, -1);
+    value: function onStepcell(cell, game) {
+      if (this.toggledAI) {
+        if (this.toggledAI !== 1 + game.step % 2) {
+          var nextState = this.makeMove(cell, game);
+          return _objectSpread({}, nextState, {
+            '...': Promise.resolve(this.airequest(nextState))
+          });
         }
-
-        var avail = 1; // console.log(subrow)
-        // console.log(subcol)
-
-        if (board[row].cols[col].available !== false || finished) {
-          avail = 0;
-        }
-
-        for (var r = 0; r < 3; r++) {
-          for (var c = 0; c < 3; c++) {
-            if (board[r].cols[c].available !== false) {
-              board[r].cols[c].available = avail;
-            }
-          }
-        }
-
-        if (avail === 0 && !finished) {
-          board[row].cols[col].available = 1;
-        }
-
-        return {
-          board: _toConsumableArray(board),
-          step: step + 1,
-          finished: finished
-        };
       }
-    } // onStepSub({ col, row, value }, { board, step, finished }) {
-    //   if (!value && !finished) {
-    //     board[row].cols[col].value = 1 + step % 2
-    //     finished = checkFinished(board, step)
-    //     return { board: [...board], step: step + 1, finished: finished }
-    //   }
-    // }
 
+      return this.makeMove(cell, game);
+    }
+  }, {
+    key: "onAirequest",
+    value: function onAirequest() {
+      return this.airequest(this);
+    }
+  }, {
+    key: "onToggleai",
+    value: function onToggleai(_ref) {
+      var state = _ref.state;
+      this.toggledAI = state;
+
+      if (state === 1 + this.step % 2) {
+        return this.airequest(this);
+      }
+    }
   }, {
     key: "onReset",
-    value: function onReset(_, _ref3) {
-      var board = _ref3.board;
-      return reset();
+    value: function onReset(_, _ref2) {
+      var board = _ref2.board;
+      return this.reset();
+    }
+  }, {
+    key: "airequest",
+    value: function airequest(state) {
+      if (!this.montecarlo) {
+        this.montecarlo = new _ai_mcts_js__WEBPACK_IMPORTED_MODULE_1__["MonteCarloTreeSearch"]();
+      }
+
+      return this.montecarlo.findNextmove(this.makeCopy(), 1 + state.step % 2);
     }
   }]);
 
   return UTTT;
-}();
+}(_ai_uttt_js__WEBPACK_IMPORTED_MODULE_0__["UTTTBoard"]);
 ;
 
 /***/ }),
