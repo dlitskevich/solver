@@ -18,9 +18,7 @@ export class UTTTBoard {
         }))
       })),
       step: 0,
-      finished: false,
-      cross: [1, 0],
-      circle: [1, 0]
+      finished: false
     }
   }
 

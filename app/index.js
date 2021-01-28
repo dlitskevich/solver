@@ -6,13 +6,22 @@ import resources from './res'
 import { TTTStore } from './ttt_store.js'
 import { UTTT } from './uttt_store.js'
 import { pipes } from 'ultimus'
+import {
+  PlayerController0,
+  PlayerController1,
+  PlayerController2
+} from './ai/player.js'
 
 const types = [
   ...commons,
   templates,
   ...pages,
   TTTStore,
-  UTTT
+  UTTT,
+  PlayerController0,
+  PlayerController1,
+  PlayerController2
+
 ]
 
 launch({

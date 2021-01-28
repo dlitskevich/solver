@@ -10,6 +10,9 @@ export default {
   gameStates: {
     gameWinner: ['Red won', 'White won', 'Draw'],
     gameTurn: ['Red turn', 'White turn']
-  }
-
+  },
+  players: [
+    { id: 0, name: 'Person' },
+    { id: 1, name: 'MCTS' }
+  ]
 }

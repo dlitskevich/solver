@@ -155,8 +155,8 @@ function () {
 
       var winnerNode = rootNode.childs.reduce(function (acc, cur) {
         return cur.state.visits > acc.state.visits ? cur : acc;
-      });
-      console.log(rootNode); // tree.root = winnerNode
+      }); // console.log(rootNode)
+      // tree.root = winnerNode
 
       return winnerNode.state.board;
     }
@@ -349,6 +349,101 @@ function () {
 
 /***/ }),
 
+/***/ "./app/ai/player.js":
+/*!**************************!*\
+  !*** ./app/ai/player.js ***!
+  \**************************/
+/*! exports provided: PlayerController0, PlayerController1, PlayerController2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PlayerController0", function() { return PlayerController0; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PlayerController1", function() { return PlayerController1; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PlayerController2", function() { return PlayerController2; });
+/* harmony import */ var _mcts_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./mcts.js */ "./app/ai/mcts.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+var PlayerController0 =
+/*#__PURE__*/
+function () {
+  function PlayerController0() {
+    _classCallCheck(this, PlayerController0);
+  }
+
+  _createClass(PlayerController0, [{
+    key: "init",
+    value: function init() {}
+  }, {
+    key: "setState",
+    value: function setState(state) {// console.log('player')
+      // if (condition) {
+      //   this.handler({ row: 1, col: 2 })
+      // } else {
+      // }
+    }
+  }]);
+
+  return PlayerController0;
+}();
+var PlayerController1 =
+/*#__PURE__*/
+function () {
+  function PlayerController1() {
+    _classCallCheck(this, PlayerController1);
+  }
+
+  _createClass(PlayerController1, [{
+    key: "init",
+    value: function init() {
+      this.motecarlo = new _mcts_js__WEBPACK_IMPORTED_MODULE_0__["MonteCarloTreeSearch"]();
+    }
+  }, {
+    key: "setState",
+    value: function setState(state) {
+      var _this = this;
+
+      // console.log('MCTS', this.player, state.step)
+      if (this.player === 1 + state.step % 2) {
+        setTimeout(function () {
+          return _this.handler(state);
+        }, 1);
+      }
+    }
+  }]);
+
+  return PlayerController1;
+}();
+var PlayerController2 =
+/*#__PURE__*/
+function () {
+  function PlayerController2() {
+    _classCallCheck(this, PlayerController2);
+  }
+
+  _createClass(PlayerController2, [{
+    key: "init",
+    value: function init() {}
+  }, {
+    key: "setState",
+    value: function setState(state) {
+      console.log('fdsf'); // if (condition) {
+      //   this.handler({ row: 1, col: 2 })
+      // } else {
+      // }
+    }
+  }]);
+
+  return PlayerController2;
+}();
+
+/***/ }),
+
 /***/ "./app/ai/uttt.js":
 /*!************************!*\
   !*** ./app/ai/uttt.js ***!
@@ -410,9 +505,7 @@ function () {
           };
         }),
         step: 0,
-        finished: false,
-        cross: [1, 0],
-        circle: [1, 0]
+        finished: false
       };
     }
   }, {
@@ -1533,6 +1626,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _uttt_store_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./uttt_store.js */ "./app/uttt_store.js");
 /* harmony import */ var ultimus__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ultimus */ "./node_modules/ultimus/dist/main.js");
 /* harmony import */ var ultimus__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(ultimus__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var _ai_player_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./ai/player.js */ "./app/ai/player.js");
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
@@ -1555,7 +1649,8 @@ function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
 
 
-var types = [].concat(_toConsumableArray(_commons__WEBPACK_IMPORTED_MODULE_1__["default"]), [_app_html__WEBPACK_IMPORTED_MODULE_2__["default"]], _toConsumableArray(_pages__WEBPACK_IMPORTED_MODULE_3__["default"]), [_ttt_store_js__WEBPACK_IMPORTED_MODULE_5__["TTTStore"], _uttt_store_js__WEBPACK_IMPORTED_MODULE_6__["UTTT"]]);
+
+var types = [].concat(_toConsumableArray(_commons__WEBPACK_IMPORTED_MODULE_1__["default"]), [_app_html__WEBPACK_IMPORTED_MODULE_2__["default"]], _toConsumableArray(_pages__WEBPACK_IMPORTED_MODULE_3__["default"]), [_ttt_store_js__WEBPACK_IMPORTED_MODULE_5__["TTTStore"], _uttt_store_js__WEBPACK_IMPORTED_MODULE_6__["UTTT"], _ai_player_js__WEBPACK_IMPORTED_MODULE_8__["PlayerController0"], _ai_player_js__WEBPACK_IMPORTED_MODULE_8__["PlayerController1"], _ai_player_js__WEBPACK_IMPORTED_MODULE_8__["PlayerController2"]]);
 Object(arrmatura__WEBPACK_IMPORTED_MODULE_0__["launch"])({
   template: '<App />',
   types: types,
@@ -1636,7 +1731,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("<component id=\"UCell\">\n  <div class=\"column col-4 cell-box\">\n    <div class=\"ucell cell-{value}\" click=\"->ustore.stepcell\" \n         data-col={col} data-row={row}\n         data-subcol={subcol} data-subrow={subrow}\n         data-value={value}>         \n    </div>\n  </div>\n</component>\n\n<component id=\"USubBoard\">  \n  <div class=\"column col-4 subBoard subBoard-{available} subWin-{finished}\">  \n    <div class=\"hider\"></div>\n    <div class=\"columns\" ui:for=\"row of board\">      \n      <UCell ui:for=\"col of row.cols\" col={col.id} row={row.id} value={col.value} subcol={subcol} subrow={subrow} />      \n    </div>\n    \n  </div>\n</component>\n\n<component id=\"UBoard\">  \n  <h6>{:gameStates|gameState:@finished:@step} </h6>\n  <div class=\"container\">\n    <div class=\"columns\" ui:for=\"row of board\">\n      <USubBoard \n        ui:for=\"col of row.cols\" \n        board=\"{board|subBoard:@row.id:@col.id}\" \n        subcol={col.id}\n        subrow={row.id} \n        available={col.available}\n        finished={col.finished}\n        uvalue={col.value} />\n    </div>\n  </div>\n</component>\n\n<component id=\"TTTPlayer\">\n  <div>\n    <h6>Select {name}</h6>  \n    <button class=\"btn control\" data-player={player} data-type=\"1\" selected=\"{select|log}}\" click=\"->ustore.togglePlayer\">Player</button>\n    <button class=\"btn control\" data-player={player} data-type=\"2\" selected=\"{select[1]}\" click=\"->ustore.toggleai\">AI</button>\n  </div>\n</component>\n\n<component id=\"UTicTacToe\">\n  <div class=\"container\">\n    <div class=\"columns\">\n      <div class=\"column col-8 board\">\n        <UBoard board=\"<- ustore.board\" step=\"<- ustore.step\" finished=\"<- ustore.finished\" />\n      </div>\n      <!-- <div class=\"column col-1\"></div> -->\n      <div class=\"column col-2\">\n        <h6>Options</h6>\n        <button class=\"btn btn-error control\" click=\"->ustore.reset\">Reset</button>\n        <button class=\"btn btn-error control\" click=\"->ustore.airequest\">AI move</button>\n        <!-- <TTTPlayer player=\"1\" name=\"Cross\" select=\"<- ustore.cross\" />\n        <TTTPlayer player=\"2\" name=\"Circle\" select=\"<- ustore.circle\" />               -->\n      </div>\n    </div>\n  </div>\n</component> \n\n\n<component id=\"UlttictactoePage\">\n  <h4>UltimateTicTacToe</h4>\n\n  <UTTT ui:ref=\"ustore\" />\n  <UTicTacToe />\n</component>");
+/* harmony default export */ __webpack_exports__["default"] = ("<component id=\"UCell\">\n  <div class=\"column col-4 cell-box\">\n    <div class=\"ucell cell-{value}\" click=\"->ustore.stepcell\" \n         data-col={col} data-row={row}\n         data-subcol={subcol} data-subrow={subrow}\n         data-value={value}>         \n    </div>\n  </div>\n</component>\n\n<component id=\"USubBoard\">  \n  <div class=\"column col-4 subBoard subBoard-{available} subWin-{finished}\">  \n    <div class=\"hider\"></div>\n    <div class=\"columns\" ui:for=\"row of board\">      \n      <UCell ui:for=\"col of row.cols\" col={col.id} row={row.id} value={col.value} subcol={subcol} subrow={subrow} />      \n    </div>\n    \n  </div>\n</component>\n\n<component id=\"UBoard\">  \n  <h6>{:gameStates|gameState:@finished:@step} </h6>\n  <div class=\"container\">\n    <div class=\"columns\" ui:for=\"row of board\">\n      <USubBoard \n        ui:for=\"col of row.cols\" \n        board=\"{board|subBoard:@row.id:@col.id}\" \n        subcol={col.id}\n        subrow={row.id} \n        available={col.available}\n        finished={col.finished}\n        uvalue={col.value} />\n    </div>\n  </div>\n</component>\n <!-- state=\"<-ustore.state\" handler=\"->ustore.stepcell\" -->\n <component id=\"UTTTPlayer\">\n\n  <ui:tag tag=\"PlayerController{type}\" player={pplayer} state=\"<-ustore.state\" handler=\"->ustore.airequest\" />\n  <div>\n    <h6>Select {name}</h6>      \n    <button ui:for=\"pl of :players\"  class=\"btn control btn-{pl.id|equals:@type|then:primary}\" data-player={pplayer} data-type=\"{pl.id}\" click=\"-> ustore.switch\">{pl.name}</button>\n  </div>\n</component> \n\n<component id=\"UTicTacToe\">\n  <div class=\"container\">\n    <div class=\"columns\">\n      <div class=\"column col-8 board\">\n        <UBoard board=\"<- ustore.board\" step=\"<- ustore.step\" finished=\"<- ustore.finished\" />\n      </div>\n      <!-- <div class=\"column col-1\"></div> -->\n      <div class=\"column col-2\">\n        <h6>Options</h6>\n        <button class=\"btn btn-error control\" click=\"->ustore.reset\">Reset</button>\n        <button class=\"btn btn-error control\" click=\"->ustore.airequest\">AI move</button>\n        <UTTTPlayer pplayer=\"1\" name=\"Cross\" type=\"<- ustore.cross\" />\n        <UTTTPlayer pplayer=\"2\" name=\"Circle\" type=\"<- ustore.circle\" />               \n      </div>\n    </div>\n  </div>\n</component> \n\n\n<component id=\"UlttictactoePage\">\n  <h4>UltimateTicTacToe</h4>\n\n  <UTTT ui:ref=\"ustore\" />\n  <UTicTacToe />\n</component>");
 
 /***/ }),
 
@@ -1669,7 +1764,14 @@ __webpack_require__.r(__webpack_exports__);
   gameStates: {
     gameWinner: ['Red won', 'White won', 'Draw'],
     gameTurn: ['Red turn', 'White turn']
-  }
+  },
+  players: [{
+    id: 0,
+    name: 'Person'
+  }, {
+    id: 1,
+    name: 'MCTS'
+  }]
 });
 
 /***/ }),
@@ -1886,7 +1988,15 @@ function (_UTTTBoard) {
   _createClass(UTTT, [{
     key: "init",
     value: function init() {
-      return this.reset();
+      return _objectSpread({}, this.reset(), {
+        cross: 0,
+        circle: 1
+      });
+    }
+  }, {
+    key: "getState",
+    value: function getState() {
+      return _objectSpread({}, this);
     }
   }, {
     key: "onStepcell",
@@ -1903,14 +2013,30 @@ function (_UTTTBoard) {
       return this.makeMove(cell, game);
     }
   }, {
+    key: "onSwitch",
+    value: function onSwitch(_ref) {
+      var player = _ref.player,
+          type = _ref.type;
+
+      if (player === 1) {
+        return _objectSpread({}, this, {
+          cross: type
+        });
+      } else {
+        return _objectSpread({}, this, {
+          circle: type
+        });
+      }
+    }
+  }, {
     key: "onAirequest",
     value: function onAirequest() {
       return this.airequest(this);
     }
   }, {
     key: "onToggleai",
-    value: function onToggleai(_ref) {
-      var state = _ref.state;
+    value: function onToggleai(_ref2) {
+      var state = _ref2.state;
       this.toggledAI = state;
 
       if (state === 1 + this.step % 2) {
@@ -1919,9 +2045,12 @@ function (_UTTTBoard) {
     }
   }, {
     key: "onReset",
-    value: function onReset(_, _ref2) {
-      var board = _ref2.board;
-      return this.reset();
+    value: function onReset(_, _ref3) {
+      var board = _ref3.board;
+      return _objectSpread({}, this.reset(), {
+        cross: 0,
+        circle: 1
+      });
     }
   }, {
     key: "airequest",

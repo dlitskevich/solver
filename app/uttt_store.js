@@ -4,7 +4,15 @@ import { MonteCarloTreeSearch } from './ai/mcts.js'
 
 export class UTTT extends UTTTBoard {
   init() {
-    return this.reset()
+    return {
+      ...this.reset(),
+      cross: 0,
+      circle: 1
+    }
+  }
+
+  getState() {
+    return { ...this }
   }
 
   onStepcell(cell, game) {
@@ -15,6 +23,20 @@ export class UTTT extends UTTTBoard {
       }
     }
     return this.makeMove(cell, game)
+  }
+
+  onSwitch({ player, type }) {
+    if (player === 1) {
+      return {
+        ...this,
+        cross: type
+      }
+    } else {
+      return {
+        ...this,
+        circle: type
+      }
+    }
   }
 
   onAirequest() {
@@ -29,7 +51,11 @@ export class UTTT extends UTTTBoard {
   }
 
   onReset(_, { board }) {
-    return this.reset()
+    return {
+      ...this.reset(),
+      cross: 0,
+      circle: 1
+    }
   }
 
   airequest (state) {

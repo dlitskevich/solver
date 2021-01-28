@@ -33,14 +33,15 @@
     </div>
   </div>
 </component>
+ <!-- state="<-ustore.state" handler="->ustore.stepcell" -->
+ <component id="UTTTPlayer">
 
-<component id="TTTPlayer">
+  <ui:tag tag="PlayerController{type}" player={pplayer} state="<-ustore.state" handler="->ustore.airequest" />
   <div>
-    <h6>Select {name}</h6>  
-    <button class="btn control" data-player={player} data-type="1" selected="{select|log}}" click="->ustore.togglePlayer">Player</button>
-    <button class="btn control" data-player={player} data-type="2" selected="{select[1]}" click="->ustore.toggleai">AI</button>
+    <h6>Select {name}</h6>      
+    <button ui:for="pl of :players"  class="btn control btn-{pl.id|equals:@type|then:primary}" data-player={pplayer} data-type="{pl.id}" click="-> ustore.switch">{pl.name}</button>
   </div>
-</component>
+</component> 
 
 <component id="UTicTacToe">
   <div class="container">
@@ -53,8 +54,8 @@
         <h6>Options</h6>
         <button class="btn btn-error control" click="->ustore.reset">Reset</button>
         <button class="btn btn-error control" click="->ustore.airequest">AI move</button>
-        <!-- <TTTPlayer player="1" name="Cross" select="<- ustore.cross" />
-        <TTTPlayer player="2" name="Circle" select="<- ustore.circle" />               -->
+        <UTTTPlayer pplayer="1" name="Cross" type="<- ustore.cross" />
+        <UTTTPlayer pplayer="2" name="Circle" type="<- ustore.circle" />               
       </div>
     </div>
   </div>

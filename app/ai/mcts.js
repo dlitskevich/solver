@@ -27,7 +27,7 @@ export class MonteCarloTreeSearch {
     }
 
     const winnerNode = rootNode.childs.reduce((acc, cur) => cur.state.visits > acc.state.visits ? cur : acc)
-    console.log(rootNode)
+    // console.log(rootNode)
     // tree.root = winnerNode
     return winnerNode.state.board
   }
