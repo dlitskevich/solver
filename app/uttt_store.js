@@ -6,8 +6,8 @@ export class UTTT extends UTTTBoard {
   init() {
     return {
       ...this.reset(),
-      cross: 0,
-      circle: 1
+      cross: 'Person',
+      circle: 'MCTS'
     }
   }
 
@@ -15,11 +15,15 @@ export class UTTT extends UTTTBoard {
     return { ...this }
   }
 
+  getRef() {
+    return this
+  }
+
   onStepcell(cell, game) {
     if (this.toggledAI) {
       if (this.toggledAI !== 1 + game.step % 2) {
         const nextState = this.makeMove(cell, game)
-        return { ...nextState, '...': Promise.resolve(this.airequest(nextState)) }
+        return { ...nextState, '...': Promise.resolve(this.mctsrequest(nextState)) }
       }
     }
     return this.makeMove(cell, game)
@@ -39,29 +43,41 @@ export class UTTT extends UTTTBoard {
     }
   }
 
-  onAirequest() {
-    return this.airequest(this)
+  onMctsrequest() {
+    return this.mctsrequest(this)
   }
 
   onToggleai({ state }) {
     this.toggledAI = state
     if (state === 1 + this.step % 2) {
-      return this.airequest(this)
+      return this.mctsrequest(this)
     }
   }
 
   onReset(_, { board }) {
     return {
       ...this.reset(),
-      cross: 0,
-      circle: 1
+      cross: 'Person',
+      circle: 'MCTS'
     }
   }
 
-  airequest (state) {
+  onMakeMoveOutside (cell) {
+    return this.makeMove(cell, this)
+  }
+
+  mctsrequest (state) {
     if (!this.montecarlo) {
       this.montecarlo = new MonteCarloTreeSearch()
     }
+    console.log(this.makeCopy())
+    if (!this.finished) {
+      return this.montecarlo.findNextmove(this.makeCopy(), 1 + state.step % 2)
+    }
+  }
+
+  randomrequest (state) {
+    this.getAvailableMoves()
     return this.montecarlo.findNextmove(this.makeCopy(), 1 + state.step % 2)
   }
 };

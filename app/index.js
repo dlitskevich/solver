@@ -7,9 +7,9 @@ import { TTTStore } from './ttt_store.js'
 import { UTTT } from './uttt_store.js'
 import { pipes } from 'ultimus'
 import {
-  PlayerController0,
-  PlayerController1,
-  PlayerController2
+  PlayerControllerPlayer,
+  PlayerControllerMCTS,
+  PlayerControllerRandom
 } from './ai/player.js'
 
 const types = [
@@ -18,9 +18,9 @@ const types = [
   ...pages,
   TTTStore,
   UTTT,
-  PlayerController0,
-  PlayerController1,
-  PlayerController2
+  PlayerControllerPlayer,
+  PlayerControllerMCTS,
+  PlayerControllerRandom
 
 ]
 

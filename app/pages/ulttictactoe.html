@@ -36,10 +36,10 @@
  <!-- state="<-ustore.state" handler="->ustore.stepcell" -->
  <component id="UTTTPlayer">
 
-  <ui:tag tag="PlayerController{type}" player={pplayer} state="<-ustore.state" handler="->ustore.airequest" />
+  <ui:tag tag="PlayerController{type}" player={pplayer} type={type} state="<-ustore.state|log" handler="->ustore.makeMoveOutside" />
   <div>
     <h6>Select {name}</h6>      
-    <button ui:for="pl of :players"  class="btn control btn-{pl.id|equals:@type|then:primary}" data-player={pplayer} data-type="{pl.id}" click="-> ustore.switch">{pl.name}</button>
+    <button ui:for="pl of :players"  class="btn control btn-{pl.name|equals:@type|then:primary}" data-player={pplayer} data-type="{pl.name}" click="-> ustore.switch">{pl.name}</button>
   </div>
 </component> 
 
@@ -53,7 +53,7 @@
       <div class="column col-2">
         <h6>Options</h6>
         <button class="btn btn-error control" click="->ustore.reset">Reset</button>
-        <button class="btn btn-error control" click="->ustore.airequest">AI move</button>
+        <button class="btn btn-error control" click="->ustore.mctsrequest">AI move</button>
         <UTTTPlayer pplayer="1" name="Cross" type="<- ustore.cross" />
         <UTTTPlayer pplayer="2" name="Circle" type="<- ustore.circle" />               
       </div>

@@ -3,6 +3,15 @@ export class UTTTBoard {
     return this.reset()
   }
 
+  copyFrom (copy = null) {
+    if (copy) {
+      this.board = copy.board
+      this.step = copy.step
+      this.finished = copy.finished
+    }
+    return { ...this }
+  }
+
   reset () {
     const size = [0, 1, 2]
     return {
@@ -57,6 +66,7 @@ export class UTTTBoard {
     }
   }
 
+  // works correctly
   performMove (cell, player) {
     const nextBoard = this.makeMove(cell, this)
     this.step = nextBoard.step

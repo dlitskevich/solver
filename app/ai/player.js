@@ -1,6 +1,18 @@
 import { MonteCarloTreeSearch } from './mcts.js'
+import { UTTTBoard } from './uttt.js'
 
-export class PlayerController0 {
+// export class PlayerController {
+//   init () {
+//   }
+
+//   setState (state) {
+//     if (this.player === 1 + state.step % 2) {
+//       setTimeout(() => this.handler(state, this.type), 1)
+//     }
+//   }
+// }
+
+export class PlayerControllerPlayer {
   init () {
   }
 
@@ -13,19 +25,35 @@ export class PlayerController0 {
     // }
   }
 }
-export class PlayerController1 {
+// MCTS player
+export class PlayerControllerMCTS {
   init () {
-    this.motecarlo = new MonteCarloTreeSearch()
+    this.montecarlo = new MonteCarloTreeSearch()
+    this.movesScores = null
+  }
+
+  getBestMove (state) {
+    console.log(1, state)
+    const board = new UTTTBoard()
+    board.copyFrom(state)
+    console.log(2, board)
+    this.movesScores = MonteCarloTreeSearch.prototype.getMovesScores(board, 1 + state.step % 2)
+    const bestMove = this.movesScores.reduce((acc, cur) => cur.visits > acc.visits ? cur : acc)
+    return bestMove.move
   }
 
   setState (state) {
-    // console.log('MCTS', this.player, state.step)
+    console.log('MCTS', this.player, this)
     if (this.player === 1 + state.step % 2) {
-      setTimeout(() => this.handler(state), 1)
+      setTimeout(() => {
+        const bestMove = this.getBestMove(state)
+        this.handler(bestMove)
+      }, 1)
     }
   }
 }
-export class PlayerController2 {
+// Random player
+export class PlayerControllerRandom {
   init () {
   }
 

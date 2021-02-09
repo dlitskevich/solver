@@ -1,3 +1,4 @@
+
 export class MonteCarloTreeSearch {
   init () {
     return {
@@ -5,6 +6,7 @@ export class MonteCarloTreeSearch {
     }
   }
 
+  // TODO: remove
   findNextmove (board, player) {
     const opponent = 3 - player
     const tree = new Tree()
@@ -12,8 +14,9 @@ export class MonteCarloTreeSearch {
     rootNode.state.board = board
     rootNode.state.player = opponent
 
-    const startTime = Date.now()
-    while ((Date.now() - startTime) < 1000) {
+    // const startTime = Date.now()
+    // while ((Date.now() - startTime) < 1000) {
+    for (let index = 0; index < 100; index++) {
       const promisingNode = this.selectPromisingNode(rootNode)
       if (promisingNode.state.board.checkWinner() === false) {
         this.expandNode(promisingNode)
@@ -29,7 +32,37 @@ export class MonteCarloTreeSearch {
     const winnerNode = rootNode.childs.reduce((acc, cur) => cur.state.visits > acc.state.visits ? cur : acc)
     // console.log(rootNode)
     // tree.root = winnerNode
+    console.log(winnerNode)
     return winnerNode.state.board
+  }
+
+  getMovesScores (board, player) {
+    const opponent = 3 - player
+    const tree = new Tree()
+    const rootNode = tree.root
+    rootNode.state.board = board
+    rootNode.state.player = opponent
+
+    // const startTime = Date.now()
+    // while ((Date.now() - startTime) < 1000) {
+    for (let index = 0; index < 100; index++) {
+      const promisingNode = this.selectPromisingNode(rootNode)
+      if (promisingNode.state.board.checkWinner() === false) {
+        this.expandNode(promisingNode)
+      }
+      let nodeToExplore = promisingNode
+      if (promisingNode.childs.length > 0) {
+        nodeToExplore = promisingNode.randomChild()
+      }
+      const playoutResult = this.simulateRandomPlayout(nodeToExplore, opponent)
+      this.backPropogation(nodeToExplore, playoutResult)
+    }
+    const movesScores = rootNode.childs.map((child) => { return { visits: child.state.visits, move: child.state.move } })
+    // console.log(rootNode)
+    // tree.root = winnerNode
+    console.log(movesScores)
+
+    return movesScores
   }
 
   selectPromisingNode (rootNode) {
@@ -59,9 +92,9 @@ export class MonteCarloTreeSearch {
     //   console.log(tempNode)
     // }
     if (winner === opponent) {
-      console.log(123, JSON.parse(JSON.stringify(nodeToExplore.state)))
-      console.log(123, JSON.parse(JSON.stringify(nodeToExplore.parent.state)))
-      console.log(JSON.parse(JSON.stringify(tempNode.state)))
+      // console.log(123, JSON.parse(JSON.stringify(nodeToExplore.state)))
+      // console.log(123, JSON.parse(JSON.stringify(nodeToExplore.parent.state)))
+      // console.log(JSON.parse(JSON.stringify(tempNode.state)))
 
       tempNode.parent.state.score = Number.MIN_SAFE_INTEGER
       return winner
@@ -110,19 +143,13 @@ class Tree {
 }
 
 class Node {
-  constructor (state = new State(), parent = null, childs = []) {
-    if (arguments.length === 1) {
+  constructor (state = null, parent = null, childs = []) {
+    this.parent = parent
+    this.childs = childs
+    if (state !== null) {
       this.state = new State(state)
-      this.parent = parent
-      this.childs = childs
-    } else if (arguments.length === 2) {
-      this.state = new State(state)
-      this.parent = parent
-      this.childs = childs
     } else {
-      this.state = state
-      this.parent = parent
-      this.childs = childs
+      this.state = new State()
     }
   }
 
@@ -138,11 +165,13 @@ class State {
       this.score = state.score
       this.board = state.board.makeCopy()
       this.player = state.player
+      this.move = state.move
     } else {
       this.visits = 0
       this.score = 10
       this.board = null
       this.player = null
+      this.move = null
     }
   }
 
@@ -160,6 +189,7 @@ class State {
     const availableMoves = this.board.getAvailableMoves()
     return availableMoves.map((move) => {
       const newState = new State()
+      newState.move = move
       newState.board = this.board.makeCopy()
       newState.player = 3 - this.player
       newState.board.performMove(move, newState.player)
