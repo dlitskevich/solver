@@ -125,7 +125,8 @@ function () {
       return {
         scoreForWin: 10
       };
-    }
+    } // TODO: remove
+
   }, {
     key: "findNextmove",
     value: function findNextmove(board, player) {
@@ -133,10 +134,10 @@ function () {
       var tree = new Tree();
       var rootNode = tree.root;
       rootNode.state.board = board;
-      rootNode.state.player = opponent;
-      var startTime = Date.now();
+      rootNode.state.player = opponent; // const startTime = Date.now()
+      // while ((Date.now() - startTime) < 1000) {
 
-      while (Date.now() - startTime < 1000) {
+      for (var index = 0; index < 100; index++) {
         var promisingNode = this.selectPromisingNode(rootNode);
 
         if (promisingNode.state.board.checkWinner() === false) {
@@ -158,7 +159,46 @@ function () {
       }); // console.log(rootNode)
       // tree.root = winnerNode
 
+      console.log(winnerNode);
       return winnerNode.state.board;
+    }
+  }, {
+    key: "getMovesScores",
+    value: function getMovesScores(board, player) {
+      var opponent = 3 - player;
+      var tree = new Tree();
+      var rootNode = tree.root;
+      rootNode.state.board = board;
+      rootNode.state.player = opponent; // const startTime = Date.now()
+      // while ((Date.now() - startTime) < 1000) {
+
+      for (var index = 0; index < 100; index++) {
+        var promisingNode = this.selectPromisingNode(rootNode);
+
+        if (promisingNode.state.board.checkWinner() === false) {
+          this.expandNode(promisingNode);
+        }
+
+        var nodeToExplore = promisingNode;
+
+        if (promisingNode.childs.length > 0) {
+          nodeToExplore = promisingNode.randomChild();
+        }
+
+        var playoutResult = this.simulateRandomPlayout(nodeToExplore, opponent);
+        this.backPropogation(nodeToExplore, playoutResult);
+      }
+
+      var movesScores = rootNode.childs.map(function (child) {
+        return {
+          visits: child.state.visits,
+          move: child.state.move
+        };
+      }); // console.log(rootNode)
+      // tree.root = winnerNode
+
+      console.log(movesScores);
+      return movesScores;
     }
   }, {
     key: "selectPromisingNode",
@@ -193,9 +233,9 @@ function () {
       // }
 
       if (winner === opponent) {
-        console.log(123, JSON.parse(JSON.stringify(nodeToExplore.state)));
-        console.log(123, JSON.parse(JSON.stringify(nodeToExplore.parent.state)));
-        console.log(JSON.parse(JSON.stringify(tempNode.state)));
+        // console.log(123, JSON.parse(JSON.stringify(nodeToExplore.state)))
+        // console.log(123, JSON.parse(JSON.stringify(nodeToExplore.parent.state)))
+        // console.log(JSON.parse(JSON.stringify(tempNode.state)))
         tempNode.parent.state.score = Number.MIN_SAFE_INTEGER;
         return winner;
       }
@@ -259,24 +299,19 @@ var Node =
 /*#__PURE__*/
 function () {
   function Node() {
-    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new State();
+    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
     var parent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
     var childs = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
 
     _classCallCheck(this, Node);
 
-    if (arguments.length === 1) {
+    this.parent = parent;
+    this.childs = childs;
+
+    if (state !== null) {
       this.state = new State(state);
-      this.parent = parent;
-      this.childs = childs;
-    } else if (arguments.length === 2) {
-      this.state = new State(state);
-      this.parent = parent;
-      this.childs = childs;
     } else {
-      this.state = state;
-      this.parent = parent;
-      this.childs = childs;
+      this.state = new State();
     }
   }
 
@@ -301,11 +336,13 @@ function () {
       this.score = state.score;
       this.board = state.board.makeCopy();
       this.player = state.player;
+      this.move = state.move;
     } else {
       this.visits = 0;
       this.score = 10;
       this.board = null;
       this.player = null;
+      this.move = null;
     }
   }
 
@@ -329,6 +366,7 @@ function () {
       var availableMoves = this.board.getAvailableMoves();
       return availableMoves.map(function (move) {
         var newState = new State();
+        newState.move = move;
         newState.board = _this.board.makeCopy();
         newState.player = 3 - _this.player;
         newState.board.performMove(move, newState.player);
@@ -353,15 +391,16 @@ function () {
 /*!**************************!*\
   !*** ./app/ai/player.js ***!
   \**************************/
-/*! exports provided: PlayerController0, PlayerController1, PlayerController2 */
+/*! exports provided: PlayerControllerPlayer, PlayerControllerMCTS, PlayerControllerRandom */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PlayerController0", function() { return PlayerController0; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PlayerController1", function() { return PlayerController1; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PlayerController2", function() { return PlayerController2; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PlayerControllerPlayer", function() { return PlayerControllerPlayer; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PlayerControllerMCTS", function() { return PlayerControllerMCTS; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PlayerControllerRandom", function() { return PlayerControllerRandom; });
 /* harmony import */ var _mcts_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./mcts.js */ "./app/ai/mcts.js");
+/* harmony import */ var _uttt_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./uttt.js */ "./app/ai/uttt.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -369,14 +408,25 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 
-var PlayerController0 =
+ // export class PlayerController {
+//   init () {
+//   }
+//   setState (state) {
+//     if (this.player === 1 + state.step % 2) {
+//       setTimeout(() => this.handler(state, this.type), 1)
+//     }
+//   }
+// }
+//
+
+var PlayerControllerPlayer =
 /*#__PURE__*/
 function () {
-  function PlayerController0() {
-    _classCallCheck(this, PlayerController0);
+  function PlayerControllerPlayer() {
+    _classCallCheck(this, PlayerControllerPlayer);
   }
 
-  _createClass(PlayerController0, [{
+  _createClass(PlayerControllerPlayer, [{
     key: "init",
     value: function init() {}
   }, {
@@ -389,44 +439,63 @@ function () {
     }
   }]);
 
-  return PlayerController0;
-}();
-var PlayerController1 =
+  return PlayerControllerPlayer;
+}(); // MCTS player for UTTT
+
+var PlayerControllerMCTS =
 /*#__PURE__*/
 function () {
-  function PlayerController1() {
-    _classCallCheck(this, PlayerController1);
+  function PlayerControllerMCTS() {
+    _classCallCheck(this, PlayerControllerMCTS);
   }
 
-  _createClass(PlayerController1, [{
+  _createClass(PlayerControllerMCTS, [{
     key: "init",
     value: function init() {
-      this.motecarlo = new _mcts_js__WEBPACK_IMPORTED_MODULE_0__["MonteCarloTreeSearch"]();
+      this.montecarlo = new _mcts_js__WEBPACK_IMPORTED_MODULE_0__["MonteCarloTreeSearch"]();
+      this.movesScores = null;
+    }
+  }, {
+    key: "getBestMove",
+    value: function getBestMove(state) {
+      console.log(1, state);
+      var board = new _uttt_js__WEBPACK_IMPORTED_MODULE_1__["UTTTBoard"]();
+      board.copyFrom(state);
+      console.log(2, board);
+      this.movesScores = _mcts_js__WEBPACK_IMPORTED_MODULE_0__["MonteCarloTreeSearch"].prototype.getMovesScores(board, 1 + state.step % 2);
+      var bestMove = this.movesScores.reduce(function (acc, cur) {
+        return cur.visits > acc.visits ? cur : acc;
+      });
+      return bestMove.move;
     }
   }, {
     key: "setState",
     value: function setState(state) {
       var _this = this;
 
-      // console.log('MCTS', this.player, state.step)
+      console.log('MCTS', this.player, this);
+
       if (this.player === 1 + state.step % 2) {
         setTimeout(function () {
-          return _this.handler(state);
+          var bestMove = _this.getBestMove(state);
+
+          _this.handler(bestMove);
         }, 1);
       }
     }
   }]);
 
-  return PlayerController1;
-}();
-var PlayerController2 =
+  return PlayerControllerMCTS;
+}(); // Random player
+
+var PlayerControllerRandom =
 /*#__PURE__*/
 function () {
-  function PlayerController2() {
-    _classCallCheck(this, PlayerController2);
+  function PlayerControllerRandom() {
+    _classCallCheck(this, PlayerControllerRandom);
   }
 
-  _createClass(PlayerController2, [{
+  _createClass(PlayerControllerRandom, [{
     key: "init",
     value: function init() {}
   }, {
@@ -439,7 +508,7 @@ function () {
     }
   }]);
 
-  return PlayerController2;
+  return PlayerControllerRandom;
 }();
 
 /***/ }),
@@ -455,6 +524,12 @@ function () {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "UTTTBoard", function() { return UTTTBoard; });
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -473,6 +548,19 @@ function () {
     key: "init",
     value: function init() {
       return this.reset();
+    }
+  }, {
+    key: "copyFrom",
+    value: function copyFrom() {
+      var copy = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+      if (copy) {
+        this.board = copy.board;
+        this.step = copy.step;
+        this.finished = copy.finished;
+      }
+
+      return _objectSpread({}, this);
     }
   }, {
     key: "reset",
@@ -519,6 +607,7 @@ function () {
       var board = _ref2.board,
           step = _ref2.step,
           finished = _ref2.finished;
+      // const { board, step, finished } = this
       var subboard = board[subrow].cols[subcol]; // console.log(subboard)
 
       if (!value && !finished && subboard.available === 1 && !subboard.value && !subboard.finished) {
@@ -559,7 +648,8 @@ function () {
           finished: finished
         };
       }
-    }
+    } // works correctly
+
   }, {
     key: "performMove",
     value: function performMove(cell, player) {
@@ -1607,6 +1697,667 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./app/games/mcts.js":
+/*!***************************!*\
+  !*** ./app/games/mcts.js ***!
+  \***************************/
+/*! exports provided: MonteCarloTreeSearch */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MonteCarloTreeSearch", function() { return MonteCarloTreeSearch; });
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var MonteCarloTreeSearch =
+/*#__PURE__*/
+function () {
+  function MonteCarloTreeSearch() {
+    _classCallCheck(this, MonteCarloTreeSearch);
+  }
+
+  _createClass(MonteCarloTreeSearch, [{
+    key: "init",
+    value: function init() {
+      return {
+        scoreForWin: 10
+      };
+    } // TODO: remove
+
+  }, {
+    key: "findNextmove",
+    value: function findNextmove(game, player) {
+      var opponent = 3 - player;
+      var tree = new Tree();
+      var rootNode = tree.root;
+      rootNode.state.game = game;
+      rootNode.state.player = opponent; // const startTime = Date.now()
+      // while ((Date.now() - startTime) < 1000) {
+
+      for (var index = 0; index < 100; index++) {
+        var promisingNode = this.selectPromisingNode(rootNode);
+
+        if (promisingNode.state.game.finished === false) {
+          this.expandNode(promisingNode);
+        }
+
+        var nodeToExplore = promisingNode;
+
+        if (promisingNode.childs.length > 0) {
+          nodeToExplore = promisingNode.randomChild();
+        }
+
+        var playoutResult = this.simulateRandomPlayout(nodeToExplore, opponent);
+        this.backPropogation(nodeToExplore, playoutResult);
+      }
+
+      var winnerNode = rootNode.childs.reduce(function (acc, cur) {
+        return cur.state.visits > acc.state.visits ? cur : acc;
+      }); // console.log(rootNode)
+      // tree.root = winnerNode
+
+      console.log(winnerNode);
+      return winnerNode.state.game;
+    }
+  }, {
+    key: "getMovesScores",
+    value: function getMovesScores(game, player) {
+      var opponent = 3 - player;
+      var tree = new Tree();
+      var rootNode = tree.root;
+      rootNode.state.game = game;
+      rootNode.state.player = opponent; // const startTime = Date.now()
+      // while ((Date.now() - startTime) < 1000) {
+
+      for (var index = 0; index < 100; index++) {
+        var promisingNode = this.selectPromisingNode(rootNode);
+
+        if (promisingNode.state.game.finished === false) {
+          this.expandNode(promisingNode);
+        }
+
+        var nodeToExplore = promisingNode;
+
+        if (promisingNode.childs.length > 0) {
+          nodeToExplore = promisingNode.randomChild();
+        }
+
+        var playoutResult = this.simulateRandomPlayout(nodeToExplore, opponent);
+        this.backPropogation(nodeToExplore, playoutResult);
+      }
+
+      var movesScores = rootNode.childs.map(function (child) {
+        return {
+          visits: child.state.visits,
+          move: child.state.move
+        };
+      }); // console.log(rootNode)
+      // tree.root = winnerNode
+
+      console.log(movesScores);
+      return movesScores;
+    }
+  }, {
+    key: "selectPromisingNode",
+    value: function selectPromisingNode(rootNode) {
+      var node = rootNode;
+
+      while (node.childs.length !== 0) {
+        node = UCT.findBestChild(node);
+      }
+
+      return node;
+    }
+  }, {
+    key: "expandNode",
+    value: function expandNode(node) {
+      var possibleStates = node.state.getPossibleStates();
+      possibleStates.forEach(function (state) {
+        var newNode = new Node(state, node);
+        newNode.state.player = 3 - node.state.player;
+        node.childs.push(newNode);
+      });
+    }
+  }, {
+    key: "simulateRandomPlayout",
+    value: function simulateRandomPlayout(nodeToExplore, opponent) {
+      var tempNode = new Node(nodeToExplore.state, nodeToExplore.parent);
+      var tempState = tempNode.state;
+      var winner = tempState.game.finished; // if (winner) {
+      //   console.log(winner, opponent)
+      //   console.log(tempState)
+      //   console.log(tempNode)
+      // }
+
+      if (winner === opponent) {
+        // console.log(123, JSON.parse(JSON.stringify(nodeToExplore.state)))
+        // console.log(123, JSON.parse(JSON.stringify(nodeToExplore.parent.state)))
+        // console.log(JSON.parse(JSON.stringify(tempNode.state)))
+        tempNode.parent.state.score = Number.MIN_SAFE_INTEGER;
+        return winner;
+      }
+
+      tempNode.parent = null;
+
+      while (winner === false) {
+        tempState.togglePlayer();
+        tempState.randomMove();
+        winner = tempState.game.finished;
+      }
+
+      return winner;
+    }
+  }, {
+    key: "backPropogation",
+    value: function backPropogation(nodeToExplore, winner) {
+      var tempNode = nodeToExplore;
+
+      while (tempNode !== null) {
+        tempNode.state.visits++;
+
+        if (tempNode.state.player === winner) {
+          tempNode.state.addScore(1);
+        }
+
+        tempNode = tempNode.parent;
+      }
+    }
+  }]);
+
+  return MonteCarloTreeSearch;
+}();
+var UCT = {
+  uctValue: function uctValue(totalVisit, nodeWinScore, nodeVisit) {
+    if (nodeVisit === 0) {
+      return Number.MAX_SAFE_INTEGER;
+    }
+
+    return nodeWinScore / nodeVisit + 1.41 * Math.sqrt(Math.log(totalVisit) / nodeVisit);
+  },
+  findBestChild: function findBestChild(node) {
+    var parentVisits = node.state.visits;
+    var values = node.childs.map(function (child) {
+      return UCT.uctValue(parentVisits, child.state.score, child.state.visits);
+    });
+    var id = values.reduce(function (iMax, cur, i, arr) {
+      return cur > arr[iMax] ? i : iMax;
+    }, 0);
+    return node.childs[id];
+  }
+};
+
+var Tree = function Tree(root) {
+  _classCallCheck(this, Tree);
+
+  this.root = new Node();
+};
+
+var Node =
+/*#__PURE__*/
+function () {
+  function Node() {
+    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+    var parent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+    var childs = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+
+    _classCallCheck(this, Node);
+
+    this.parent = parent;
+    this.childs = childs;
+
+    if (state !== null) {
+      this.state = new State(state);
+    } else {
+      this.state = new State();
+    }
+  }
+
+  _createClass(Node, [{
+    key: "randomChild",
+    value: function randomChild() {
+      return this.childs[Math.floor(Math.random() * this.childs.length)];
+    }
+  }]);
+
+  return Node;
+}();
+
+var State =
+/*#__PURE__*/
+function () {
+  function State(state) {
+    _classCallCheck(this, State);
+
+    if (arguments.length === 1) {
+      this.visits = state.visits;
+      this.score = state.score;
+      this.game = state.game.copy(_objectSpread({}, state.game));
+      this.player = state.player;
+      this.move = state.move;
+    } else {
+      this.visits = 0;
+      this.score = 10;
+      this.game = null;
+      this.player = null;
+      this.move = null;
+    }
+  }
+
+  _createClass(State, [{
+    key: "togglePlayer",
+    value: function togglePlayer() {
+      this.player = 3 - this.player;
+    }
+  }, {
+    key: "addScore",
+    value: function addScore(score) {
+      if (this.score !== Number.MIN_SAFE_INTEGER) {
+        this.score += score;
+      }
+    }
+  }, {
+    key: "getPossibleStates",
+    value: function getPossibleStates() {
+      var _this = this;
+
+      var availableMoves = this.game.getAvailableMoves();
+      return availableMoves.map(function (move) {
+        var newState = new State();
+        newState.move = move;
+        newState.game = _this.game.makeMove(move); // newState.game = this.game.copy()
+
+        newState.player = 3 - _this.player; // newState.game.performMove(move, newState.player)
+
+        return newState;
+      });
+    }
+  }, {
+    key: "randomMove",
+    value: function randomMove() {
+      var availableMoves = this.game.getAvailableMoves();
+      var randId = Math.floor(Math.random() * availableMoves.length);
+      this.game = this.game.makeMove(availableMoves[randId]); // this.game.performMove(availableMoves[randId], this.player)
+    }
+  }]);
+
+  return State;
+}();
+
+/***/ }),
+
+/***/ "./app/games/player.js":
+/*!*****************************!*\
+  !*** ./app/games/player.js ***!
+  \*****************************/
+/*! exports provided: PlayerControllerTPlayer, PlayerControllerTMCTS, PlayerControllerTRandom */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PlayerControllerTPlayer", function() { return PlayerControllerTPlayer; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PlayerControllerTMCTS", function() { return PlayerControllerTMCTS; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PlayerControllerTRandom", function() { return PlayerControllerTRandom; });
+/* harmony import */ var _mcts_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./mcts.js */ "./app/games/mcts.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+var PlayerControllerTPlayer =
+/*#__PURE__*/
+function () {
+  function PlayerControllerTPlayer() {
+    _classCallCheck(this, PlayerControllerTPlayer);
+  }
+
+  _createClass(PlayerControllerTPlayer, [{
+    key: "init",
+    value: function init() {}
+  }, {
+    key: "setState",
+    value: function setState(state) {// console.log('player')
+      // if (condition) {
+      //   this.handler({ row: 1, col: 2 })
+      // } else {
+      // }
+    }
+  }]);
+
+  return PlayerControllerTPlayer;
+}(); // MCTS player for TTT
+
+var PlayerControllerTMCTS =
+/*#__PURE__*/
+function () {
+  function PlayerControllerTMCTS() {
+    _classCallCheck(this, PlayerControllerTMCTS);
+  }
+
+  _createClass(PlayerControllerTMCTS, [{
+    key: "init",
+    value: function init() {
+      this.montecarlo = new _mcts_js__WEBPACK_IMPORTED_MODULE_0__["MonteCarloTreeSearch"]();
+      this.movesScores = null;
+    }
+  }, {
+    key: "getBestMove",
+    value: function getBestMove(state) {
+      // console.log(1, state)
+      // const board = new UTTTBoard()
+      // board.copyFrom(state)
+      // console.log(2, board)
+      this.movesScores = _mcts_js__WEBPACK_IMPORTED_MODULE_0__["MonteCarloTreeSearch"].prototype.getMovesScores(state.game, 1 + state.game.step % 2);
+      var bestMove = this.movesScores.reduce(function (acc, cur) {
+        return cur.visits > acc.visits ? cur : acc;
+      });
+      return bestMove.move;
+    }
+  }, {
+    key: "setState",
+    value: function setState(state) {
+      var _this = this;
+
+      console.log('MCTS', this.player, this);
+
+      if (!state.game.finished && this.player === 1 + state.game.step % 2) {
+        setTimeout(function () {
+          var bestMove = _this.getBestMove(state);
+
+          _this.handler(bestMove);
+        }, 1);
+      }
+    }
+  }]);
+
+  return PlayerControllerTMCTS;
+}(); // Random player
+
+var PlayerControllerTRandom =
+/*#__PURE__*/
+function () {
+  function PlayerControllerTRandom() {
+    _classCallCheck(this, PlayerControllerTRandom);
+  }
+
+  _createClass(PlayerControllerTRandom, [{
+    key: "init",
+    value: function init() {}
+  }, {
+    key: "setState",
+    value: function setState(state) {
+      var _this2 = this;
+
+      console.log('Random', this.player, state.game);
+
+      if (!state.game.finished && this.player === 1 + state.game.step % 2) {
+        setTimeout(function () {
+          var randomMove = _this2.randomMove(state); // console.log(randomMove)
+
+
+          if (randomMove) {
+            _this2.handler(randomMove);
+          }
+        }, 1);
+      }
+    }
+  }, {
+    key: "randomMove",
+    value: function randomMove(state) {
+      var availableMoves = state.game.getAvailableMoves();
+      var randId = Math.floor(Math.random() * availableMoves.length);
+      return availableMoves[randId];
+    }
+  }]);
+
+  return PlayerControllerTRandom;
+}();
+
+/***/ }),
+
+/***/ "./app/games/ttt.js":
+/*!**************************!*\
+  !*** ./app/games/ttt.js ***!
+  \**************************/
+/*! exports provided: TTT */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TTT", function() { return TTT; });
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+// function boardReset () {
+//   const size = [0, 1, 2]
+//   return {
+//     data: size.map(row => ({ id: row, cols: size.map(col => ({ id: col, value: 0 })) }))
+//   }
+// }
+function boardReset() {
+  var size = [0, 1, 2];
+  return size.map(function (row) {
+    return {
+      id: row,
+      cols: size.map(function (col) {
+        return {
+          id: col,
+          value: 0
+        };
+      })
+    };
+  });
+}
+
+var Board =
+/*#__PURE__*/
+function () {
+  // init () {
+  //   return boardReset()
+  // }
+  function Board() {
+    _classCallCheck(this, Board);
+
+    this.data = boardReset();
+  }
+
+  _createClass(Board, [{
+    key: "makeMove",
+    value: function makeMove(_ref) {
+      var row = _ref.row,
+          col = _ref.col,
+          value = _ref.value;
+      var data = JSON.parse(JSON.stringify(this.data));
+      data[row].cols[col].value = value;
+      return this.copy(data);
+    }
+  }, {
+    key: "copy",
+    value: function copy(data) {
+      var copy = new Board();
+      copy.data = JSON.parse(JSON.stringify(data));
+      return copy;
+    }
+  }]);
+
+  return Board;
+}();
+
+function gameReset() {
+  var player1 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+  var player2 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+  return {
+    board: new Board(),
+    finished: false,
+    winner: false,
+    step: 0,
+    player1: player1,
+    player2: player2
+  };
+}
+
+function checkFinished(board, step) {
+  if (step < 4) {
+    return false;
+  }
+
+  var player = 1 + step % 2; // board.map()
+
+  var _loop = function _loop(row) {
+    if (board[row].cols.reduce(function (acc, cur) {
+      return acc && cur.value === player;
+    }, true)) {
+      return {
+        v: player
+      };
+    }
+
+    if (board.reduce(function (acc, cur) {
+      return acc && cur.cols[row].value === player;
+    }, true)) {
+      return {
+        v: player
+      };
+    }
+  };
+
+  for (var row = 0; row < 3; row++) {
+    var _ret = _loop(row);
+
+    if (_typeof(_ret) === "object") return _ret.v;
+  }
+
+  if (board.reduce(function (acc, cur, ind) {
+    return acc && cur.cols[ind].value === player;
+  }, true)) {
+    return player;
+  }
+
+  if (board.reduce(function (acc, cur, ind) {
+    return acc && cur.cols[2 - ind].value === player;
+  }, true)) {
+    return player;
+  }
+
+  if (step === 8) {
+    return 3;
+  }
+
+  return false;
+}
+
+var TTT =
+/*#__PURE__*/
+function () {
+  // init () {
+  //   console.log('TTTlog')
+  //   return gameReset(0, 1)
+  // }
+  function TTT() {
+    _classCallCheck(this, TTT);
+
+    this.board = new Board();
+    this.finished = false;
+    this.step = 0;
+  } // makeMove ({ row, col }) {
+  //   if (!this.finished) {
+  //     // console.log(row, col, this.step)
+  //     this.board = this.board.makeMove({ row, col, value: 1 + (this.step % 2) })
+  //     const winner = checkFinished(this.board.data, this.step)
+  //     this.step = this.step + 1
+  //     if (winner) {
+  //       this.finished = winner
+  //     }
+  //     // return { ...this, board, step, finished, winner }
+  //   }
+  //   return this.copy({ ...this, winner: this.finished })
+  // }
+
+
+  _createClass(TTT, [{
+    key: "makeMove",
+    value: function makeMove(_ref2) {
+      var row = _ref2.row,
+          col = _ref2.col;
+      console.log(row, col, !this.finished, this.step);
+
+      if (!this.finished) {
+        // console.log(row, col, this.step)
+        var board = this.board.makeMove({
+          row: row,
+          col: col,
+          value: 1 + this.step % 2
+        });
+        var finished = checkFinished(board.data, this.step);
+        return this.copy({
+          board: board,
+          finished: finished,
+          step: this.step + 1
+        });
+      }
+
+      return this.copy(_objectSpread({}, this));
+    }
+  }, {
+    key: "getAvailableMoves",
+    value: function getAvailableMoves() {
+      var moves = [];
+
+      for (var row = 0; row < 3; row++) {
+        for (var col = 0; col < 3; col++) {
+          if (this.board.data[row].cols[col].value === 0) {
+            moves.push({
+              col: col,
+              row: row,
+              value: 0
+            });
+          }
+        }
+      }
+
+      return moves;
+    }
+  }, {
+    key: "copy",
+    value: function copy(_ref3) {
+      var board = _ref3.board,
+          finished = _ref3.finished,
+          step = _ref3.step;
+      var copy = new TTT();
+      copy.board = board.copy(board.data);
+      copy.finished = finished;
+      copy.step = step;
+      return copy;
+    }
+  }]);
+
+  return TTT;
+}();
+
+/***/ }),
+
 /***/ "./app/index.js":
 /*!**********************!*\
   !*** ./app/index.js ***!
@@ -1627,6 +2378,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var ultimus__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ultimus */ "./node_modules/ultimus/dist/main.js");
 /* harmony import */ var ultimus__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(ultimus__WEBPACK_IMPORTED_MODULE_7__);
 /* harmony import */ var _ai_player_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./ai/player.js */ "./app/ai/player.js");
+/* harmony import */ var _games_player_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./games/player.js */ "./app/games/player.js");
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
@@ -1650,7 +2402,8 @@ function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
 
 
-var types = [].concat(_toConsumableArray(_commons__WEBPACK_IMPORTED_MODULE_1__["default"]), [_app_html__WEBPACK_IMPORTED_MODULE_2__["default"]], _toConsumableArray(_pages__WEBPACK_IMPORTED_MODULE_3__["default"]), [_ttt_store_js__WEBPACK_IMPORTED_MODULE_5__["TTTStore"], _uttt_store_js__WEBPACK_IMPORTED_MODULE_6__["UTTT"], _ai_player_js__WEBPACK_IMPORTED_MODULE_8__["PlayerController0"], _ai_player_js__WEBPACK_IMPORTED_MODULE_8__["PlayerController1"], _ai_player_js__WEBPACK_IMPORTED_MODULE_8__["PlayerController2"]]);
+
+var types = [].concat(_toConsumableArray(_commons__WEBPACK_IMPORTED_MODULE_1__["default"]), [_app_html__WEBPACK_IMPORTED_MODULE_2__["default"]], _toConsumableArray(_pages__WEBPACK_IMPORTED_MODULE_3__["default"]), [_ttt_store_js__WEBPACK_IMPORTED_MODULE_5__["TTTStore"], _uttt_store_js__WEBPACK_IMPORTED_MODULE_6__["UTTT"], _ai_player_js__WEBPACK_IMPORTED_MODULE_8__["PlayerControllerPlayer"], _ai_player_js__WEBPACK_IMPORTED_MODULE_8__["PlayerControllerMCTS"], _ai_player_js__WEBPACK_IMPORTED_MODULE_8__["PlayerControllerRandom"], _games_player_js__WEBPACK_IMPORTED_MODULE_9__["PlayerControllerTPlayer"], _games_player_js__WEBPACK_IMPORTED_MODULE_9__["PlayerControllerTMCTS"], _games_player_js__WEBPACK_IMPORTED_MODULE_9__["PlayerControllerTRandom"]]);
 Object(arrmatura__WEBPACK_IMPORTED_MODULE_0__["launch"])({
   template: '<App />',
   types: types,
@@ -1718,7 +2471,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("<component id=\"Cell\">\n  <div class=\"column col-sm-4 cell-box\">\n    <div class=\"cell cell-{value}\" click=\"->store.step\" data-col={col} data-row={row}\n         data-value={value}>\n      <!-- {value|or:0} -->\n    </div>\n  </div>\n</component>\n\n<component id=\"Board\">  \n  <h6>{:gameStates|gameState:@finished:@step} </h6>\n  <div class=\"container\">\n    <div class=\"columns\" ui:for=\"row of board\">\n      <Cell ui:for=\"col of row.cols\" col={col.id} row={row.id} value={col.value}/>\n    </div>\n  </div>\n</component>\n\n<component id=\"TicTacToe\">\n  <div class=\"container\">\n    <div class=\"columns\">\n      <div class=\"column col-6\">\n        <Board board=\"<- store.board\" step=\"<- store.step\" finished=\"<- store.finished\" />\n      </div>\n      <div class=\"column col-1\"></div>\n      <div class=\"column col-3\">\n        <button class=\"btn btn-error control\" click=\"->store.reset\">Reset</button>\n      </div>\n    </div>\n  </div>\n</component>\n\n<component id=\"TictactoePage\">\n  <h4>TicTacToe</h4>\n\n  <TTTStore ui:ref=\"store\" />\n  <TicTacToe />\n</component>");
+/* harmony default export */ __webpack_exports__["default"] = ("<component id=\"Cell\">\n  <div class=\"column col-sm-4 cell-box\">\n    <div class=\"cell cell-{value}\" click=\"->store.step\" data-col={col} data-row={row}\n         data-value={value}>\n      <!-- {value|or:0} -->\n    </div>\n  </div>\n</component>\n\n<component id=\"Board\">  \n  <h6>{:gameStates|gameState:@finished:@step} </h6>\n  <div class=\"container\">\n    <div class=\"columns\" ui:for=\"row of board\">\n      <Cell ui:for=\"col of row.cols\" col={col.id} row={row.id} value={col.value}/>\n    </div>\n  </div>\n</component>\n\n<component id=\"TTTPlayer\">\n\n  <ui:tag tag=\"PlayerControllerT{type}\" player={pplayer} type={type} state=\"<-store.state|log\" ref=\"->store.ref\" handler=\"->store.makeMoveOutside\" />\n  <div>\n    <h6>Select {name}</h6>      \n    <button ui:for=\"pl of :players\"  class=\"btn control btn-{pl.name|equals:@type|then:primary}\" data-player={pplayer} data-type=\"{pl.name}\" click=\"-> store.switch\">{pl.name}</button>\n  </div>\n</component> \n\n<component id=\"TicTacToe\">\n  <div class=\"container\">\n    <div class=\"columns\">\n      <div class=\"column col-6\">\n        <Board board=\"<- store.board\" step=\"<- store.step\" finished=\"<- store.finished\"/>\n      </div>\n      <div class=\"column col-1\"></div>\n      <div class=\"column col-2\">\n        <h6>Options</h6>\n        <button class=\"btn btn-error control\" click=\"->store.reset\">Reset</button>\n        <TTTPlayer pplayer=\"1\" name=\"Cross\" type=\"<- store.cross\" />\n        <TTTPlayer pplayer=\"2\" name=\"Circle\" type=\"<- store.circle\" />               \n      </div>\n    </div>\n  </div>\n</component>\n\n\n<component id=\"TictactoePage\">\n  <h4>TicTacToe</h4>\n\n  <TTTStore ui:ref=\"store\" />\n  <TicTacToe />\n</component>");
 
 /***/ }),
 
@@ -1731,7 +2484,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("<component id=\"UCell\">\n  <div class=\"column col-4 cell-box\">\n    <div class=\"ucell cell-{value}\" click=\"->ustore.stepcell\" \n         data-col={col} data-row={row}\n         data-subcol={subcol} data-subrow={subrow}\n         data-value={value}>         \n    </div>\n  </div>\n</component>\n\n<component id=\"USubBoard\">  \n  <div class=\"column col-4 subBoard subBoard-{available} subWin-{finished}\">  \n    <div class=\"hider\"></div>\n    <div class=\"columns\" ui:for=\"row of board\">      \n      <UCell ui:for=\"col of row.cols\" col={col.id} row={row.id} value={col.value} subcol={subcol} subrow={subrow} />      \n    </div>\n    \n  </div>\n</component>\n\n<component id=\"UBoard\">  \n  <h6>{:gameStates|gameState:@finished:@step} </h6>\n  <div class=\"container\">\n    <div class=\"columns\" ui:for=\"row of board\">\n      <USubBoard \n        ui:for=\"col of row.cols\" \n        board=\"{board|subBoard:@row.id:@col.id}\" \n        subcol={col.id}\n        subrow={row.id} \n        available={col.available}\n        finished={col.finished}\n        uvalue={col.value} />\n    </div>\n  </div>\n</component>\n <!-- state=\"<-ustore.state\" handler=\"->ustore.stepcell\" -->\n <component id=\"UTTTPlayer\">\n\n  <ui:tag tag=\"PlayerController{type}\" player={pplayer} state=\"<-ustore.state\" handler=\"->ustore.airequest\" />\n  <div>\n    <h6>Select {name}</h6>      \n    <button ui:for=\"pl of :players\"  class=\"btn control btn-{pl.id|equals:@type|then:primary}\" data-player={pplayer} data-type=\"{pl.id}\" click=\"-> ustore.switch\">{pl.name}</button>\n  </div>\n</component> \n\n<component id=\"UTicTacToe\">\n  <div class=\"container\">\n    <div class=\"columns\">\n      <div class=\"column col-8 board\">\n        <UBoard board=\"<- ustore.board\" step=\"<- ustore.step\" finished=\"<- ustore.finished\" />\n      </div>\n      <!-- <div class=\"column col-1\"></div> -->\n      <div class=\"column col-2\">\n        <h6>Options</h6>\n        <button class=\"btn btn-error control\" click=\"->ustore.reset\">Reset</button>\n        <button class=\"btn btn-error control\" click=\"->ustore.airequest\">AI move</button>\n        <UTTTPlayer pplayer=\"1\" name=\"Cross\" type=\"<- ustore.cross\" />\n        <UTTTPlayer pplayer=\"2\" name=\"Circle\" type=\"<- ustore.circle\" />               \n      </div>\n    </div>\n  </div>\n</component> \n\n\n<component id=\"UlttictactoePage\">\n  <h4>UltimateTicTacToe</h4>\n\n  <UTTT ui:ref=\"ustore\" />\n  <UTicTacToe />\n</component>");
+/* harmony default export */ __webpack_exports__["default"] = ("<component id=\"UCell\">\n  <div class=\"column col-4 cell-box\">\n    <div class=\"ucell cell-{value}\" click=\"->ustore.stepcell\" \n         data-col={col} data-row={row}\n         data-subcol={subcol} data-subrow={subrow}\n         data-value={value}>         \n    </div>\n  </div>\n</component>\n\n<component id=\"USubBoard\">  \n  <div class=\"column col-4 subBoard subBoard-{available} subWin-{finished}\">  \n    <div class=\"hider\"></div>\n    <div class=\"columns\" ui:for=\"row of board\">      \n      <UCell ui:for=\"col of row.cols\" col={col.id} row={row.id} value={col.value} subcol={subcol} subrow={subrow} />      \n    </div>\n    \n  </div>\n</component>\n\n<component id=\"UBoard\">  \n  <h6>{:gameStates|gameState:@finished:@step} </h6>\n  <div class=\"container\">\n    <div class=\"columns\" ui:for=\"row of board\">\n      <USubBoard \n        ui:for=\"col of row.cols\" \n        board=\"{board|subBoard:@row.id:@col.id}\" \n        subcol={col.id}\n        subrow={row.id} \n        available={col.available}\n        finished={col.finished}\n        uvalue={col.value} />\n    </div>\n  </div>\n</component>\n <!-- state=\"<-ustore.state\" handler=\"->ustore.stepcell\" -->\n <component id=\"UTTTPlayer\">\n\n  <ui:tag tag=\"PlayerController{type}\" player={pplayer} type={type} state=\"<-ustore.state|log\" ref=\"->ustore.ref\" handler=\"->ustore.makeMoveOutside\" />\n  <div>\n    <h6>Select {name}</h6>      \n    <button ui:for=\"pl of :players\"  class=\"btn control btn-{pl.name|equals:@type|then:primary}\" data-player={pplayer} data-type=\"{pl.name}\" click=\"-> ustore.switch\">{pl.name}</button>\n  </div>\n</component> \n\n<component id=\"UTicTacToe\">\n  <div class=\"container\">\n    <div class=\"columns\">\n      <div class=\"column col-8 board\">\n        <UBoard board=\"<- ustore.board\" step=\"<- ustore.step\" finished=\"<- ustore.finished\" />\n      </div>\n      <!-- <div class=\"column col-1\"></div> -->\n      <div class=\"column col-2\">\n        <h6>Options</h6>\n        <button class=\"btn btn-error control\" click=\"->ustore.reset\">Reset</button>\n        <button class=\"btn btn-error control\" click=\"->ustore.mctsrequest\">AI move</button>\n        <UTTTPlayer pplayer=\"1\" name=\"Cross\" type=\"<- ustore.cross\" />\n        <UTTTPlayer pplayer=\"2\" name=\"Circle\" type=\"<- ustore.circle\" />               \n      </div>\n    </div>\n  </div>\n</component> \n\n\n<component id=\"UlttictactoePage\">\n  <h4>UltimateTicTacToe</h4>\n\n  <UTTT ui:ref=\"ustore\" />\n  <UTicTacToe />\n</component>");
 
 /***/ }),
 
@@ -1771,6 +2524,9 @@ __webpack_require__.r(__webpack_exports__);
   }, {
     id: 1,
     name: 'MCTS'
+  }, {
+    id: 2,
+    name: 'Random'
   }]
 });
 
@@ -1786,13 +2542,12 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TTTStore", function() { return TTTStore; });
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+/* harmony import */ var _games_ttt_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./games/ttt.js */ "./app/games/ttt.js");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
-function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
-
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -1800,79 +2555,13 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
 /* eslint-disable space-before-function-paren */
+
+
 function reset() {
-  var size = [0, 1, 2];
   return {
-    board: size.map(function (row) {
-      return {
-        id: row,
-        cols: size.map(function (col) {
-          return {
-            id: col,
-            value: 0
-          };
-        })
-      };
-    }),
-    step: 0,
-    finished: false
+    game: new _games_ttt_js__WEBPACK_IMPORTED_MODULE_0__["TTT"]()
   };
-} // function checkWin(acc, cur){
-//   return (acc&&(cur.value==player))
-// }
-
-
-function checkFinished(board, step) {
-  if (step < 4) {
-    return false;
-  }
-
-  var player = 1 + step % 2; // board.map()
-
-  var _loop = function _loop(row) {
-    if (board[row].cols.reduce(function (acc, cur) {
-      return acc && cur.value === player;
-    }, true)) {
-      return {
-        v: player
-      };
-    }
-
-    if (board.reduce(function (acc, cur) {
-      return acc && cur.cols[row].value === player;
-    }, true)) {
-      return {
-        v: player
-      };
-    }
-  };
-
-  for (var row = 0; row < 3; row++) {
-    var _ret = _loop(row);
-
-    if (_typeof(_ret) === "object") return _ret.v;
-  }
-
-  if (board.reduce(function (acc, cur, ind) {
-    return acc && cur.cols[ind].value === player;
-  }, true)) {
-    return player;
-  }
-
-  if (board.reduce(function (acc, cur, ind) {
-    return acc && cur.cols[2 - ind].value === player;
-  }, true)) {
-    return player;
-  }
-
-  if (step === 8) {
-    return 3;
-  }
-
-  return false;
 }
 
 var TTTStore =
@@ -1885,47 +2574,94 @@ function () {
   _createClass(TTTStore, [{
     key: "init",
     value: function init() {
-      return reset();
+      return _objectSpread({}, reset(), {
+        cross: 'Person',
+        circle: 'Random'
+      });
+    }
+  }, {
+    key: "getBoard",
+    value: function getBoard() {
+      console.log(this.game);
+      return this.game.board.data;
+    }
+  }, {
+    key: "getFinished",
+    value: function getFinished() {
+      return this.game.finished;
+    }
+  }, {
+    key: "getStep",
+    value: function getStep() {
+      return this.game.step;
+    }
+  }, {
+    key: "getState",
+    value: function getState() {
+      return _objectSpread({}, this);
+    }
+  }, {
+    key: "onRef",
+    value: function onRef() {
+      return this;
+    }
+  }, {
+    key: "onSwitch",
+    value: function onSwitch(_ref) {
+      var player = _ref.player,
+          type = _ref.type;
+
+      if (player === 1) {
+        return _objectSpread({}, this, {
+          cross: type
+        });
+      } else {
+        return _objectSpread({}, this, {
+          circle: type
+        });
+      }
+    }
+  }, {
+    key: "currentPlayer",
+    value: function currentPlayer() {
+      var player = 1 + this.game.step % 2;
+      return player === 1 ? this.cross : this.circle;
     }
   }, {
     key: "onStep",
-    value: function onStep(_ref, _ref2) {
-      var col = _ref.col,
-          row = _ref.row,
-          value = _ref.value;
-      var board = _ref2.board,
-          step = _ref2.step,
-          finished = _ref2.finished;
+    value: function onStep(_ref2, _ref3) {
+      var col = _ref2.col,
+          row = _ref2.row,
+          value = _ref2.value;
+      var game = _ref3.game;
 
-      if (!value && !finished) {
-        board[row].cols[col].value = 1 + step % 2;
-        finished = checkFinished(board, step);
-        return {
-          board: _toConsumableArray(board),
-          step: step + 1,
-          finished: finished
-        };
+      if (this.currentPlayer() === 'Person') {
+        if (!value) {
+          game = game.makeMove({
+            col: col,
+            row: row
+          });
+          return {
+            game: game
+          };
+        }
       }
+    }
+  }, {
+    key: "onMakeMoveOutside",
+    value: function onMakeMoveOutside(cell) {
+      // test without this
+      this.game = this.game.makeMove(cell);
+      return _objectSpread({}, this);
     } // setBoard(v) {
     //   this.board = v
     // }
 
   }, {
     key: "onReset",
-    value: function onReset(_, _ref3) {
-      var board = _ref3.board;
-
-      for (var row = 0; row < 3; row++) {
-        for (var col = 0; col < 3; col++) {
-          board[row].cols[col].value = 0;
-        }
-      }
-
-      return {
-        board: _toConsumableArray(board),
-        step: 0,
-        finished: false
-      };
+    value: function onReset(_, _ref4) {
+      var game = _ref4.game;
+      return reset();
     }
   }]);
 
@@ -1989,8 +2725,8 @@ function (_UTTTBoard) {
     key: "init",
     value: function init() {
       return _objectSpread({}, this.reset(), {
-        cross: 0,
-        circle: 1
+        cross: 'Person',
+        circle: 'MCTS'
       });
     }
   }, {
@@ -1999,13 +2735,18 @@ function (_UTTTBoard) {
       return _objectSpread({}, this);
     }
   }, {
+    key: "onRef",
+    value: function onRef() {
+      return this;
+    }
+  }, {
     key: "onStepcell",
     value: function onStepcell(cell, game) {
       if (this.toggledAI) {
         if (this.toggledAI !== 1 + game.step % 2) {
           var nextState = this.makeMove(cell, game);
           return _objectSpread({}, nextState, {
-            '...': Promise.resolve(this.airequest(nextState))
+            '...': Promise.resolve(this.mctsrequest(nextState))
           });
         }
       }
@@ -2029,9 +2770,9 @@ function (_UTTTBoard) {
       }
     }
   }, {
-    key: "onAirequest",
-    value: function onAirequest() {
-      return this.airequest(this);
+    key: "onMctsrequest",
+    value: function onMctsrequest() {
+      return this.mctsrequest(this);
     }
   }, {
     key: "onToggleai",
@@ -2040,7 +2781,7 @@ function (_UTTTBoard) {
       this.toggledAI = state;
 
       if (state === 1 + this.step % 2) {
-        return this.airequest(this);
+        return this.mctsrequest(this);
       }
     }
   }, {
@@ -2048,17 +2789,33 @@ function (_UTTTBoard) {
     value: function onReset(_, _ref3) {
       var board = _ref3.board;
       return _objectSpread({}, this.reset(), {
-        cross: 0,
-        circle: 1
+        cross: 'Person',
+        circle: 'MCTS'
       });
     }
   }, {
-    key: "airequest",
-    value: function airequest(state) {
+    key: "onMakeMoveOutside",
+    value: function onMakeMoveOutside(cell) {
+      // test without this
+      return this.makeMove(cell, this);
+    }
+  }, {
+    key: "mctsrequest",
+    value: function mctsrequest(state) {
       if (!this.montecarlo) {
         this.montecarlo = new _ai_mcts_js__WEBPACK_IMPORTED_MODULE_1__["MonteCarloTreeSearch"]();
       }
 
+      console.log(this.makeCopy());
+
+      if (!this.finished) {
+        return this.montecarlo.findNextmove(this.makeCopy(), 1 + state.step % 2);
+      }
+    }
+  }, {
+    key: "randomrequest",
+    value: function randomrequest(state) {
+      this.getAvailableMoves();
       return this.montecarlo.findNextmove(this.makeCopy(), 1 + state.step % 2);
     }
   }]);
