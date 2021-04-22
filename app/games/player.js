@@ -1,5 +1,5 @@
-import { MonteCarloTreeSearch } from './mcts.js'
-import { UTTTBoard } from './uttt.js'
+import { MonteCarloTreeSearch } from '../ai/mcts.js'
+import { UTTTBoard } from '../ai/uttt.js'
 
 // export class PlayerController {
 //   init () {

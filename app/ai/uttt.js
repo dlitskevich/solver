@@ -32,6 +32,7 @@ export class UTTTBoard {
   }
 
   makeMove ({ col, row, value, subrow, subcol }, { board, step, finished }) {
+    // const { board, step, finished } = this
     const subboard = board[subrow].cols[subcol]
     // console.log(subboard)
     if (!value && !finished && (subboard.available === 1) && !subboard.value && !subboard.finished) {

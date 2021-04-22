@@ -36,7 +36,7 @@
  <!-- state="<-ustore.state" handler="->ustore.stepcell" -->
  <component id="UTTTPlayer">
 
-  <ui:tag tag="PlayerController{type}" player={pplayer} type={type} state="<-ustore.state|log" handler="->ustore.makeMoveOutside" />
+  <ui:tag tag="PlayerController{type}" player={pplayer} type={type} state="<-ustore.state|log" ref="->ustore.ref" handler="->ustore.makeMoveOutside" />
   <div>
     <h6>Select {name}</h6>      
     <button ui:for="pl of :players"  class="btn control btn-{pl.name|equals:@type|then:primary}" data-player={pplayer} data-type="{pl.name}" click="-> ustore.switch">{pl.name}</button>

@@ -15,7 +15,7 @@ export class UTTT extends UTTTBoard {
     return { ...this }
   }
 
-  getRef() {
+  onRef() {
     return this
   }
 
@@ -63,6 +63,7 @@ export class UTTT extends UTTTBoard {
   }
 
   onMakeMoveOutside (cell) {
+    // test without this
     return this.makeMove(cell, this)
   }
 
