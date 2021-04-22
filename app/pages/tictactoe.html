@@ -16,19 +16,32 @@
   </div>
 </component>
 
+<component id="TTTPlayer">
+
+  <ui:tag tag="PlayerControllerT{type}" player={pplayer} type={type} state="<-store.state|log" ref="->store.ref" handler="->store.makeMoveOutside" />
+  <div>
+    <h6>Select {name}</h6>      
+    <button ui:for="pl of :players"  class="btn control btn-{pl.name|equals:@type|then:primary}" data-player={pplayer} data-type="{pl.name}" click="-> store.switch">{pl.name}</button>
+  </div>
+</component> 
+
 <component id="TicTacToe">
   <div class="container">
     <div class="columns">
       <div class="column col-6">
-        <Board board="<- store.board|log" step="<- store.step|log" finished="<- store.finished|log"/>
+        <Board board="<- store.board" step="<- store.step" finished="<- store.finished"/>
       </div>
       <div class="column col-1"></div>
-      <div class="column col-3">
+      <div class="column col-2">
+        <h6>Options</h6>
         <button class="btn btn-error control" click="->store.reset">Reset</button>
+        <TTTPlayer pplayer="1" name="Cross" type="<- store.cross" />
+        <TTTPlayer pplayer="2" name="Circle" type="<- store.circle" />               
       </div>
     </div>
   </div>
 </component>
+
 
 <component id="TictactoePage">
   <h4>TicTacToe</h4>

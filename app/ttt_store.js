@@ -6,14 +6,14 @@ function reset() {
     game: new TTT()
   }
 }
-// function checkWin(acc, cur){
-//   return (acc&&(cur.value==player))
-// }
 
 export class TTTStore {
   init() {
-    console.log('TTTstorelog')
-    return reset()
+    return {
+      ...reset(),
+      cross: 'Person',
+      circle: 'Random'
+    }
   }
 
   getBoard() {
@@ -29,11 +29,46 @@ export class TTTStore {
     return this.game.step
   }
 
-  onStep({ col, row, value }, { game }) {
-    if (!value) {
-      game = game.makeMove({ col, row })
-      return { game }
+  getState() {
+    return { ...this }
+  }
+
+  onRef() {
+    return this
+  }
+
+  onSwitch({ player, type }) {
+    if (player === 1) {
+      return {
+        ...this,
+        cross: type
+      }
+    } else {
+      return {
+        ...this,
+        circle: type
+      }
     }
+  }
+
+  currentPlayer() {
+    const player = 1 + this.game.step % 2
+    return player === 1 ? this.cross : this.circle
+  }
+
+  onStep({ col, row, value }, { game }) {
+    if (this.currentPlayer() === 'Person') {
+      if (!value) {
+        game = game.makeMove({ col, row })
+        return { game }
+      }
+    }
+  }
+
+  onMakeMoveOutside (cell) {
+    // test without this
+    this.game = this.game.makeMove(cell)
+    return { ...this }
   }
 
   // setBoard(v) {

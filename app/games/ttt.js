@@ -18,13 +18,14 @@ class Board {
   }
 
   makeMove ({ row, col, value }) {
-    this.data[row].cols[col].value = value
-    return this.copy(this.data)
+    const data = JSON.parse(JSON.stringify(this.data))
+    data[row].cols[col].value = value
+    return this.copy(data)
   }
 
   copy (data) {
     const copy = new Board()
-    copy.data = data
+    copy.data = JSON.parse(JSON.stringify(data))
     return copy
   }
 }
@@ -74,29 +75,50 @@ export class TTT {
   constructor () {
     this.board = new Board()
     this.finished = false
-    this.winner = false
     this.step = 0
   }
 
+  // makeMove ({ row, col }) {
+  //   if (!this.finished) {
+  //     // console.log(row, col, this.step)
+  //     this.board = this.board.makeMove({ row, col, value: 1 + (this.step % 2) })
+  //     const winner = checkFinished(this.board.data, this.step)
+  //     this.step = this.step + 1
+  //     if (winner) {
+  //       this.finished = winner
+  //     }
+  //     // return { ...this, board, step, finished, winner }
+  //   }
+  //   return this.copy({ ...this, winner: this.finished })
+  // }
   makeMove ({ row, col }) {
+    console.log(row, col, !this.finished, this.step)
     if (!this.finished) {
-      console.log(row, col, this.step)
-      this.board = this.board.makeMove({ row, col, value: 1 + (this.step % 2) })
-      const winner = checkFinished(this.board.data, this.step)
-      this.step = this.step + 1
-      if (winner) {
-        this.finished = true
-      }
-      // return { ...this, board, step, finished, winner }
+      // console.log(row, col, this.step)
+      const board = this.board.makeMove({ row, col, value: 1 + (this.step % 2) })
+      const finished = checkFinished(board.data, this.step)
+
+      return this.copy({ board, finished, step: this.step + 1 })
     }
     return this.copy({ ...this })
   }
 
-  copy ({ board, finished, winner, step }) {
+  getAvailableMoves () {
+    const moves = []
+    for (let row = 0; row < 3; row++) {
+      for (let col = 0; col < 3; col++) {
+        if (this.board.data[row].cols[col].value === 0) {
+          moves.push({ col: col, row: row, value: 0 })
+        }
+      }
+    }
+    return moves
+  }
+
+  copy ({ board, finished, step }) {
     const copy = new TTT()
-    copy.board = board
+    copy.board = board.copy(board.data)
     copy.finished = finished
-    copy.winner = winner
     copy.step = step
     return copy
   }

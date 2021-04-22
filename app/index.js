@@ -12,6 +12,12 @@ import {
   PlayerControllerRandom
 } from './ai/player.js'
 
+import {
+  PlayerControllerTPlayer,
+  PlayerControllerTMCTS,
+  PlayerControllerTRandom
+} from './games/player.js'
+
 const types = [
   ...commons,
   templates,
@@ -20,7 +26,10 @@ const types = [
   UTTT,
   PlayerControllerPlayer,
   PlayerControllerMCTS,
-  PlayerControllerRandom
+  PlayerControllerRandom,
+  PlayerControllerTPlayer,
+  PlayerControllerTMCTS,
+  PlayerControllerTRandom
 
 ]
 
