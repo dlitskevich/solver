@@ -17,7 +17,6 @@ export class TTTStore {
   }
 
   getBoard() {
-    console.log(this.game)
     return this.game.board.data
   }
 

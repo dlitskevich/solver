@@ -18,7 +18,7 @@
 
 <component id="TTTPlayer">
 
-  <ui:tag tag="PlayerControllerT{type}" player={pplayer} type={type} state="<-store.state|log" ref="->store.ref" handler="->store.makeMoveOutside" />
+  <ui:tag tag="PlayerControllerT{type}" player={pplayer} type={type} state="<-store.state" ref="->store.ref" handler="->store.makeMoveOutside" />
   <div>
     <h6>Select {name}</h6>      
     <button ui:for="pl of :players"  class="btn control btn-{pl.name|equals:@type|then:primary}" data-player={pplayer} data-type="{pl.name}" click="-> store.switch">{pl.name}</button>
@@ -48,4 +48,7 @@
 
   <TTTStore ui:ref="store" />
   <TicTacToe />
+  <h4>Comparation</h4>
+  <!-- <TTTStats cross ="<- store.cross" circle ="<- store.circle" finished="<- store.finished|log" /> -->
+  <ui:tag tag="TTTStats" cross="<- store.cross" circle="<-store.circle" finished="<- store.finished" />
 </component>

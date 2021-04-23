@@ -8,19 +8,25 @@ export class MiniMax {
     return {}
   }
 
-  pruningSearch ({ game, depth, maximizing, alpha = -10000, beta = 10000 }) {
+  pruningSearch (game, depth, maximizing, alpha = -10000, beta = 10000, first = false) {
     const availableMoves = game.getAvailableMoves()
     if (game.finished || !depth || !availableMoves) {
       return this.assess(game)
     }
+
+    const moveAssessment = []
+    let bestValue = 0
     let bestMove = {}
     if (!game.finished) {
       if (maximizing) {
-        let bestValue = -10000
+        bestValue = -10000
         for (let index = 0; index < availableMoves.length; index++) {
           const move = availableMoves[index]
           const value = this.pruningSearch(game.makeMove(move), depth - 1, !maximizing, alpha, beta)
-          availableMoves[index] = availableMoves[index].push({ value })
+          if (first) {
+            moveAssessment.push({ move: availableMoves[index], value })
+          }
+
           if (value > bestValue) {
             bestValue = value
             bestMove = move
@@ -28,11 +34,13 @@ export class MiniMax {
           }
         }
       } else {
-        let bestValue = 10000
+        bestValue = 10000
         for (let index = 0; index < availableMoves.length; index++) {
           const move = availableMoves[index]
           const value = this.pruningSearch(game.makeMove(move), depth - 1, !maximizing, alpha, beta)
-          availableMoves[index] = availableMoves[index].push({ value })
+          if (first) {
+            moveAssessment.push({ move: availableMoves[index], value })
+          }
           if (value < bestValue) {
             bestValue = value
             bestMove = move
@@ -41,6 +49,9 @@ export class MiniMax {
         }
       }
     }
-    return { bestMove, availableMoves }
+    if (first) {
+      return { bestMove, moveAssessment, bestValue }
+    }
+    return bestValue
   }
 }

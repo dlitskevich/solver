@@ -15,21 +15,24 @@ import {
 import {
   PlayerControllerTPlayer,
   PlayerControllerTMCTS,
-  PlayerControllerTRandom
+  PlayerControllerTRandom,
+  PlayerControllerTMiniMax
 } from './games/player.js'
-
+import { TTTStats } from './games/stats.js'
 const types = [
   ...commons,
   templates,
   ...pages,
   TTTStore,
   UTTT,
+  TTTStats,
   PlayerControllerPlayer,
   PlayerControllerMCTS,
   PlayerControllerRandom,
   PlayerControllerTPlayer,
   PlayerControllerTMCTS,
-  PlayerControllerTRandom
+  PlayerControllerTRandom,
+  PlayerControllerTMiniMax
 
 ]
 

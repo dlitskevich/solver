@@ -30,16 +30,16 @@ class Board {
   }
 }
 
-function gameReset (player1 = 0, player2 = 1) {
-  return {
-    board: new Board(),
-    finished: false,
-    winner: false,
-    step: 0,
-    player1,
-    player2
-  }
-}
+// function gameReset (player1 = 0, player2 = 1) {
+//   return {
+//     board: new Board(),
+//     finished: false,
+//     winner: false,
+//     step: 0,
+//     player1,
+//     player2
+//   }
+// }
 
 function checkFinished (board, step) {
   if (step < 4) {

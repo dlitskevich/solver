@@ -1,4 +1,5 @@
 import { MonteCarloTreeSearch } from './mcts.js'
+import { MiniMax } from './minimax.js'
 
 export class PlayerControllerTPlayer {
   init () {
@@ -21,10 +22,6 @@ export class PlayerControllerTMCTS {
   }
 
   getBestMove (state) {
-    // console.log(1, state)
-    // const board = new UTTTBoard()
-    // board.copyFrom(state)
-    // console.log(2, board)
     this.movesScores = MonteCarloTreeSearch.prototype.getMovesScores(state.game, 1 + state.game.step % 2)
     const bestMove = this.movesScores.reduce((acc, cur) => cur.visits > acc.visits ? cur : acc)
     return bestMove.move
@@ -73,10 +70,10 @@ export class PlayerControllerTMiniMax {
   assess (game) {
     switch (game.finished) {
       case 1:
-        return (1 + game.step % 2 === game.finished) ? 100000 : -100000
+        return 1000
 
       case 2:
-        return (1 + game.step % 2 === 2) ? 100000 : -100000
+        return -1000
 
       default:
         return 0
@@ -84,21 +81,30 @@ export class PlayerControllerTMiniMax {
   }
 
   setState (state) {
-    console.log('Random', this.player, state.game)
+    console.log('MiniMax', this.player, state.game)
     if (!state.game.finished && (this.player === 1 + state.game.step % 2)) {
       setTimeout(() => {
-        const randomMove = this.randomMove(state)
-        // console.log(randomMove)
-        if (randomMove) {
-          this.handler(randomMove)
+        const bestMove = this.getBestMove(state.game)
+        if (bestMove) {
+          this.handler(bestMove)
         }
       }, 1)
     }
   }
 
-  randomMove (state) {
-    const availableMoves = state.game.getAvailableMoves()
-    const randId = Math.floor(Math.random() * availableMoves.length)
-    return availableMoves[randId]
+  getBestMove (game, depth = 4) {
+    const minimax = new MiniMax(this.assess)
+    const answ = minimax.pruningSearch(game, depth, game.step % 2 === 0, -10000, 10000, true)
+    const sameValueMoves = []
+    answ.moveAssessment.forEach(element => {
+      if (element.value === answ.bestValue) {
+        sameValueMoves.push(element)
+      }
+    })
+    if (sameValueMoves.length > 1) {
+      const randId = Math.floor(Math.random() * sameValueMoves.length)
+      return sameValueMoves[randId].move
+    }
+    return answ.bestMove
   }
 }
