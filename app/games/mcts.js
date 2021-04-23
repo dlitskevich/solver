@@ -32,7 +32,7 @@ export class MonteCarloTreeSearch {
     const winnerNode = rootNode.childs.reduce((acc, cur) => cur.state.visits > acc.state.visits ? cur : acc)
     // console.log(rootNode)
     // tree.root = winnerNode
-    console.log(winnerNode)
+    // console.log(winnerNode)
     return winnerNode.state.game
   }
 
@@ -60,7 +60,7 @@ export class MonteCarloTreeSearch {
     const movesScores = rootNode.childs.map((child) => { return { visits: child.state.visits, move: child.state.move } })
     // console.log(rootNode)
     // tree.root = winnerNode
-    console.log(movesScores)
+    // console.log(movesScores)
 
     return movesScores
   }

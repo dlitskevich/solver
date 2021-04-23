@@ -64,3 +64,41 @@ export class PlayerControllerTRandom {
     return availableMoves[randId]
   }
 }
+
+// MiniMax player
+export class PlayerControllerTMiniMax {
+  init () {
+  }
+
+  assess (game) {
+    switch (game.finished) {
+      case 1:
+        return (1 + game.step % 2 === game.finished) ? 100000 : -100000
+
+      case 2:
+        return (1 + game.step % 2 === 2) ? 100000 : -100000
+
+      default:
+        return 0
+    }
+  }
+
+  setState (state) {
+    console.log('Random', this.player, state.game)
+    if (!state.game.finished && (this.player === 1 + state.game.step % 2)) {
+      setTimeout(() => {
+        const randomMove = this.randomMove(state)
+        // console.log(randomMove)
+        if (randomMove) {
+          this.handler(randomMove)
+        }
+      }, 1)
+    }
+  }
+
+  randomMove (state) {
+    const availableMoves = state.game.getAvailableMoves()
+    const randId = Math.floor(Math.random() * availableMoves.length)
+    return availableMoves[randId]
+  }
+}

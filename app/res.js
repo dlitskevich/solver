@@ -14,6 +14,7 @@ export default {
   players: [
     { id: 0, name: 'Person' },
     { id: 1, name: 'MCTS' },
-    { id: 2, name: 'Random' }
+    { id: 2, name: 'Random' },
+    { id: 3, name: 'MiniMax' }
   ]
 }

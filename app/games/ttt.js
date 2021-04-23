@@ -92,7 +92,7 @@ export class TTT {
   //   return this.copy({ ...this, winner: this.finished })
   // }
   makeMove ({ row, col }) {
-    console.log(row, col, !this.finished, this.step)
+    // console.log(row, col, !this.finished, this.step)
     if (!this.finished) {
       // console.log(row, col, this.step)
       const board = this.board.makeMove({ row, col, value: 1 + (this.step % 2) })
