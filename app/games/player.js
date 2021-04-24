@@ -5,7 +5,7 @@ export class PlayerControllerTPlayer {
   init () {
   }
 
-  setState (state) {
+  setState (game) {
     // console.log('player')
     // if (condition) {
     //   this.handler({ row: 1, col: 2 })
@@ -21,18 +21,18 @@ export class PlayerControllerTMCTS {
     this.movesScores = null
   }
 
-  getBestMove (state) {
-    this.movesScores = MonteCarloTreeSearch.prototype.getMovesScores(state.game, 1 + state.game.step % 2)
+  getBestMove (game) {
+    this.movesScores = MonteCarloTreeSearch.prototype.getMovesScores(game, 1 + game.step % 2)
     // console.log(this.movesScores)
     const bestMove = this.movesScores.reduce((acc, cur) => cur.visits > acc.visits ? cur : acc)
     return bestMove.move
   }
 
-  setState (state) {
-    // console.log('MCTS', this.player, this)
-    if (!state.game.finished && (this.player === 1 + state.game.step % 2)) {
+  setState (game) {
+    console.log('MCTS', this.player, this)
+    if (!game.finished && (this.player === 1 + game.step % 2)) {
       setTimeout(() => {
-        const bestMove = this.getBestMove(state)
+        const bestMove = this.getBestMove(game)
         this.handler(bestMove)
       }, 1)
     }
@@ -43,11 +43,11 @@ export class PlayerControllerTRandom {
   init () {
   }
 
-  setState (state) {
-    // console.log('Random', this.player, state.game)
-    if (!state.game.finished && (this.player === 1 + state.game.step % 2)) {
+  setState (game) {
+    // console.log('Random', this.player, game)
+    if (!game.finished && (this.player === 1 + game.step % 2)) {
       setTimeout(() => {
-        const randomMove = this.randomMove(state)
+        const randomMove = this.randomMove(game)
         // console.log(randomMove)
         if (randomMove) {
           this.handler(randomMove)
@@ -56,8 +56,8 @@ export class PlayerControllerTRandom {
     }
   }
 
-  randomMove (state) {
-    const availableMoves = state.game.getAvailableMoves()
+  randomMove (game) {
+    const availableMoves = game.getAvailableMoves()
     const randId = Math.floor(Math.random() * availableMoves.length)
     return availableMoves[randId]
   }
@@ -81,11 +81,11 @@ export class PlayerControllerTMiniMax {
     }
   }
 
-  setState (state) {
-    // console.log('MiniMax', this.player, state.game)
-    if (!state.game.finished && (this.player === 1 + state.game.step % 2)) {
+  setState (game) {
+    // console.log('MiniMax', this.player, game)
+    if (!game.finished && (this.player === 1 + game.step % 2)) {
       setTimeout(() => {
-        const bestMove = this.getBestMove(state.game)
+        const bestMove = this.getBestMove(game)
         if (bestMove) {
           this.handler(bestMove)
         }

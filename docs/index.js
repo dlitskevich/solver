@@ -2123,7 +2123,7 @@ function () {
     value: function init() {}
   }, {
     key: "setState",
-    value: function setState(state) {// console.log('player')
+    value: function setState(game) {// console.log('player')
       // if (condition) {
       //   this.handler({ row: 1, col: 2 })
       // } else {
@@ -2149,8 +2149,8 @@ function () {
     }
   }, {
     key: "getBestMove",
-    value: function getBestMove(state) {
-      this.movesScores = _mcts_js__WEBPACK_IMPORTED_MODULE_0__["MonteCarloTreeSearch"].prototype.getMovesScores(state.game, 1 + state.game.step % 2); // console.log(this.movesScores)
+    value: function getBestMove(game) {
+      this.movesScores = _mcts_js__WEBPACK_IMPORTED_MODULE_0__["MonteCarloTreeSearch"].prototype.getMovesScores(game, 1 + game.step % 2); // console.log(this.movesScores)
 
       var bestMove = this.movesScores.reduce(function (acc, cur) {
         return cur.visits > acc.visits ? cur : acc;
@@ -2159,13 +2159,14 @@ function () {
     }
   }, {
     key: "setState",
-    value: function setState(state) {
+    value: function setState(game) {
       var _this = this;
 
-      // console.log('MCTS', this.player, this)
-      if (!state.game.finished && this.player === 1 + state.game.step % 2) {
+      console.log('MCTS', this.player, this);
+
+      if (!game.finished && this.player === 1 + game.step % 2) {
         setTimeout(function () {
-          var bestMove = _this.getBestMove(state);
+          var bestMove = _this.getBestMove(game);
 
           _this.handler(bestMove);
         }, 1);
@@ -2188,13 +2189,13 @@ function () {
     value: function init() {}
   }, {
     key: "setState",
-    value: function setState(state) {
+    value: function setState(game) {
       var _this2 = this;
 
-      // console.log('Random', this.player, state.game)
-      if (!state.game.finished && this.player === 1 + state.game.step % 2) {
+      // console.log('Random', this.player, game)
+      if (!game.finished && this.player === 1 + game.step % 2) {
         setTimeout(function () {
-          var randomMove = _this2.randomMove(state); // console.log(randomMove)
+          var randomMove = _this2.randomMove(game); // console.log(randomMove)
 
 
           if (randomMove) {
@@ -2205,8 +2206,8 @@ function () {
     }
   }, {
     key: "randomMove",
-    value: function randomMove(state) {
-      var availableMoves = state.game.getAvailableMoves();
+    value: function randomMove(game) {
+      var availableMoves = game.getAvailableMoves();
       var randId = Math.floor(Math.random() * availableMoves.length);
       return availableMoves[randId];
     }
@@ -2241,13 +2242,13 @@ function () {
     }
   }, {
     key: "setState",
-    value: function setState(state) {
+    value: function setState(game) {
       var _this3 = this;
 
-      // console.log('MiniMax', this.player, state.game)
-      if (!state.game.finished && this.player === 1 + state.game.step % 2) {
+      // console.log('MiniMax', this.player, game)
+      if (!game.finished && this.player === 1 + game.step % 2) {
         setTimeout(function () {
-          var bestMove = _this3.getBestMove(state.game);
+          var bestMove = _this3.getBestMove(game);
 
           if (bestMove) {
             _this3.handler(bestMove);
@@ -2304,7 +2305,7 @@ function reset() {
     circleWin: 0,
     draw: 0,
     total: 0,
-    times: 100
+    times: 30
   };
 } // TTT stats
 
@@ -2869,7 +2870,7 @@ function () {
   }, {
     key: "getState",
     value: function getState() {
-      return _objectSpread({}, this);
+      return this.game;
     }
   }, {
     key: "onRef",
@@ -2883,11 +2884,11 @@ function () {
           type = _ref.type;
 
       if (player === 1) {
-        return _objectSpread({}, this, {
+        return _objectSpread({}, this, {}, reset(), {
           cross: type
         });
       } else {
-        return _objectSpread({}, this, {
+        return _objectSpread({}, this, {}, reset(), {
           circle: type
         });
       }

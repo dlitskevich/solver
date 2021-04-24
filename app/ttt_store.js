@@ -29,7 +29,7 @@ export class TTTStore {
   }
 
   getState() {
-    return { ...this }
+    return this.game
   }
 
   onRef() {
@@ -40,11 +40,13 @@ export class TTTStore {
     if (player === 1) {
       return {
         ...this,
+        ...reset(),
         cross: type
       }
     } else {
       return {
         ...this,
+        ...reset(),
         circle: type
       }
     }
