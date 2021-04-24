@@ -1765,8 +1765,8 @@ function () {
         return cur.state.visits > acc.state.visits ? cur : acc;
       }); // console.log(rootNode)
       // tree.root = winnerNode
+      // console.log(winnerNode)
 
-      console.log(winnerNode);
       return winnerNode.state.game;
     }
   }, {
@@ -1803,8 +1803,8 @@ function () {
         };
       }); // console.log(rootNode)
       // tree.root = winnerNode
+      // console.log(movesScores)
 
-      console.log(movesScores);
       return movesScores;
     }
   }, {
@@ -1995,11 +1995,104 @@ function () {
 
 /***/ }),
 
+/***/ "./app/games/minimax.js":
+/*!******************************!*\
+  !*** ./app/games/minimax.js ***!
+  \******************************/
+/*! exports provided: MiniMax */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MiniMax", function() { return MiniMax; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var MiniMax =
+/*#__PURE__*/
+function () {
+  function MiniMax(assess) {
+    _classCallCheck(this, MiniMax);
+
+    this.assess = assess;
+  }
+
+  _createClass(MiniMax, [{
+    key: "getMovesScores",
+    value: function getMovesScores(game) {
+      return {};
+    }
+  }, {
+    key: "pruningSearch",
+    value: function pruningSearch(game, depth, maximizing) {
+      var alpha = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : -10000;
+      var beta = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 10000;
+      var first = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
+      var availableMoves = game.getAvailableMoves();
+
+      if (game.finished || !depth || !availableMoves) {
+        return this.assess(game);
+      }
+
+      var moveAssessment = [];
+      var bestValue = 0;
+      var bestMove = {};
+
+      if (!game.finished) {
+        bestValue = maximizing ? -10000 : 10000;
+
+        for (var index = 0; index < availableMoves.length; index++) {
+          var move = availableMoves[index];
+          var value = this.pruningSearch(game.makeMove(move), depth - 1, !maximizing, alpha, beta);
+
+          if (first) {
+            moveAssessment.push({
+              move: availableMoves[index],
+              value: value
+            });
+          }
+
+          if (maximizing) {
+            if (value > bestValue) {
+              bestValue = value;
+              bestMove = move;
+              alpha = Math.max(alpha, bestValue);
+            }
+          } else {
+            if (value < bestValue) {
+              bestValue = value;
+              bestMove = move;
+              beta = Math.min(beta, bestValue);
+            }
+          }
+        }
+      }
+
+      if (first) {
+        return {
+          bestMove: bestMove,
+          moveAssessment: moveAssessment,
+          bestValue: bestValue
+        };
+      }
+
+      return bestValue;
+    }
+  }]);
+
+  return MiniMax;
+}();
+
+/***/ }),
+
 /***/ "./app/games/player.js":
 /*!*****************************!*\
   !*** ./app/games/player.js ***!
   \*****************************/
-/*! exports provided: PlayerControllerTPlayer, PlayerControllerTMCTS, PlayerControllerTRandom */
+/*! exports provided: PlayerControllerTPlayer, PlayerControllerTMCTS, PlayerControllerTRandom, PlayerControllerTMiniMax */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2007,12 +2100,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PlayerControllerTPlayer", function() { return PlayerControllerTPlayer; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PlayerControllerTMCTS", function() { return PlayerControllerTMCTS; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PlayerControllerTRandom", function() { return PlayerControllerTRandom; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PlayerControllerTMiniMax", function() { return PlayerControllerTMiniMax; });
 /* harmony import */ var _mcts_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./mcts.js */ "./app/games/mcts.js");
+/* harmony import */ var _minimax_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./minimax.js */ "./app/games/minimax.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 
 
 var PlayerControllerTPlayer =
@@ -2054,11 +2150,8 @@ function () {
   }, {
     key: "getBestMove",
     value: function getBestMove(state) {
-      // console.log(1, state)
-      // const board = new UTTTBoard()
-      // board.copyFrom(state)
-      // console.log(2, board)
-      this.movesScores = _mcts_js__WEBPACK_IMPORTED_MODULE_0__["MonteCarloTreeSearch"].prototype.getMovesScores(state.game, 1 + state.game.step % 2);
+      this.movesScores = _mcts_js__WEBPACK_IMPORTED_MODULE_0__["MonteCarloTreeSearch"].prototype.getMovesScores(state.game, 1 + state.game.step % 2); // console.log(this.movesScores)
+
       var bestMove = this.movesScores.reduce(function (acc, cur) {
         return cur.visits > acc.visits ? cur : acc;
       });
@@ -2069,8 +2162,7 @@ function () {
     value: function setState(state) {
       var _this = this;
 
-      console.log('MCTS', this.player, this);
-
+      // console.log('MCTS', this.player, this)
       if (!state.game.finished && this.player === 1 + state.game.step % 2) {
         setTimeout(function () {
           var bestMove = _this.getBestMove(state);
@@ -2099,8 +2191,7 @@ function () {
     value: function setState(state) {
       var _this2 = this;
 
-      console.log('Random', this.player, state.game);
-
+      // console.log('Random', this.player, state.game)
       if (!state.game.finished && this.player === 1 + state.game.step % 2) {
         setTimeout(function () {
           var randomMove = _this2.randomMove(state); // console.log(randomMove)
@@ -2122,6 +2213,185 @@ function () {
   }]);
 
   return PlayerControllerTRandom;
+}(); // MiniMax player
+
+var PlayerControllerTMiniMax =
+/*#__PURE__*/
+function () {
+  function PlayerControllerTMiniMax() {
+    _classCallCheck(this, PlayerControllerTMiniMax);
+  }
+
+  _createClass(PlayerControllerTMiniMax, [{
+    key: "init",
+    value: function init() {}
+  }, {
+    key: "assess",
+    value: function assess(game) {
+      switch (game.finished) {
+        case 1:
+          return 1000;
+
+        case 2:
+          return -1000;
+
+        default:
+          return 0;
+      }
+    }
+  }, {
+    key: "setState",
+    value: function setState(state) {
+      var _this3 = this;
+
+      // console.log('MiniMax', this.player, state.game)
+      if (!state.game.finished && this.player === 1 + state.game.step % 2) {
+        setTimeout(function () {
+          var bestMove = _this3.getBestMove(state.game);
+
+          if (bestMove) {
+            _this3.handler(bestMove);
+          }
+        }, 1);
+      }
+    }
+  }, {
+    key: "getBestMove",
+    value: function getBestMove(game) {
+      var depth = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 4;
+      var minimax = new _minimax_js__WEBPACK_IMPORTED_MODULE_1__["MiniMax"](this.assess);
+      var answ = minimax.pruningSearch(game, depth, game.step % 2 === 0, -10000, 10000, true);
+      var sameValueMoves = [];
+      answ.moveAssessment.forEach(function (element) {
+        if (element.value === answ.bestValue) {
+          sameValueMoves.push(element);
+        }
+      });
+
+      if (sameValueMoves.length > 1) {
+        var randId = Math.floor(Math.random() * sameValueMoves.length);
+        return sameValueMoves[randId].move;
+      }
+
+      return answ.bestMove;
+    }
+  }]);
+
+  return PlayerControllerTMiniMax;
+}();
+
+/***/ }),
+
+/***/ "./app/games/stats.js":
+/*!****************************!*\
+  !*** ./app/games/stats.js ***!
+  \****************************/
+/*! exports provided: TTTStats */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TTTStats", function() { return TTTStats; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function reset() {
+  return {
+    crossWin: 0,
+    circleWin: 0,
+    draw: 0,
+    total: 0,
+    times: 100
+  };
+} // TTT stats
+
+
+var TTTStats =
+/*#__PURE__*/
+function () {
+  function TTTStats() {
+    _classCallCheck(this, TTTStats);
+  }
+
+  _createClass(TTTStats, [{
+    key: "init",
+    value: function init() {
+      return reset();
+    }
+  }, {
+    key: "createarray",
+    value: function createarray() {
+      var size = [0, 1, 2];
+      return size.map(function (row) {
+        return {
+          id: row,
+          cols: size.map(function (col) {
+            return {
+              id: col,
+              value: 0
+            };
+          })
+        };
+      });
+    } // setPlayers (state) {
+    //   this.players = state
+    // }
+
+  }, {
+    key: "reset",
+    value: function reset() {
+      this.crossWin = 0;
+      this.circleWin = 0;
+      this.draw = 0;
+      this.total = 0;
+      this.times = 0;
+    } // setCross (state) {
+    //   console.log('bruh')
+    //   return this.reset()
+    // }
+    // setCircle (state) {
+    //   return this.reset()
+    // }
+
+  }, {
+    key: "setFinished",
+    value: function setFinished(state) {
+      var _this = this;
+
+      // console.log('TTTState', state, this)
+      // console.log(this.times)
+      if (this.times > 0) {
+        switch (state) {
+          case 1:
+            this.crossWin += 1;
+            break;
+
+          case 2:
+            this.circleWin += 1;
+            break;
+
+          case 3:
+            this.draw += 1;
+            break;
+
+          default:
+            return;
+        }
+
+        this.total += 1;
+        this.times -= 1; // console.log('do it')
+
+        setTimeout(function () {
+          _this.handler();
+        }, 1);
+      }
+    }
+  }]);
+
+  return TTTStats;
 }();
 
 /***/ }),
@@ -2203,20 +2473,17 @@ function () {
   }]);
 
   return Board;
-}();
+}(); // function gameReset (player1 = 0, player2 = 1) {
+//   return {
+//     board: new Board(),
+//     finished: false,
+//     winner: false,
+//     step: 0,
+//     player1,
+//     player2
+//   }
+// }
 
-function gameReset() {
-  var player1 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-  var player2 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
-  return {
-    board: new Board(),
-    finished: false,
-    winner: false,
-    step: 0,
-    player1: player1,
-    player2: player2
-  };
-}
 
 function checkFinished(board, step) {
   if (step < 4) {
@@ -2301,8 +2568,8 @@ function () {
     value: function makeMove(_ref2) {
       var row = _ref2.row,
           col = _ref2.col;
-      console.log(row, col, !this.finished, this.step);
 
+      // console.log(row, col, !this.finished, this.step)
       if (!this.finished) {
         // console.log(row, col, this.step)
         var board = this.board.makeMove({
@@ -2379,6 +2646,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var ultimus__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(ultimus__WEBPACK_IMPORTED_MODULE_7__);
 /* harmony import */ var _ai_player_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./ai/player.js */ "./app/ai/player.js");
 /* harmony import */ var _games_player_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./games/player.js */ "./app/games/player.js");
+/* harmony import */ var _games_stats_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./games/stats.js */ "./app/games/stats.js");
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
@@ -2403,7 +2671,8 @@ function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
 
 
-var types = [].concat(_toConsumableArray(_commons__WEBPACK_IMPORTED_MODULE_1__["default"]), [_app_html__WEBPACK_IMPORTED_MODULE_2__["default"]], _toConsumableArray(_pages__WEBPACK_IMPORTED_MODULE_3__["default"]), [_ttt_store_js__WEBPACK_IMPORTED_MODULE_5__["TTTStore"], _uttt_store_js__WEBPACK_IMPORTED_MODULE_6__["UTTT"], _ai_player_js__WEBPACK_IMPORTED_MODULE_8__["PlayerControllerPlayer"], _ai_player_js__WEBPACK_IMPORTED_MODULE_8__["PlayerControllerMCTS"], _ai_player_js__WEBPACK_IMPORTED_MODULE_8__["PlayerControllerRandom"], _games_player_js__WEBPACK_IMPORTED_MODULE_9__["PlayerControllerTPlayer"], _games_player_js__WEBPACK_IMPORTED_MODULE_9__["PlayerControllerTMCTS"], _games_player_js__WEBPACK_IMPORTED_MODULE_9__["PlayerControllerTRandom"]]);
+
+var types = [].concat(_toConsumableArray(_commons__WEBPACK_IMPORTED_MODULE_1__["default"]), [_app_html__WEBPACK_IMPORTED_MODULE_2__["default"]], _toConsumableArray(_pages__WEBPACK_IMPORTED_MODULE_3__["default"]), [_ttt_store_js__WEBPACK_IMPORTED_MODULE_5__["TTTStore"], _uttt_store_js__WEBPACK_IMPORTED_MODULE_6__["UTTT"], _games_stats_js__WEBPACK_IMPORTED_MODULE_10__["TTTStats"], _ai_player_js__WEBPACK_IMPORTED_MODULE_8__["PlayerControllerPlayer"], _ai_player_js__WEBPACK_IMPORTED_MODULE_8__["PlayerControllerMCTS"], _ai_player_js__WEBPACK_IMPORTED_MODULE_8__["PlayerControllerRandom"], _games_player_js__WEBPACK_IMPORTED_MODULE_9__["PlayerControllerTPlayer"], _games_player_js__WEBPACK_IMPORTED_MODULE_9__["PlayerControllerTMCTS"], _games_player_js__WEBPACK_IMPORTED_MODULE_9__["PlayerControllerTRandom"], _games_player_js__WEBPACK_IMPORTED_MODULE_9__["PlayerControllerTMiniMax"]]);
 Object(arrmatura__WEBPACK_IMPORTED_MODULE_0__["launch"])({
   template: '<App />',
   types: types,
@@ -2471,7 +2740,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("<component id=\"Cell\">\n  <div class=\"column col-sm-4 cell-box\">\n    <div class=\"cell cell-{value}\" click=\"->store.step\" data-col={col} data-row={row}\n         data-value={value}>\n      <!-- {value|or:0} -->\n    </div>\n  </div>\n</component>\n\n<component id=\"Board\">  \n  <h6>{:gameStates|gameState:@finished:@step} </h6>\n  <div class=\"container\">\n    <div class=\"columns\" ui:for=\"row of board\">\n      <Cell ui:for=\"col of row.cols\" col={col.id} row={row.id} value={col.value}/>\n    </div>\n  </div>\n</component>\n\n<component id=\"TTTPlayer\">\n\n  <ui:tag tag=\"PlayerControllerT{type}\" player={pplayer} type={type} state=\"<-store.state|log\" ref=\"->store.ref\" handler=\"->store.makeMoveOutside\" />\n  <div>\n    <h6>Select {name}</h6>      \n    <button ui:for=\"pl of :players\"  class=\"btn control btn-{pl.name|equals:@type|then:primary}\" data-player={pplayer} data-type=\"{pl.name}\" click=\"-> store.switch\">{pl.name}</button>\n  </div>\n</component> \n\n<component id=\"TicTacToe\">\n  <div class=\"container\">\n    <div class=\"columns\">\n      <div class=\"column col-6\">\n        <Board board=\"<- store.board\" step=\"<- store.step\" finished=\"<- store.finished\"/>\n      </div>\n      <div class=\"column col-1\"></div>\n      <div class=\"column col-2\">\n        <h6>Options</h6>\n        <button class=\"btn btn-error control\" click=\"->store.reset\">Reset</button>\n        <TTTPlayer pplayer=\"1\" name=\"Cross\" type=\"<- store.cross\" />\n        <TTTPlayer pplayer=\"2\" name=\"Circle\" type=\"<- store.circle\" />               \n      </div>\n    </div>\n  </div>\n</component>\n\n\n<component id=\"TictactoePage\">\n  <h4>TicTacToe</h4>\n\n  <TTTStore ui:ref=\"store\" />\n  <TicTacToe />\n</component>");
+/* harmony default export */ __webpack_exports__["default"] = ("<component id=\"Cell\">\n  <div class=\"column col-sm-4 cell-box\">\n    <div class=\"cell cell-{value}\" click=\"->store.step\" data-col={col} data-row={row}\n         data-value={value}>\n      <!-- {value|or:0} -->\n    </div>\n  </div>\n</component>\n\n<component id=\"Board\">  \n  <h6>{:gameStates|gameState:@finished:@step} </h6>\n  <div class=\"container\">\n    <div class=\"columns\" ui:for=\"row of board\">\n      <Cell ui:for=\"col of row.cols\" col={col.id} row={row.id} value={col.value}/>\n    </div>\n  </div>\n</component>\n\n<component id=\"TTTPlayer\">\n\n  <ui:tag tag=\"PlayerControllerT{type}\" player={pplayer} type={type} state=\"<-store.state\" ref=\"->store.ref\" handler=\"->store.makeMoveOutside\" />\n  <div>\n    <h6>Select {name}</h6>      \n    <button ui:for=\"pl of :players\"  class=\"btn control btn-{pl.name|equals:@type|then:primary}\" data-player={pplayer} data-type=\"{pl.name}\" click=\"-> store.switch\">{pl.name}</button>\n  </div>\n</component> \n\n<component id=\"TicTacToe\">\n  <div class=\"container\">\n    <div class=\"columns\">\n      <div class=\"column col-6\">\n        <Board board=\"<- store.board\" step=\"<- store.step\" finished=\"<- store.finished\"/>\n      </div>\n      <div class=\"column col-1\"></div>\n      <div class=\"column col-2\">\n        <h6>Options</h6>\n        <button class=\"btn btn-error control\" click=\"->store.reset\">Reset</button>\n        <TTTPlayer pplayer=\"1\" name=\"Cross\" type=\"<- store.cross\" />\n        <TTTPlayer pplayer=\"2\" name=\"Circle\" type=\"<- store.circle\" />               \n      </div>\n    </div>\n  </div>\n</component>\n<component id=\"StatRow\">\n  <p>Cross {cross} – {crossWin} Circle {circle} – {circleWin}  Total - {total}</p>\n</component>\n\n\n<component id=\"TictactoePage\">\n  <h4>TicTacToe</h4>\n\n  <TTTStore ui:ref=\"store\" />\n  <TicTacToe />\n  <h4>Comparation</h4>\n  <!-- <TTTStats cross =\"<- store.cross\" circle =\"<- store.circle\" finished=\"<- store.finished|log\" /> -->\n  <ui:tag tag=\"TTTStats\" ui:ref=\"stat\" handler=\"->store.reset\" players={:players} cross=\"<- store.cross\" circle=\"<-store.circle\" finished=\"<- store.finished\" />\n  <StatRow cross=\"<- stat.cross\" crossWin=\"<- stat.crossWin\" circleWin=\"<- stat.circleWin\" draw=\"<- stat.draw\" total=\"<- stat.total\" circle=\"<- stat.circle\" />\n  \n</component>");
 
 /***/ }),
 
@@ -2527,6 +2796,9 @@ __webpack_require__.r(__webpack_exports__);
   }, {
     id: 2,
     name: 'Random'
+  }, {
+    id: 3,
+    name: 'MiniMax'
   }]
 });
 
@@ -2582,7 +2854,6 @@ function () {
   }, {
     key: "getBoard",
     value: function getBoard() {
-      console.log(this.game);
       return this.game.board.data;
     }
   }, {
