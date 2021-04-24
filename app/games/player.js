@@ -23,12 +23,13 @@ export class PlayerControllerTMCTS {
 
   getBestMove (state) {
     this.movesScores = MonteCarloTreeSearch.prototype.getMovesScores(state.game, 1 + state.game.step % 2)
+    // console.log(this.movesScores)
     const bestMove = this.movesScores.reduce((acc, cur) => cur.visits > acc.visits ? cur : acc)
     return bestMove.move
   }
 
   setState (state) {
-    console.log('MCTS', this.player, this)
+    // console.log('MCTS', this.player, this)
     if (!state.game.finished && (this.player === 1 + state.game.step % 2)) {
       setTimeout(() => {
         const bestMove = this.getBestMove(state)
@@ -43,7 +44,7 @@ export class PlayerControllerTRandom {
   }
 
   setState (state) {
-    console.log('Random', this.player, state.game)
+    // console.log('Random', this.player, state.game)
     if (!state.game.finished && (this.player === 1 + state.game.step % 2)) {
       setTimeout(() => {
         const randomMove = this.randomMove(state)
@@ -81,7 +82,7 @@ export class PlayerControllerTMiniMax {
   }
 
   setState (state) {
-    console.log('MiniMax', this.player, state.game)
+    // console.log('MiniMax', this.player, state.game)
     if (!state.game.finished && (this.player === 1 + state.game.step % 2)) {
       setTimeout(() => {
         const bestMove = this.getBestMove(state.game)
