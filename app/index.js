@@ -3,8 +3,8 @@ import commons from './commons'
 import templates from './app.html'
 import pages from './pages'
 import resources from './res'
-import { TTTStore } from './ttt_store.js'
-import { UTTT } from './uttt_store.js'
+import { TTTStore } from './stores/ttt_store.js'
+import { UTTTStore } from './stores/uttt_store.js'
 import { pipes } from 'ultimus'
 import {
   PlayerControllerPlayer,
@@ -17,14 +17,14 @@ import {
   PlayerControllerTMCTS,
   PlayerControllerTRandom,
   PlayerControllerTMiniMax
-} from './games/player.js'
+} from './players/playerTTT.js'
 import { TTTStats } from './games/stats.js'
 const types = [
   ...commons,
   templates,
   ...pages,
   TTTStore,
-  UTTT,
+  UTTTStore,
   TTTStats,
   PlayerControllerPlayer,
   PlayerControllerMCTS,
@@ -55,6 +55,7 @@ launch({
         return states.gameTurn[step % 2]
       }
     },
-    subBoard: (board, r, c) => board[r].cols[c].board
+    subGame: (board, r, c) => board[r].cols[c].subgame.board.data
+
   }
 })

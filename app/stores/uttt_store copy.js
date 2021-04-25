@@ -1,6 +1,6 @@
 /* eslint-disable space-before-function-paren */
-import { UTTTBoard } from './ai/uttt.js'
-import { MonteCarloTreeSearch } from './ai/mcts.js'
+import { UTTTBoard } from '../games/uttt.js'
+import { MonteCarloTreeSearch } from '../ai/mcts.js'
 
 export class UTTT extends UTTTBoard {
   init() {

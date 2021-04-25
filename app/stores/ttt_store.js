@@ -1,5 +1,5 @@
 /* eslint-disable space-before-function-paren */
-import { TTT } from './games/ttt.js'
+import { TTT } from '../games/ttt.js'
 
 function reset() {
   return {

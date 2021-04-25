@@ -1,5 +1,5 @@
 import { MonteCarloTreeSearch } from './mcts.js'
-import { UTTTBoard } from './uttt.js'
+import { UTTT } from '../games/uttt.js'
 
 // export class PlayerController {
 //   init () {
@@ -34,7 +34,7 @@ export class PlayerControllerMCTS {
 
   getBestMove (state) {
     console.log(1, state)
-    const board = new UTTTBoard()
+    const board = new UTTT()
     board.copyFrom(state)
     console.log(2, board)
     this.movesScores = MonteCarloTreeSearch.prototype.getMovesScores(board, 1 + state.step % 2)

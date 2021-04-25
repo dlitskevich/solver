@@ -41,8 +41,8 @@ class Board {
 //   }
 // }
 
-function checkFinished (board, step) {
-  if (step < 4) {
+function checkFinished (board, step, minwinstep = 4) {
+  if (step < minwinstep) {
     return false
   }
   const player = 1 + step % 2
@@ -121,5 +121,18 @@ export class TTT {
     copy.finished = finished
     copy.step = step
     return copy
+  }
+
+  // This is for UTTT
+  makeSubMove ({ row, col, value }) {
+    // console.log(row, col, !this.finished, this.step)
+    if (!this.finished) {
+      // console.log(row, col, this.step)
+      const board = this.board.makeMove({ row, col, value })
+      const finished = checkFinished(board.data, this.step, 2)
+
+      return this.copy({ board, finished, step: this.step + 1 })
+    }
+    return this.copy({ ...this })
   }
 }

@@ -1,5 +1,5 @@
-import { MonteCarloTreeSearch } from './mcts.js'
-import { MiniMax } from './minimax.js'
+import { MonteCarloTreeSearch } from '../algorithms/mcts.js'
+import { MiniMax } from '../algorithms/minimax.js'
 
 export class PlayerControllerTPlayer {
   init () {
