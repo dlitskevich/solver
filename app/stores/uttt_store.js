@@ -14,7 +14,7 @@ export class UTTTStore {
     return {
       ...reset(),
       cross: 'Person',
-      circle: 'Person'// 'MCTS'
+      circle: 'MCTS'
     }
   }
 

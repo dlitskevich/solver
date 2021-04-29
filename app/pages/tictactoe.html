@@ -41,9 +41,7 @@
     </div>
   </div>
 </component>
-<component id="StatRow">
-  <p>Cross {cross} – {crossWin} Circle {circle} – {circleWin}  Total - {total}</p>
-</component>
+
 
 
 <component id="TictactoePage">
@@ -52,7 +50,6 @@
   <TTTStore ui:ref="store" />
   <TicTacToe />
   <h4>Comparation</h4>
-  <!-- <TTTStats cross ="<- store.cross" circle ="<- store.circle" finished="<- store.finished|log" /> -->
   <ui:tag tag="TTTStats" ui:ref="stat" handler="->store.reset" players={:players} cross="<- store.cross" circle="<-store.circle" finished="<- store.finished" />
   <StatRow cross="<- stat.cross" crossWin="<- stat.crossWin" circleWin="<- stat.circleWin" draw="<- stat.draw" total="<- stat.total" circle="<- stat.circle" />
   

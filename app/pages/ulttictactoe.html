@@ -21,7 +21,7 @@
 <component id="UBoard">  
   <h6>{:gameStates|gameState:@finished:@step} </h6>
   <div class="container">
-    <div class="columns" ui:for="row of board|log">
+    <div class="columns" ui:for="row of board">
        <USubBoard 
         ui:for="col of row.cols" 
         board="{board|subGame:@row.id:@col.id}" 
@@ -53,7 +53,7 @@
       <div class="column col-2">
         <h6>Options</h6>
         <button class="btn btn-error control" click="->ustore.reset">Reset</button>
-        <button class="btn btn-error control" click="->ustore.mctsrequest">AI move</button>
+        <!-- <button class="btn btn-error control" click="->ustore.mctsrequest">AI move</button> -->
         <UTTTPlayer pplayer="1" name="Cross" type="<- ustore.cross" />
         <UTTTPlayer pplayer="2" name="Circle" type="<- ustore.circle" />               
       </div>
@@ -67,4 +67,9 @@
 
   <UTTTStore ui:ref="ustore" />
   <UTicTacToe />
+  
+  <h4>Comparation</h4>
+  <ui:tag tag="TTTStats" ui:ref="stat" handler="->ustore.reset" players={:players} cross="<- ustore.cross" circle="<-ustore.circle" finished="<- ustore.finished" />
+  <StatRow cross="<- stat.cross" crossWin="<- stat.crossWin" circleWin="<- stat.circleWin" draw="<- stat.draw" total="<- stat.total" circle="<- stat.circle" />
+  
 </component>

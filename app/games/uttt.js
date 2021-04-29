@@ -48,7 +48,17 @@ class Board {
   copy (data) {
     // TODO: rewrite copy by map
     const copy = new Board()
-    copy.data = JSON.parse(JSON.stringify(data))
+    copy.data = data.map(
+      row => ({
+        ...row,
+        cols: row.cols.map(
+          col => ({
+            ...col,
+            subgame: col.subgame.copy(col.subgame)
+          })
+        )
+      })
+    )
     return copy
   }
 }
@@ -154,7 +164,7 @@ export class UTTT {
         }
       }
     }
-    console.log(moves)
+    // console.log(moves)
     return moves
   }
 }
