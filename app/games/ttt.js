@@ -41,11 +41,13 @@ class Board {
 //   }
 // }
 
-function checkFinished (board, step, minwinstep = 4) {
+function checkFinished (board, step, minwinstep = 4, player = false) {
   if (step < minwinstep) {
     return false
   }
-  const player = 1 + step % 2
+  if (!player) {
+    player = 1 + step % 2
+  }
   // board.map()
   for (let row = 0; row < 3; row++) {
     if (board[row].cols.reduce((acc, cur) => (acc && (cur.value === player)), true)) {
@@ -129,7 +131,7 @@ export class TTT {
     if (!this.finished) {
       // console.log(row, col, this.step)
       const board = this.board.makeMove({ row, col, value })
-      const finished = checkFinished(board.data, this.step, 2)
+      const finished = checkFinished(board.data, this.step, 2, value)
 
       return this.copy({ board, finished, step: this.step + 1 })
     }
