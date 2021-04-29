@@ -18,10 +18,10 @@
 
 <component id="TTTPlayer">
 
-  <ui:tag tag="PlayerControllerT{type}" player={pplayer} type={type} state="<-store.state" ref="->store.ref" handler="->store.makeMoveOutside" />
+  <ui:tag tag="PlayerController{type}" player={pplayer} type={type} state="<-store.state" ref="->store.ref" handler="->store.makeMoveOutside" />
   <div>
     <h6>Select {name}</h6>      
-    <button ui:for="pl of :players"  class="btn control btn-{pl.name|equals:@type|then:primary}" data-player={pplayer} data-type="{pl.name}" click="-> store.switch">{pl.name}</button>
+    <button ui:for="pl of :playersTTT"  class="btn control btn-{pl.name|equals:@type|then:primary}" data-player={pplayer} data-type="{pl.type}" click="-> store.switch">{pl.name}</button>
   </div>
 </component> 
 
@@ -35,7 +35,7 @@
       <div class="column col-2">
         <h6>Options</h6>
         <button class="btn btn-error control" click="->store.reset">Reset</button>
-        <TTTPlayer pplayer="1" name="Cross" type="<- store.cross" />
+        <TTTPlayer pplayer="1" name="Cross" type="<- store.cross|log" />
         <TTTPlayer pplayer="2" name="Circle" type="<- store.circle" />               
       </div>
     </div>

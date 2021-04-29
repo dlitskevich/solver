@@ -11,10 +11,16 @@ export default {
     gameWinner: ['Red won', 'White won', 'Draw'],
     gameTurn: ['Red turn', 'White turn']
   },
-  players: [
-    { id: 0, name: 'Person' },
-    { id: 1, name: 'MCTS' },
-    { id: 2, name: 'Random' },
-    { id: 3, name: 'MiniMax' }
+  playersTTT: [
+    { id: 0, name: 'Person', type: 'Person' },
+    { id: 1, name: 'MCTS', type: 'MCTS' },
+    { id: 2, name: 'Random', type: 'Random' },
+    { id: 3, name: 'MiniMax', type: 'MiniMax' }
+  ],
+  playersUTTT: [
+    { id: 0, name: 'Person', type: 'Person' },
+    { id: 1, name: 'MCTS', type: 'MCTS' },
+    { id: 2, name: 'Random', type: 'Random' },
+    { id: 3, name: 'MiniMax', type: 'MiniMax' }
   ]
 }

@@ -8,7 +8,8 @@ function boardReset () {
       id: col,
       subgame: new TTT(),
       value: 0,
-      available: 1
+      available: 1,
+      finished: false
     }))
   }))
 }
@@ -100,13 +101,13 @@ export class UTTT {
 
   makeMove ({ col, row, subrow, subcol }) {
     // const { board, step, finished } = this
-    console.log(col, row, subcol, subrow)
+    // console.log(col, row, subcol, subrow)
     const subboard = this.board.data[row].cols[col]
     // console.log(subboard)
     if (!this.finished && (subboard.available === 1) && !subboard.finished) {
       const board = this.board.makeMove({ subcol, subrow, row, col, value: 1 + (this.step % 2) })
       const finished = checkFinished(board.data, this.step)
-      console.log(board)
+      // console.log(board)
       // determine available subboards for the next move
       let avail = 1
       if (board.data[subrow].cols[subcol].available !== false || finished) {
@@ -138,21 +139,22 @@ export class UTTT {
 
   getAvailableMoves () {
     const moves = []
-    for (let subrow = 0; subrow < 3; subrow++) {
-      for (let subcol = 0; subcol < 3; subcol++) {
-        const subboard = this.board[subrow].cols[subcol]
-        if (subboard.available !== 1) {
+    for (let row = 0; row < 3; row++) {
+      for (let col = 0; col < 3; col++) {
+        const cell = this.board.data[row].cols[col]
+        if (cell.available !== 1) {
           continue
         }
-        for (let row = 0; row < 3; row++) {
-          for (let col = 0; col < 3; col++) {
-            if (subboard.board[row].cols[col].value === 0) {
+        for (let subrow = 0; subrow < 3; subrow++) {
+          for (let subcol = 0; subcol < 3; subcol++) {
+            if (cell.subgame.board.data[subrow].cols[subcol].value === 0) {
               moves.push({ col: col, row: row, value: 0, subrow: subrow, subcol: subcol })
             }
           }
         }
       }
     }
+    console.log(moves)
     return moves
   }
 }

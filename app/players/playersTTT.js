@@ -1,21 +1,8 @@
 import { MonteCarloTreeSearch } from '../algorithms/mcts.js'
 import { MiniMax } from '../algorithms/minimax.js'
 
-export class PlayerControllerTPlayer {
-  init () {
-  }
-
-  setState (game) {
-    // console.log('player')
-    // if (condition) {
-    //   this.handler({ row: 1, col: 2 })
-    // } else {
-
-    // }
-  }
-}
 // MCTS player for TTT
-export class PlayerControllerTMCTS {
+export class PlayerControllerTTTMCTS {
   init () {
     this.montecarlo = new MonteCarloTreeSearch()
     this.movesScores = null
@@ -38,33 +25,9 @@ export class PlayerControllerTMCTS {
     }
   }
 }
-// Random player
-export class PlayerControllerTRandom {
-  init () {
-  }
-
-  setState (game) {
-    // console.log('Random', this.player, game)
-    if (!game.finished && (this.player === 1 + game.step % 2)) {
-      setTimeout(() => {
-        const randomMove = this.randomMove(game)
-        // console.log(randomMove)
-        if (randomMove) {
-          this.handler(randomMove)
-        }
-      }, 1)
-    }
-  }
-
-  randomMove (game) {
-    const availableMoves = game.getAvailableMoves()
-    const randId = Math.floor(Math.random() * availableMoves.length)
-    return availableMoves[randId]
-  }
-}
 
 // MiniMax player
-export class PlayerControllerTMiniMax {
+export class PlayerControllerTTTMiniMax {
   init () {
   }
 

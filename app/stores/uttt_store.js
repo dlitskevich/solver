@@ -1,6 +1,6 @@
 /* eslint-disable space-before-function-paren */
 import { UTTT } from '../games/uttt.js'
-import { MonteCarloTreeSearch } from '../ai/mcts.js'
+import { MonteCarloTreeSearch } from '../algorithms/mcts.js'
 
 function reset() {
   return {
@@ -10,7 +10,7 @@ function reset() {
 
 export class UTTTStore {
   init() {
-    console.log('bruh', this)
+    // console.log('bruh', this)
     return {
       ...reset(),
       cross: 'Person',
@@ -31,7 +31,7 @@ export class UTTTStore {
   }
 
   getState() {
-    return { ...this }
+    return this.game
   }
 
   onRef() {
@@ -43,24 +43,20 @@ export class UTTTStore {
     return player === 1 ? this.cross : this.circle
   }
 
-  // onStepcell(cell, game) {
-  //   if (this.toggledAI) {
-  //     if (this.toggledAI !== 1 + game.step % 2) {
-  //       const nextState = this.makeMove(cell, game)
-  //       return { ...nextState, '...': Promise.resolve(this.mctsrequest(nextState)) }
-  //     }
-  //   }
-  //   return this.makeMove(cell, game)
-  // }
   onStepcell({ col, row, subcol, subrow, value }, { game }) {
     if (this.currentPlayer() === 'Person') {
       if (!value) {
-        console.log(game)
+        // console.log(game)
         game = game.makeMove({ col, row, subcol, subrow })
-        console.log(game)
+        // console.log(game)
         return { ...this, game }
       }
     }
+  }
+
+  onMakeMoveOutside (cell) {
+    this.game = this.game.makeMove(cell)
+    return { ...this }
   }
 
   onSwitch({ player, type }) {
@@ -77,6 +73,10 @@ export class UTTTStore {
     }
   }
 
+  onReset(_, { board }) {
+    return reset()
+  }
+
   onMctsrequest() {
     return this.mctsrequest(this)
   }
@@ -88,27 +88,22 @@ export class UTTTStore {
     }
   }
 
-  onReset(_, { board }) {
-    return reset()
-  }
-
-  onMakeMoveOutside (cell) {
-    // test without this
-    return this.makeMove(cell, this)
-  }
-
   mctsrequest (state) {
     if (!this.montecarlo) {
       this.montecarlo = new MonteCarloTreeSearch()
     }
-    console.log(this.copy())
+    // console.log(this.copy())
     if (!this.finished) {
       return this.montecarlo.findNextmove(this.copy(), 1 + state.step % 2)
     }
   }
-
-  randomrequest (state) {
-    this.getAvailableMoves()
-    return this.montecarlo.findNextmove(this.copy(), 1 + state.step % 2)
-  }
+  // onStepcell(cell, game) {
+  //   if (this.toggledAI) {
+  //     if (this.toggledAI !== 1 + game.step % 2) {
+  //       const nextState = this.makeMove(cell, game)
+  //       return { ...nextState, '...': Promise.resolve(this.mctsrequest(nextState)) }
+  //     }
+  //   }
+  //   return this.makeMove(cell, game)
+  // }
 };

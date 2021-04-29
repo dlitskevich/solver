@@ -6,18 +6,18 @@ import resources from './res'
 import { TTTStore } from './stores/ttt_store.js'
 import { UTTTStore } from './stores/uttt_store.js'
 import { pipes } from 'ultimus'
+// import {
+//   PlayerControllerPlayer,
+//   PlayerControllerMCTS,
+//   PlayerControllerRandom
+// } from './ai/player.js'
+
 import {
   PlayerControllerPlayer,
   PlayerControllerMCTS,
-  PlayerControllerRandom
-} from './ai/player.js'
-
-import {
-  PlayerControllerTPlayer,
-  PlayerControllerTMCTS,
-  PlayerControllerTRandom,
-  PlayerControllerTMiniMax
-} from './players/playerTTT.js'
+  PlayerControllerRandom,
+  PlayerControllerMiniMax
+} from './players/players.js'
 import { TTTStats } from './games/stats.js'
 const types = [
   ...commons,
@@ -29,10 +29,7 @@ const types = [
   PlayerControllerPlayer,
   PlayerControllerMCTS,
   PlayerControllerRandom,
-  PlayerControllerTPlayer,
-  PlayerControllerTMCTS,
-  PlayerControllerTRandom,
-  PlayerControllerTMiniMax
+  PlayerControllerMiniMax
 
 ]
 
