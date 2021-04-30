@@ -4,7 +4,8 @@ export default {
     sitemap: [
       { id: 'main', name: 'Info', icon2: 'home' },
       { id: 'tictactoe', name: 'TicTacToe', icon: 'work' },
-      { id: 'ulttictactoe', name: 'UltimateTicTacToe', icon: 'work' }
+      { id: 'ulttictactoe', name: 'UltimateTicTacToe', icon: 'work' },
+      { id: 'neat', name: 'Neat', icon: 'work' }
     ]
   },
   gameStates: {
@@ -20,7 +21,7 @@ export default {
   playersUTTT: [
     { id: 0, name: 'Person', type: 'Person' },
     { id: 1, name: 'MCTS', type: 'MCTS' },
-    { id: 2, name: 'Random', type: 'Random' },
-    { id: 3, name: 'MiniMax', type: 'MiniMax' }
+    { id: 2, name: 'Random', type: 'Random' }
+    // { id: 3, name: 'MiniMax', type: 'MiniMax' }
   ]
 }

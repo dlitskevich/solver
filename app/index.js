@@ -5,6 +5,7 @@ import pages from './pages'
 import resources from './res'
 import { TTTStore } from './stores/ttt_store.js'
 import { UTTTStore } from './stores/uttt_store.js'
+import { NEATStore } from './stores/neat_store.js'
 import { pipes } from 'ultimus'
 // import {
 //   PlayerControllerPlayer,
@@ -25,6 +26,7 @@ const types = [
   ...pages,
   TTTStore,
   UTTTStore,
+  NEATStore,
   TTTStats,
   PlayerControllerPlayer,
   PlayerControllerMCTS,
