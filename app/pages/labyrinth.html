@@ -1,0 +1,27 @@
+
+
+<component id="Player">
+  <div class="player" style="top: {value.y}px; left: {value.x}px;"></div> 
+</component>
+<component id="Goal">
+  <div class="goal" style="top: 100px; left: 200px;"></div> 
+</component>
+
+<component id="Labyrinth">
+  <ui:tag tag="LabyrinthMonitor"  step="<-nstore.step" moveAll="->nstore.moveall" assessAll="->nstore.evolve" />
+  <div class="labyrinth"  >
+    <Player ui:for="pl of players|toArray"  value="{pl.value}" />
+    <Goal  />
+  </div>
+</component>
+
+
+<component id="LabyrinthPage">
+  <h4>NEAT is neat</h4>
+  <LabyrinthStore ui:ref="nstore" />
+  <Labyrinth players="<-nstore.players|log" />
+  
+  <button class="btn btn-error control" click="->nstore.reset">Reset</button>
+  <button class="btn btn-error control" click="->nstore.moveall">MoveAll</button>
+  <h4>Comparation</h4>
+</component>

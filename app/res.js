@@ -5,7 +5,7 @@ export default {
       { id: 'main', name: 'Info', icon2: 'home' },
       { id: 'tictactoe', name: 'TicTacToe', icon: 'work' },
       { id: 'ulttictactoe', name: 'UltimateTicTacToe', icon: 'work' },
-      { id: 'neat', name: 'Neat', icon: 'work' }
+      { id: 'labyrinth', name: 'Labyrinth', icon: 'work' }
     ]
   },
   gameStates: {

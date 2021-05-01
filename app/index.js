@@ -5,7 +5,7 @@ import pages from './pages'
 import resources from './res'
 import { TTTStore } from './stores/ttt_store.js'
 import { UTTTStore } from './stores/uttt_store.js'
-import { NEATStore } from './stores/neat_store.js'
+import { LabyrinthStore } from './stores/labyrinth_store.js'
 import { pipes } from 'ultimus'
 // import {
 //   PlayerControllerPlayer,
@@ -20,14 +20,17 @@ import {
   PlayerControllerMiniMax
 } from './players/players.js'
 import { TTTStats } from './games/stats.js'
+import { LabyrinthMonitor } from './players/labyrinthmonitor.js'
+
 const types = [
   ...commons,
   templates,
   ...pages,
   TTTStore,
   UTTTStore,
-  NEATStore,
+  LabyrinthStore,
   TTTStats,
+  LabyrinthMonitor,
   PlayerControllerPlayer,
   PlayerControllerMCTS,
   PlayerControllerRandom,
@@ -47,6 +50,7 @@ launch({
     age: () => 34,
     wrapWithKey: (v, k, r) => ({ ...r, [k]: v }),
     inc: (x = 0) => (x + 1),
+    toArray: (array) => array.map((element, i) => ({ id: i, value: element })),
     gameState: (states, f, step) => {
       if (f) {
         return states.gameWinner[f - 1]

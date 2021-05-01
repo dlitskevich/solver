@@ -10,18 +10,20 @@ class Population {
     this.size = size
     this.individuals = []
     for (let i = 0; i < size; i++) {
-      const individual = new Individual(inNum, outNum)
+      const individual = new Individual(inNum, outNum, i)
       this.individuals.push(individual)
     }
   }
 }
 
 class Individual {
-  constructor (inNum, outNum) {
+  constructor (inNum, outNum, id) {
+    this.id = id
     this.inNum = inNum
     this.outNum = outNum
     this.totalNum = inNum + outNum
     this.nodes = []
+    this.score = false
 
     for (let i = this.inNum; i < this.totalNum; i++) {
       const node = new Node(i)
@@ -63,12 +65,17 @@ class Individual {
 
   getMaxLayer () {
     let maxLayer = 0
-    for (let i = 0; this.inNum < this.totalNum; i++) {
+    for (let i = this.inNum + this.outNum; i < this.totalNum; i++) {
       const node = this.nodes[i]
       if (!node.layer && (node.layer > maxLayer)) {
         maxLayer = node.layer
       }
     }
+    return maxLayer
+  }
+
+  setScore (score) {
+    this.score = score
   }
 
   evaluate (args) {

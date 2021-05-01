@@ -1,9 +1,9 @@
 import ticTacToe from './tictactoe.html'
 import ultTicTacToe from './ulttictactoe.html'
-import neat from './neat.html'
+import labyrinth from './labyrinth.html'
 
 export default [
   ticTacToe,
   ultTicTacToe,
-  neat
+  labyrinth
 ]
