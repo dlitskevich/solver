@@ -2,12 +2,13 @@
 import { NEAT } from '../algorithms/neat.js'
 import { Labyrinth } from '../games/labyrinth.js'
 function reset() {
-  const size = 10
+  const size = 50
   return {
     size,
-    neat: new NEAT({ size: 10, inNum: 3, outNum: 4 }),
+    neat: new NEAT({ size, inNum: 3, outNum: 2 }),
     game: new Labyrinth(size),
-    step: 0
+    step: 0,
+    cycle: 0
   }
 }
 
@@ -16,10 +17,6 @@ export class LabyrinthStore {
     return {
       ...reset()
     }
-  }
-
-  getBoard() {
-    return this.game.board.data
   }
 
   getIndividuals() {
@@ -54,7 +51,11 @@ export class LabyrinthStore {
 
   evolve() {
     this.scoreAll()
-    return { ...this, step: 0 }
+    console.log(this)
+    this.neat.population.evolvePopulation(4)
+
+    this.game.reset()
+    return { ...this, step: 0, cycle: this.cycle + 1 }
   }
 
   onEvolve() {

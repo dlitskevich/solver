@@ -21,10 +21,11 @@ class Player {
   }
 
   move (direction) {
+    const velocity = 1
     const norm = _norm(direction)
     const copy = this.copy()
-    copy.x += 5 * direction[0] / norm
-    copy.y += 5 * direction[1] / norm
+    copy.x += velocity * direction[0] / norm
+    copy.y += velocity * direction[1] / norm
     copy.getDistance()
     return copy
   }
@@ -40,8 +41,16 @@ export class Labyrinth {
   constructor (size) {
     this.width = 400
     this.height = 600
+    this.size = size
     this.players = []
     for (let i = 0; i < size; i++) {
+      this.players.push(new Player(200, 500, new Goal(200, 100)))
+    }
+  }
+
+  reset () {
+    this.players = []
+    for (let i = 0; i < this.size; i++) {
       this.players.push(new Player(200, 500, new Goal(200, 100)))
     }
   }

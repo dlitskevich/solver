@@ -9,9 +9,22 @@
 
 <component id="Labyrinth">
   <ui:tag tag="LabyrinthMonitor"  step="<-nstore.step" moveAll="->nstore.moveall" assessAll="->nstore.evolve" />
-  <div class="labyrinth"  >
-    <Player ui:for="pl of players|toArray"  value="{pl.value}" />
-    <Goal  />
+  
+  <div class="container">
+    <div class="columns">
+      <div class="column col-6 labcontainer">
+        <div class="labyrinth"  >
+          <Player ui:for="pl of players|toArray"  value="{pl.value}" />
+          <Goal  />
+        </div>
+      </div>
+      <div class="column col-1"></div>
+      <div class="column col-2">
+        <h6>Options</h6>
+        <button class="btn btn-error control" click="->nstore.reset">Reset</button>
+        <button class="btn btn-error control" click="->nstore.moveall">MoveAll</button>            
+      </div>
+    </div>
   </div>
 </component>
 
@@ -19,9 +32,8 @@
 <component id="LabyrinthPage">
   <h4>NEAT is neat</h4>
   <LabyrinthStore ui:ref="nstore" />
-  <Labyrinth players="<-nstore.players|log" />
+  <Labyrinth players="<-nstore.players" />
   
-  <button class="btn btn-error control" click="->nstore.reset">Reset</button>
-  <button class="btn btn-error control" click="->nstore.moveall">MoveAll</button>
+  
   <h4>Comparation</h4>
 </component>
