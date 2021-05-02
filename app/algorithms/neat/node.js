@@ -63,8 +63,7 @@ export class Node {
 
   connectionExist (nodeId) {
     const connId = cantorPairing(this.id, nodeId)
-    this.conns.forEach((conn) => { if (conn.id === connId) { return true } })
-    return false
+    return this.conns.some((conn) => conn.id === connId)
   }
 
   toNextLayer () {

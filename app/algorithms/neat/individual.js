@@ -46,7 +46,7 @@ export class Individual {
   getLayers (layers) {
     const nodes = []
     this.nodes.forEach((node) => {
-      if (node.layer in layers) {
+      if (layers.some((layer) => layer === node.layer)) {
         nodes.push(node)
       }
     })
@@ -57,7 +57,7 @@ export class Individual {
     let maxLayer = 0
     for (let i = this.inNum + this.outNum; i < this.totalNum; i++) {
       const node = this.nodes[i]
-      if (!node.layer && (node.layer > maxLayer)) {
+      if (node.layer && (node.layer > maxLayer)) {
         maxLayer = node.layer
       }
     }
@@ -72,7 +72,7 @@ export class Individual {
   evaluate (args) {
     // first layer init
     this.getLayer(0).forEach((node, i) => node.activateFirst(args[i]))
-    for (let layer = 1; layer < this.getMaxLayer(); layer++) {
+    for (let layer = 1; layer < this.getMaxLayer() + 1; layer++) {
       this.getLayer(layer).forEach((node, i) => node.activate())
     }
     const answ = this.getLayer(false).sort((node1, node2) => node1.id - node2.id).map((node) => node.activateLast())
@@ -93,7 +93,7 @@ export class Individual {
     const node = candidates[Math.floor(Math.random() * candidates.length)]
     const conn = node.conns[Math.floor(Math.random() * node.conns.length)]
     const outNode = conn.outNode
-    const newNode = new Node(this.totalNum, outNode.layer)
+    const newNode = new Node(this.totalNum, outNode.layer ? outNode.layer : node.layer + 1)
     this.totalNum += 1
     outNode.toNextLayer()
     newNode.addConnection(outNode)
@@ -113,15 +113,14 @@ export class Individual {
     this.getNode(id).conns.forEach((conn) => { conn.active = false })
   }
 
-  copy () {
+  copy (score = MAX_NUM) {
     const copy = new Individual(this.inNum, this.outNum, this.id)
     copy.id = this.id
-    copy.totalNum = this.inNum + this.outNum
     copy.nodes = this.nodes.map((node) => node.copy())
-    copy.score = MAX_NUM
+    copy.score = score
     this.nodes.forEach((node, i) => {
       // const nodeid = node.id
-      copy.nodes[i].conns = node.conns.map((conn) => conn.copy(node.id, this.getNode(conn.outNode.id)))
+      copy.nodes[i].conns = node.conns.map((conn) => conn.copy(node.id, copy.getNode(conn.outNode.id)))
     })
     return copy
   }

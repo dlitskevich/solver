@@ -35,7 +35,7 @@ class Population {
   findBest () {
     this.individuals.forEach((individual) => {
       if (individual.score < this.best.score) {
-        this.best = individual.copy()
+        this.best = individual.copy(individual.score)
       }
     })
   }
