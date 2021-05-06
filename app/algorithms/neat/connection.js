@@ -8,10 +8,25 @@ export class Connection {
     this.active = true
   }
 
+  toggle () {
+    this.active = !this.active
+  }
+
+  activate () {
+    this.active = true
+  }
+
   copy (inNodeid, outNode) {
     const copy = new Connection(inNodeid, outNode)
     copy.weight = this.weight
     copy.active = this.active
     return copy
   }
+
+  // crossCopy (inNode, outNode) {
+  //   if (outNode.layer !== false && outNode.layer <= inNode.layer) {
+  //     return false
+  //   }
+  //   return this.copy(inNode.id, outNode)
+  // }
 }

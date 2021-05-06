@@ -50,7 +50,7 @@ export class Node {
 
   toggleRandConnection () {
     const randConnId = Math.floor(Math.rand() * this.conns.length)
-    this.conns[randConnId].active = !this.conns[randConnId].active
+    this.conns[randConnId].toggle()
   }
 
   updateBias () {
@@ -73,7 +73,7 @@ export class Node {
     }
   }
 
-  copy () {
+  copy (allNodes) {
     const copy = new Node(this.id, this.layer)
     copy.conns = [] // can't duplicate conns here, cause not all nodes created yet
     copy.sum = 0

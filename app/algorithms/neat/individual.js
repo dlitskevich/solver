@@ -102,6 +102,47 @@ export class Individual {
     this.nodes.push(newNode)
   }
 
+  crossOver (donor) {
+    const nodeSeparator = this.nodes[Math.floor(Math.random() * this.nodes.length)]
+    const connSeparatorId = nodeSeparator.conns[Math.floor(Math.random() * nodeSeparator.conns.length)].id
+    const child = this.copy()
+    if (donor.totalNum > this.totalNum) {
+      child.nodes.concat(donor.nodes.slice(this.totalNum).map(node => node.copy()))
+      this.nodes.slice(this.totalNum).forEach((node, i) => {
+        child.nodes[i].conns = node.conns.map((conn) => conn.copy(node.id, child.getNode(conn.outNode.id)))
+      })
+      this.totalNum = donor.totalNum
+    }
+    let i = 0
+    while (i < child.getMaxLayer()) {
+      const nodes = this.getLayer(i)
+      nodes.forEach((node) => {
+        const donorNode = donor.getNode(node.id)
+        if (donorNode) {
+          this._crossOverNodes(node, donorNode, connSeparatorId)
+        }
+      })
+      i++
+    }
+    return child
+  }
+
+  _crossOverNodes (thisNode, donorNode, connSeparatorId) {
+    donorNode.conns.forEach(conn => {
+      if (conn.id > connSeparatorId) {
+        const childConnId = thisNode.conns.findIndex((c) => c.id === conn.id)
+        if (childConnId) {
+          thisNode.conns[childConnId] = conn.copy(thisNode.id, this.getNode(conn.outNode.id))
+        } else {
+          const outNode = this.getNode(conn.outNode.id)
+          if (outNode.layer === false || outNode.layer > thisNode.layer) {
+            thisNode.conns.push(conn.copy(thisNode.id, outNode))
+          }
+        }
+      }
+    })
+  }
+
   disableNode (id) {
     this.nodes.forEach((node, i) => {
       node.conns.forEach((conn) => {
