@@ -103,24 +103,24 @@ export class Individual {
   }
 
   crossOver (donor) {
-    const nodeSeparator = this.nodes[Math.floor(Math.random() * this.nodes.length)]
+    const nodeSeparator = this.nodes[this.outNum + Math.floor(Math.random() * (this.nodes.length - this.outNum))]
     const connSeparatorId = nodeSeparator.conns[Math.floor(Math.random() * nodeSeparator.conns.length)].id
     const child = this.copy()
     if (donor.totalNum > this.totalNum) {
-      child.nodes.concat(donor.nodes.slice(this.totalNum).map(node => node.copy()))
+      child.nodes = child.nodes.concat(donor.nodes.slice(this.totalNum).map(node => node.copy()))
       // adding connections
       // this.nodes.slice(this.totalNum).forEach((node, i) => {
       //   child.nodes[i].conns = node.conns.map((conn) => conn.copy(node.id, child.getNode(conn.outNode.id)))
       // })
-      this.totalNum = donor.totalNum
+      child.totalNum = donor.totalNum
     }
     let i = 0
     while (i < child.getMaxLayer()) {
-      const nodes = this.getLayer(i)
+      const nodes = child.getLayer(i)
       nodes.forEach((node) => {
         const donorNode = donor.getNode(node.id)
         if (donorNode) {
-          this._crossOverNodes(node, donorNode, connSeparatorId)
+          child._crossOverNodes(node, donorNode, connSeparatorId)
         }
       })
       i++
@@ -136,9 +136,10 @@ export class Individual {
           thisNode.conns[childConnId] = conn.copy(thisNode.id, this.getNode(conn.outNode.id))
         } else {
           const outNode = this.getNode(conn.outNode.id)
-          if (outNode.layer === false || outNode.layer > thisNode.layer) {
-            thisNode.conns.push(conn.copy(thisNode.id, outNode))
-          }
+          // if (outNode.layer === false || outNode.layer > thisNode.layer) {
+          //   thisNode.conns.push(conn.copy(thisNode.id, outNode))
+          // }
+          thisNode.addConnection(outNode)
         }
       }
     })

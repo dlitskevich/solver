@@ -6,15 +6,23 @@ import {
 
 export class NEAT {
   constructor (params) {
+    if (!params.probParams) {
+      params.probParams = {
+        crossOver: 0.3,
+        addNode: 0.3,
+        addConn: 0.4
+      }
+    }
     this.population = new Population(params)
   }
 }
 
 class Population {
-  constructor ({ size, inNum, outNum }) {
+  constructor ({ size, inNum, outNum, probParams }) {
     this.size = size
     this.individuals = []
     this.best = { id: false, score: MAX_NUM }
+    this.probParams = probParams
 
     for (let i = 0; i < size; i++) {
       const individual = new Individual(inNum, outNum, i)
@@ -22,11 +30,11 @@ class Population {
     }
   }
 
-  getNodeIndividual (id) {
+  getIndividual (id) {
     for (let i = 0; i < this.size; i++) {
-      const node = this.individuals[i]
-      if (node.id === id) {
-        return { id: i, value: node }
+      const individual = this.individuals[i]
+      if (individual.id === id) {
+        return { id: i, value: individual }
         // id -- id in individuals array
       }
     }
@@ -44,16 +52,16 @@ class Population {
     this.findBest()
     for (let i = 0; i < toEvolveNum; i++) {
       const rand = Math.random()
-      if (rand < 0) {
-        // TODO: crossover
+      const { id: toReplaceId, value: toReplaceValue } = this.getIndividual(this.selectWorst())
+      const copy = this.getIndividual(this.selectBest()).value.copy()
+      if (rand < this.probParams.crossOver) {
+        copy.crossOver(toReplaceValue)
       } else {
-        const toReplaceId = this.getNodeIndividual(this.selectWorst()).id
-        const copy = this.getNodeIndividual(this.selectBest()).value.copy()
         copy.addRandNode()
         copy.addRandConnection()
-        copy.id = toReplaceId
-        this.individuals[toReplaceId] = copy
       }
+      copy.id = toReplaceId
+      this.individuals[toReplaceId] = copy
     }
   }
 

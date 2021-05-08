@@ -2,7 +2,7 @@
 import { NEAT } from '../algorithms/neat.js'
 import { Labyrinth } from '../games/labyrinth.js'
 function reset() {
-  const size = 50
+  const size = 45
   return {
     size,
     neat: new NEAT({ size, inNum: 3, outNum: 2 }),
