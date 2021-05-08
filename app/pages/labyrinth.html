@@ -1,7 +1,7 @@
 
 
 <component id="Player">
-  <div class="player" style="top: {value.y}px; left: {value.x}px;"></div> 
+  <div class="player {title}" style="top: {value.y}px; left: {value.x}px;"></div> 
 </component>
 <component id="Goal">
   <div class="goal" style="top: 100px; left: 200px;"></div> 
@@ -15,6 +15,7 @@
       <div class="column col-6 labcontainer">
         <div class="labyrinth"  >
           <Player ui:for="pl of players|toArray"  value="{pl.value}" />
+          <Player value="<- nstore.bestplayer" title="bestplayer"/>
           <Goal  />
         </div>
       </div>

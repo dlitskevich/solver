@@ -14,7 +14,7 @@ class Population {
   constructor ({ size, inNum, outNum }) {
     this.size = size
     this.individuals = []
-    this.best = { score: MAX_NUM }
+    this.best = { id: false, score: MAX_NUM }
 
     for (let i = 0; i < size; i++) {
       const individual = new Individual(inNum, outNum, i)

@@ -39,10 +39,13 @@ class Player {
 
 export class Labyrinth {
   constructor (size) {
-    this.width = 400
-    this.height = 600
-    this.size = size
-    this.players = []
+    Object.assign(this, {
+      width: 400,
+      height: 600,
+      size,
+      players: [],
+      bestPlayer: new Player(200, 500, new Goal(200, 100))
+    })
     for (let i = 0; i < size; i++) {
       this.players.push(new Player(200, 500, new Goal(200, 100)))
     }
@@ -50,6 +53,7 @@ export class Labyrinth {
 
   reset () {
     this.players = []
+    this.bestPlayer = new Player(200, 500, new Goal(200, 100))
     for (let i = 0; i < this.size; i++) {
       this.players.push(new Player(200, 500, new Goal(200, 100)))
     }

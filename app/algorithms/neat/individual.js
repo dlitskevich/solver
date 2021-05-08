@@ -108,9 +108,10 @@ export class Individual {
     const child = this.copy()
     if (donor.totalNum > this.totalNum) {
       child.nodes.concat(donor.nodes.slice(this.totalNum).map(node => node.copy()))
-      this.nodes.slice(this.totalNum).forEach((node, i) => {
-        child.nodes[i].conns = node.conns.map((conn) => conn.copy(node.id, child.getNode(conn.outNode.id)))
-      })
+      // adding connections
+      // this.nodes.slice(this.totalNum).forEach((node, i) => {
+      //   child.nodes[i].conns = node.conns.map((conn) => conn.copy(node.id, child.getNode(conn.outNode.id)))
+      // })
       this.totalNum = donor.totalNum
     }
     let i = 0
@@ -157,6 +158,7 @@ export class Individual {
   copy (score = MAX_NUM) {
     const copy = new Individual(this.inNum, this.outNum, this.id)
     copy.id = this.id
+    copy.totalNum = this.totalNum
     copy.nodes = this.nodes.map((node) => node.copy())
     copy.score = score
     this.nodes.forEach((node, i) => {
