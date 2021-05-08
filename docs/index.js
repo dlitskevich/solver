@@ -497,6 +497,214 @@ function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NEAT", function() { return NEAT; });
+/* harmony import */ var _neat_individual__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./neat/individual */ "./app/algorithms/neat/individual.js");
+/* harmony import */ var _neat_functions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./neat/functions */ "./app/algorithms/neat/functions.js");
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+
+
+var NEAT = function NEAT(params) {
+  _classCallCheck(this, NEAT);
+
+  if (!params.probParams) {
+    params.probParams = {
+      crossOver: 0.3,
+      addNode: 0.3,
+      addConn: 0.4
+    };
+  }
+
+  this.population = new Population(params);
+};
+
+var Population =
+/*#__PURE__*/
+function () {
+  function Population(_ref) {
+    var size = _ref.size,
+        inNum = _ref.inNum,
+        outNum = _ref.outNum,
+        probParams = _ref.probParams;
+
+    _classCallCheck(this, Population);
+
+    this.size = size;
+    this.individuals = [];
+    this.best = {
+      id: false,
+      score: _neat_functions__WEBPACK_IMPORTED_MODULE_1__["MAX_NUM"]
+    };
+    this.probParams = probParams;
+
+    for (var i = 0; i < size; i++) {
+      var individual = new _neat_individual__WEBPACK_IMPORTED_MODULE_0__["Individual"](inNum, outNum, i);
+      this.individuals.push(individual);
+    }
+  }
+
+  _createClass(Population, [{
+    key: "getIndividual",
+    value: function getIndividual(id) {
+      for (var i = 0; i < this.size; i++) {
+        var individual = this.individuals[i];
+
+        if (individual.id === id) {
+          return {
+            id: i,
+            value: individual
+          }; // id -- id in individuals array
+        }
+      }
+    }
+  }, {
+    key: "findBest",
+    value: function findBest() {
+      var _this = this;
+
+      this.individuals.forEach(function (individual) {
+        if (individual.score < _this.best.score) {
+          _this.best = individual.copy(individual.score);
+        }
+      });
+    }
+  }, {
+    key: "evolvePopulation",
+    value: function evolvePopulation() {
+      var toEvolveNum = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 4;
+      this.findBest();
+
+      for (var i = 0; i < toEvolveNum; i++) {
+        var rand = Math.random();
+
+        var _this$getIndividual = this.getIndividual(this.selectWorst()),
+            toReplaceId = _this$getIndividual.id,
+            toReplaceValue = _this$getIndividual.value;
+
+        var copy = this.getIndividual(this.selectBest()).value.copy();
+
+        if (rand < this.probParams.crossOver) {
+          copy.crossOver(toReplaceValue);
+        } else {
+          copy.addRandNode();
+          copy.addRandConnection();
+        }
+
+        copy.id = toReplaceId;
+        this.individuals[toReplaceId] = copy;
+      }
+    }
+  }, {
+    key: "selectBest",
+    value: function selectBest() {
+      var candidatesId = [];
+      var weights = [];
+      this.individuals.forEach(function (individual) {
+        if (individual.score < _neat_functions__WEBPACK_IMPORTED_MODULE_1__["MAX_NUM"]) {
+          candidatesId.push(individual.id);
+          weights.push(1 / (1 + individual.score));
+        }
+      });
+      return Object(_neat_functions__WEBPACK_IMPORTED_MODULE_1__["randomWeighted"])(candidatesId, weights);
+    }
+  }, {
+    key: "selectWorst",
+    value: function selectWorst() {
+      var candidatesId = [];
+      var weights = [];
+      this.individuals.forEach(function (individual) {
+        if (individual.score < _neat_functions__WEBPACK_IMPORTED_MODULE_1__["MAX_NUM"]) {
+          candidatesId.push(individual.id);
+          weights.push(individual.score);
+        }
+      });
+      return Object(_neat_functions__WEBPACK_IMPORTED_MODULE_1__["randomWeighted"])(candidatesId, weights);
+    }
+  }]);
+
+  return Population;
+}();
+
+/***/ }),
+
+/***/ "./app/algorithms/neat/connection.js":
+/*!*******************************************!*\
+  !*** ./app/algorithms/neat/connection.js ***!
+  \*******************************************/
+/*! exports provided: Connection */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Connection", function() { return Connection; });
+/* harmony import */ var _functions_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./functions.js */ "./app/algorithms/neat/functions.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+var Connection =
+/*#__PURE__*/
+function () {
+  function Connection(inNodeid, outNode) {
+    _classCallCheck(this, Connection);
+
+    this.id = Object(_functions_js__WEBPACK_IMPORTED_MODULE_0__["cantorPairing"])(inNodeid, outNode.id);
+    this.outNode = outNode;
+    this.weight = 2 * Math.random() - 1;
+    this.active = true;
+  }
+
+  _createClass(Connection, [{
+    key: "toggle",
+    value: function toggle() {
+      this.active = !this.active;
+    }
+  }, {
+    key: "activate",
+    value: function activate() {
+      this.active = true;
+    }
+  }, {
+    key: "copy",
+    value: function copy(inNodeid, outNode) {
+      var copy = new Connection(inNodeid, outNode);
+      copy.weight = this.weight;
+      copy.active = this.active;
+      return copy;
+    } // crossCopy (inNode, outNode) {
+    //   if (outNode.layer !== false && outNode.layer <= inNode.layer) {
+    //     return false
+    //   }
+    //   return this.copy(inNode.id, outNode)
+    // }
+
+  }]);
+
+  return Connection;
+}();
+
+/***/ }),
+
+/***/ "./app/algorithms/neat/functions.js":
+/*!******************************************!*\
+  !*** ./app/algorithms/neat/functions.js ***!
+  \******************************************/
+/*! exports provided: activationFunctions, MAX_NUM, randomSample, randomWeighted, cantorPairing */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "activationFunctions", function() { return activationFunctions; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MAX_NUM", function() { return MAX_NUM; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "randomSample", function() { return randomSample; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "randomWeighted", function() { return randomWeighted; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cantorPairing", function() { return cantorPairing; });
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
@@ -505,58 +713,129 @@ function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.
 
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+var ActivationFunctions =
+/*#__PURE__*/
+function () {
+  function ActivationFunctions() {
+    _classCallCheck(this, ActivationFunctions);
+
+    this.funcs = [function (x) {
+      return x;
+    }, Math.sin, Math.tan, function (x) {
+      return x > 0 ? x : 0;
+    }];
+  }
+
+  _createClass(ActivationFunctions, [{
+    key: "randomFunc",
+    value: function randomFunc() {
+      var ans = this.funcs[Math.floor(this.funcs.length * Math.random())];
+      return ans;
+    }
+  }]);
+
+  return ActivationFunctions;
+}();
+
+var activationFunctions = new ActivationFunctions();
+var MAX_NUM = 100000000;
+function randomSample(array, quant) {
+  var copy = _toConsumableArray(array);
+
+  var sample = [];
+
+  for (var i = 0; i < quant; i++) {
+    var selectId = Math.floor(Math.random() * copy.length);
+    sample.push(copy[selectId]);
+    copy.splice(selectId, 1);
+  }
+
+  return sample;
+}
+function randomWeighted(array, weights) {
+  var sum = 0;
+  var rand = Math.random();
+  var norm = weights.reduce(function (acc, val) {
+    return acc + val;
+  }, 0);
+
+  for (var i = 0; i < array.length; i++) {
+    sum += weights[i] / norm;
+
+    if (rand < sum) {
+      return array[i];
+    }
+  }
+
+  return array.slice(-1)[0];
+}
+function cantorPairing(x, y) {
+  return (x + y) * (x + y + 1) / 2 + y;
+}
+
+/***/ }),
+
+/***/ "./app/algorithms/neat/individual.js":
+/*!*******************************************!*\
+  !*** ./app/algorithms/neat/individual.js ***!
+  \*******************************************/
+/*! exports provided: Individual */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Individual", function() { return Individual; });
+/* harmony import */ var _functions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./functions */ "./app/algorithms/neat/functions.js");
+/* harmony import */ var _node__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./node */ "./app/algorithms/neat/node.js");
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var NEAT = function NEAT(params) {
-  _classCallCheck(this, NEAT);
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-  this.population = new Population(params);
-};
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-var Population = function Population(_ref) {
-  var size = _ref.size,
-      inNum = _ref.inNum,
-      outNum = _ref.outNum;
 
-  _classCallCheck(this, Population);
-
-  this.size = size;
-  this.individuals = [];
-
-  for (var i = 0; i < size; i++) {
-    var individual = new Individual(inNum, outNum);
-    this.individuals.push(individual);
-  }
-};
 
 var Individual =
 /*#__PURE__*/
 function () {
-  function Individual(inNum, outNum) {
+  function Individual(inNum, outNum, id) {
     var _this = this;
 
     _classCallCheck(this, Individual);
 
+    this.id = id;
     this.inNum = inNum;
     this.outNum = outNum;
     this.totalNum = inNum + outNum;
     this.nodes = [];
+    this.score = _functions__WEBPACK_IMPORTED_MODULE_0__["MAX_NUM"];
+    this.maxLayer = 0;
 
     for (var i = this.inNum; i < this.totalNum; i++) {
-      var node = new Node(i);
+      var node = new _node__WEBPACK_IMPORTED_MODULE_1__["Node"](i);
       this.nodes.push(node);
     }
 
     var lastLayer = this.getLayer(false);
 
     var _loop = function _loop(_i) {
-      var node = new Node(_i, 0);
+      var node = new _node__WEBPACK_IMPORTED_MODULE_1__["Node"](_i, 0);
       var addNodesNum = Math.ceil(Math.random() * _this.outNum);
-      randomSample(lastLayer, addNodesNum).forEach(function (el) {
+      Object(_functions__WEBPACK_IMPORTED_MODULE_0__["randomSample"])(lastLayer, addNodesNum).forEach(function (el) {
         return node.addConnection(el);
       });
 
@@ -587,13 +866,20 @@ function () {
         if (node.layer === layer) {
           nodes.push(node);
         }
-      }); // for (let i = 0; i < this.totalNum; i++) {
-      //   const node = this.nodes[i]
-      //   if (node.layer === layer) {
-      //     nodes.push(node)
-      //   }
-      // }
-
+      });
+      return nodes;
+    }
+  }, {
+    key: "getLayers",
+    value: function getLayers(layers) {
+      var nodes = [];
+      this.nodes.forEach(function (node) {
+        if (layers.some(function (layer) {
+          return layer === node.layer;
+        })) {
+          nodes.push(node);
+        }
+      });
       return nodes;
     }
   }, {
@@ -601,13 +887,21 @@ function () {
     value: function getMaxLayer() {
       var maxLayer = 0;
 
-      for (var i = 0; this.inNum < this.totalNum; i++) {
+      for (var i = this.inNum + this.outNum; i < this.totalNum; i++) {
         var node = this.nodes[i];
 
-        if (!node.layer && node.layer > maxLayer) {
+        if (node.layer && node.layer > maxLayer) {
           maxLayer = node.layer;
         }
       }
+
+      this.maxLayer = maxLayer;
+      return maxLayer;
+    }
+  }, {
+    key: "setScore",
+    value: function setScore(score) {
+      this.score = score;
     }
   }, {
     key: "evaluate",
@@ -617,7 +911,7 @@ function () {
         return node.activateFirst(args[i]);
       });
 
-      for (var layer = 1; layer < this.getMaxLayer(); layer++) {
+      for (var layer = 1; layer < this.getMaxLayer() + 1; layer++) {
         this.getLayer(layer).forEach(function (node, i) {
           return node.activate();
         });
@@ -630,10 +924,152 @@ function () {
       });
       return answ;
     }
+  }, {
+    key: "addRandConnection",
+    value: function addRandConnection() {
+      var inCandidates = this.getLayers(_toConsumableArray(Array(this.maxLayer + 1).keys()));
+      var inNode = inCandidates[Math.floor(Math.random() * inCandidates.length)];
+
+      var outLayers = _toConsumableArray(Array(this.maxLayer - inNode.layer).keys()).map(function (v) {
+        return v + inNode.layer + 1;
+      });
+
+      var outCandidates = this.getLayers([].concat(_toConsumableArray(outLayers), [false]));
+      var outNode = outCandidates[Math.floor(Math.random() * outCandidates.length)];
+      inNode.addConnection(outNode);
+    }
+  }, {
+    key: "addRandNode",
+    value: function addRandNode() {
+      var candidates = this.nodes.slice(this.outNum, this.nodes.length);
+      var node = candidates[Math.floor(Math.random() * candidates.length)];
+      var conn = node.conns[Math.floor(Math.random() * node.conns.length)];
+      var outNode = conn.outNode;
+      var newNode = new _node__WEBPACK_IMPORTED_MODULE_1__["Node"](this.totalNum, outNode.layer ? outNode.layer : node.layer + 1);
+      this.totalNum += 1;
+      outNode.toNextLayer();
+      newNode.addConnection(outNode);
+      conn.outNode = newNode;
+      conn.active = true;
+      this.nodes.push(newNode);
+    }
+  }, {
+    key: "crossOver",
+    value: function crossOver(donor) {
+      var nodeSeparator = this.nodes[this.outNum + Math.floor(Math.random() * (this.nodes.length - this.outNum))];
+      var connSeparatorId = nodeSeparator.conns[Math.floor(Math.random() * nodeSeparator.conns.length)].id;
+      var child = this.copy();
+
+      if (donor.totalNum > this.totalNum) {
+        child.nodes = child.nodes.concat(donor.nodes.slice(this.totalNum).map(function (node) {
+          return node.copy();
+        })); // adding connections
+        // this.nodes.slice(this.totalNum).forEach((node, i) => {
+        //   child.nodes[i].conns = node.conns.map((conn) => conn.copy(node.id, child.getNode(conn.outNode.id)))
+        // })
+
+        child.totalNum = donor.totalNum;
+      }
+
+      var i = 0;
+
+      while (i < child.getMaxLayer()) {
+        var nodes = child.getLayer(i);
+        nodes.forEach(function (node) {
+          var donorNode = donor.getNode(node.id);
+
+          if (donorNode) {
+            child._crossOverNodes(node, donorNode, connSeparatorId);
+          }
+        });
+        i++;
+      }
+
+      return child;
+    }
+  }, {
+    key: "_crossOverNodes",
+    value: function _crossOverNodes(thisNode, donorNode, connSeparatorId) {
+      var _this2 = this;
+
+      donorNode.conns.forEach(function (conn) {
+        if (conn.id > connSeparatorId) {
+          var childConnId = thisNode.conns.findIndex(function (c) {
+            return c.id === conn.id;
+          });
+
+          if (childConnId) {
+            thisNode.conns[childConnId] = conn.copy(thisNode.id, _this2.getNode(conn.outNode.id));
+          } else {
+            var outNode = _this2.getNode(conn.outNode.id); // if (outNode.layer === false || outNode.layer > thisNode.layer) {
+            //   thisNode.conns.push(conn.copy(thisNode.id, outNode))
+            // }
+
+
+            thisNode.addConnection(outNode);
+          }
+        }
+      });
+    }
+  }, {
+    key: "disableNode",
+    value: function disableNode(id) {
+      this.nodes.forEach(function (node, i) {
+        node.conns.forEach(function (conn) {
+          if (conn.outNode.id === id) {
+            conn.active = false;
+          }
+        });
+      });
+      this.getNode(id).conns.forEach(function (conn) {
+        conn.active = false;
+      });
+    }
+  }, {
+    key: "copy",
+    value: function copy() {
+      var score = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _functions__WEBPACK_IMPORTED_MODULE_0__["MAX_NUM"];
+      var copy = new Individual(this.inNum, this.outNum, this.id);
+      copy.id = this.id;
+      copy.totalNum = this.totalNum;
+      copy.nodes = this.nodes.map(function (node) {
+        return node.copy();
+      });
+      copy.score = score;
+      this.nodes.forEach(function (node, i) {
+        // const nodeid = node.id
+        copy.nodes[i].conns = node.conns.map(function (conn) {
+          return conn.copy(node.id, copy.getNode(conn.outNode.id));
+        });
+      });
+      return copy;
+    }
   }]);
 
   return Individual;
 }();
+
+/***/ }),
+
+/***/ "./app/algorithms/neat/node.js":
+/*!*************************************!*\
+  !*** ./app/algorithms/neat/node.js ***!
+  \*************************************/
+/*! exports provided: Node */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Node", function() { return Node; });
+/* harmony import */ var _functions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./functions */ "./app/algorithms/neat/functions.js");
+/* harmony import */ var _connection_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./connection.js */ "./app/algorithms/neat/connection.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
 
 var Node =
 /*#__PURE__*/
@@ -647,7 +1083,7 @@ function () {
     this.conns = [];
     this.sum = 0;
     this.bias = 2 * Math.random() - 1;
-    this.activation = activationFunctions.randomFunc();
+    this.activation = _functions__WEBPACK_IMPORTED_MODULE_0__["activationFunctions"].randomFunc();
     this.output = 0;
     this.layer = layer;
   }
@@ -655,12 +1091,13 @@ function () {
   _createClass(Node, [{
     key: "activate",
     value: function activate() {
-      var _this2 = this;
+      var _this = this;
 
       this.output = this.activation(this.sum) + this.bias;
+      this.resetSum();
       this.conns.forEach(function (conn) {
         if (conn.active) {
-          conn.outNode.sum += _this2.output * conn.weight;
+          conn.outNode.sum += _this.output * conn.weight;
         }
       });
     }
@@ -674,11 +1111,12 @@ function () {
     key: "activateLast",
     value: function activateLast() {
       this.output = this.activation(this.sum) + this.bias;
+      this.resetSum();
       return this.output;
     }
   }, {
-    key: "reset",
-    value: function reset() {
+    key: "resetSum",
+    value: function resetSum() {
       this.sum = 0;
     }
   }, {
@@ -686,77 +1124,63 @@ function () {
     value: function addConnection(node) {
       if (!node.layer || node.layer > this.layer) {
         if (!this.connectionExist(node.id)) {
-          var conn = new Connection(this.id, node);
+          var conn = new _connection_js__WEBPACK_IMPORTED_MODULE_1__["Connection"](this.id, node);
           this.conns.push(conn);
+        } else {
+          this.weight += 2 * Math.random() - 1;
         }
       }
     }
   }, {
+    key: "toggleRandConnection",
+    value: function toggleRandConnection() {
+      var randConnId = Math.floor(Math.rand() * this.conns.length);
+      this.conns[randConnId].toggle();
+    }
+  }, {
+    key: "updateBias",
+    value: function updateBias() {
+      this.bias += 2 * Math.random() - 1;
+    }
+  }, {
+    key: "updateActivationFunction",
+    value: function updateActivationFunction() {
+      this.activation = _functions__WEBPACK_IMPORTED_MODULE_0__["activationFunctions"].randomFunc();
+    }
+  }, {
     key: "connectionExist",
     value: function connectionExist(nodeId) {
-      var connId = cantorPairing(this.id, nodeId);
-      this.conns.forEach(function (conn) {
-        if (conn.id === connId) {
-          return true;
-        }
+      var connId = Object(_functions__WEBPACK_IMPORTED_MODULE_0__["cantorPairing"])(this.id, nodeId);
+      return this.conns.some(function (conn) {
+        return conn.id === connId;
       });
-      return false;
+    }
+  }, {
+    key: "toNextLayer",
+    value: function toNextLayer() {
+      if (this.layer) {
+        this.layer += 1;
+        this.conns.forEach(function (conn) {
+          return conn.outNode.toNextLayer();
+        });
+      }
+    }
+  }, {
+    key: "copy",
+    value: function copy(allNodes) {
+      var copy = new Node(this.id, this.layer);
+      copy.conns = []; // can't duplicate conns here, cause not all nodes created yet
+
+      copy.sum = 0;
+      copy.bias = this.bias;
+      copy.activation = this.activation;
+      copy.output = 0;
+      return copy;
     }
   }]);
 
   return Node;
 }();
-
-function cantorPairing(x, y) {
-  return (x + y) * (x + y + 1) / 2 + y;
-}
-
-var Connection = function Connection(inNodeid, outNode) {
-  _classCallCheck(this, Connection);
-
-  this.id = cantorPairing(inNodeid, outNode.id);
-  this.outNode = outNode;
-  this.weight = 2 * Math.random() - 1;
-  this.active = true;
-};
-
-var ActivationFunctions =
-/*#__PURE__*/
-function () {
-  function ActivationFunctions() {
-    _classCallCheck(this, ActivationFunctions);
-
-    this.funcs = [function (x) {
-      return x;
-    }, Math.sin, Math.tan];
-  }
-
-  _createClass(ActivationFunctions, [{
-    key: "randomFunc",
-    value: function randomFunc() {
-      var ans = this.funcs[Math.floor(this.funcs.length * Math.random())];
-      return ans;
-    }
-  }]);
-
-  return ActivationFunctions;
-}();
-
-var activationFunctions = new ActivationFunctions();
-
-function randomSample(array, quant) {
-  var copy = _toConsumableArray(array);
-
-  var sample = [];
-
-  for (var i = 0; i < quant; i++) {
-    var selectId = Math.floor(Math.random() * copy.length);
-    sample.push(copy[selectId]);
-    copy.splice(selectId, 1);
-  }
-
-  return sample;
-}
 
 /***/ }),
 
@@ -1683,6 +2107,116 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./app/games/labyrinth.js":
+/*!********************************!*\
+  !*** ./app/games/labyrinth.js ***!
+  \********************************/
+/*! exports provided: Labyrinth */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Labyrinth", function() { return Labyrinth; });
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Goal = function Goal(x, y) {
+  _classCallCheck(this, Goal);
+
+  this.x = x;
+  this.y = y;
+};
+
+var Player =
+/*#__PURE__*/
+function () {
+  function Player(x, y, goal) {
+    _classCallCheck(this, Player);
+
+    this.x = x;
+    this.y = y;
+    this.goal = goal;
+    this.getDistance();
+  }
+
+  _createClass(Player, [{
+    key: "getDistance",
+    value: function getDistance() {
+      var xDiff = this.x - this.goal.x;
+      var yDiff = this.y - this.goal.y;
+      this.distance = Math.pow(xDiff, 2) + Math.pow(yDiff, 2);
+      return this.distance;
+    }
+  }, {
+    key: "move",
+    value: function move(direction) {
+      var velocity = 1;
+
+      var norm = _norm(direction);
+
+      var copy = this.copy();
+      copy.x += velocity * direction[0] / norm;
+      copy.y += velocity * direction[1] / norm;
+      copy.getDistance();
+      return copy;
+    }
+  }, {
+    key: "copy",
+    value: function copy() {
+      var copy = new Player(this.x, this.y, this.goal);
+      copy.distance = this.distance;
+      return copy;
+    }
+  }]);
+
+  return Player;
+}();
+
+var Labyrinth =
+/*#__PURE__*/
+function () {
+  function Labyrinth(size) {
+    _classCallCheck(this, Labyrinth);
+
+    Object.assign(this, {
+      width: 400,
+      height: 600,
+      size: size,
+      players: [],
+      bestPlayer: new Player(200, 500, new Goal(200, 100))
+    });
+
+    for (var i = 0; i < size; i++) {
+      this.players.push(new Player(200, 500, new Goal(200, 100)));
+    }
+  }
+
+  _createClass(Labyrinth, [{
+    key: "reset",
+    value: function reset() {
+      this.players = [];
+      this.bestPlayer = new Player(200, 500, new Goal(200, 100));
+
+      for (var i = 0; i < this.size; i++) {
+        this.players.push(new Player(200, 500, new Goal(200, 100)));
+      }
+    }
+  }]);
+
+  return Labyrinth;
+}();
+
+function _norm(array) {
+  return array.reduce(function (acc, val) {
+    return acc + Math.pow(val, 2);
+  }, 0);
+}
+
+/***/ }),
+
 /***/ "./app/games/stats.js":
 /*!****************************!*\
   !*** ./app/games/stats.js ***!
@@ -2364,11 +2898,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _res__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./res */ "./app/res.js");
 /* harmony import */ var _stores_ttt_store_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./stores/ttt_store.js */ "./app/stores/ttt_store.js");
 /* harmony import */ var _stores_uttt_store_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./stores/uttt_store.js */ "./app/stores/uttt_store.js");
-/* harmony import */ var _stores_neat_store_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./stores/neat_store.js */ "./app/stores/neat_store.js");
+/* harmony import */ var _stores_labyrinth_store_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./stores/labyrinth_store.js */ "./app/stores/labyrinth_store.js");
 /* harmony import */ var ultimus__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ultimus */ "./node_modules/ultimus/dist/main.js");
 /* harmony import */ var ultimus__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(ultimus__WEBPACK_IMPORTED_MODULE_8__);
 /* harmony import */ var _players_players_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./players/players.js */ "./app/players/players.js");
 /* harmony import */ var _games_stats_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./games/stats.js */ "./app/games/stats.js");
+/* harmony import */ var _players_labyrinthmonitor_js__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./players/labyrinthmonitor.js */ "./app/players/labyrinthmonitor.js");
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
@@ -2399,7 +2934,8 @@ function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
 
 
-var types = [].concat(_toConsumableArray(_commons__WEBPACK_IMPORTED_MODULE_1__["default"]), [_app_html__WEBPACK_IMPORTED_MODULE_2__["default"]], _toConsumableArray(_pages__WEBPACK_IMPORTED_MODULE_3__["default"]), [_stores_ttt_store_js__WEBPACK_IMPORTED_MODULE_5__["TTTStore"], _stores_uttt_store_js__WEBPACK_IMPORTED_MODULE_6__["UTTTStore"], _stores_neat_store_js__WEBPACK_IMPORTED_MODULE_7__["NEATStore"], _games_stats_js__WEBPACK_IMPORTED_MODULE_10__["TTTStats"], _players_players_js__WEBPACK_IMPORTED_MODULE_9__["PlayerControllerPlayer"], _players_players_js__WEBPACK_IMPORTED_MODULE_9__["PlayerControllerMCTS"], _players_players_js__WEBPACK_IMPORTED_MODULE_9__["PlayerControllerRandom"], _players_players_js__WEBPACK_IMPORTED_MODULE_9__["PlayerControllerMiniMax"]]);
+
+var types = [].concat(_toConsumableArray(_commons__WEBPACK_IMPORTED_MODULE_1__["default"]), [_app_html__WEBPACK_IMPORTED_MODULE_2__["default"]], _toConsumableArray(_pages__WEBPACK_IMPORTED_MODULE_3__["default"]), [_stores_ttt_store_js__WEBPACK_IMPORTED_MODULE_5__["TTTStore"], _stores_uttt_store_js__WEBPACK_IMPORTED_MODULE_6__["UTTTStore"], _stores_labyrinth_store_js__WEBPACK_IMPORTED_MODULE_7__["LabyrinthStore"], _games_stats_js__WEBPACK_IMPORTED_MODULE_10__["TTTStats"], _players_labyrinthmonitor_js__WEBPACK_IMPORTED_MODULE_11__["LabyrinthMonitor"], _players_players_js__WEBPACK_IMPORTED_MODULE_9__["PlayerControllerPlayer"], _players_players_js__WEBPACK_IMPORTED_MODULE_9__["PlayerControllerMCTS"], _players_players_js__WEBPACK_IMPORTED_MODULE_9__["PlayerControllerRandom"], _players_players_js__WEBPACK_IMPORTED_MODULE_9__["PlayerControllerMiniMax"]]);
 Object(arrmatura__WEBPACK_IMPORTED_MODULE_0__["launch"])({
   template: '<App />',
   types: types,
@@ -2425,6 +2961,14 @@ Object(arrmatura__WEBPACK_IMPORTED_MODULE_0__["launch"])({
     inc: function inc() {
       var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
       return x + 1;
+    },
+    toArray: function toArray(array) {
+      return array.map(function (element, i) {
+        return {
+          id: i,
+          value: element
+        };
+      });
     },
     gameState: function gameState(states, f, step) {
       if (f) {
@@ -2452,24 +2996,24 @@ Object(arrmatura__WEBPACK_IMPORTED_MODULE_0__["launch"])({
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _tictactoe_html__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./tictactoe.html */ "./app/pages/tictactoe.html");
 /* harmony import */ var _ulttictactoe_html__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ulttictactoe.html */ "./app/pages/ulttictactoe.html");
-/* harmony import */ var _neat_html__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./neat.html */ "./app/pages/neat.html");
+/* harmony import */ var _labyrinth_html__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./labyrinth.html */ "./app/pages/labyrinth.html");
 
 
 
-/* harmony default export */ __webpack_exports__["default"] = ([_tictactoe_html__WEBPACK_IMPORTED_MODULE_0__["default"], _ulttictactoe_html__WEBPACK_IMPORTED_MODULE_1__["default"], _neat_html__WEBPACK_IMPORTED_MODULE_2__["default"]]);
+/* harmony default export */ __webpack_exports__["default"] = ([_tictactoe_html__WEBPACK_IMPORTED_MODULE_0__["default"], _ulttictactoe_html__WEBPACK_IMPORTED_MODULE_1__["default"], _labyrinth_html__WEBPACK_IMPORTED_MODULE_2__["default"]]);
 
 /***/ }),
 
-/***/ "./app/pages/neat.html":
-/*!*****************************!*\
-  !*** ./app/pages/neat.html ***!
-  \*****************************/
+/***/ "./app/pages/labyrinth.html":
+/*!**********************************!*\
+  !*** ./app/pages/labyrinth.html ***!
+  \**********************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("\n\n<component id=\"NeatPage\">\n  <h4>NEAT is neat</h4>\n\n  <NEATStore ui:ref=\"nstore\" />\n  <button class=\"btn btn-error control\" click=\"->nstore.reset\">Reset</button>\n\n  <h4>Comparation</h4>\n</component>");
+/* harmony default export */ __webpack_exports__["default"] = ("\n\n<component id=\"Player\">\n  <div class=\"player {title}\" style=\"top: {value.y}px; left: {value.x}px;\"></div> \n</component>\n<component id=\"Goal\">\n  <div class=\"goal\" style=\"top: 100px; left: 200px;\"></div> \n</component>\n\n<component id=\"Labyrinth\">\n  <ui:tag tag=\"LabyrinthMonitor\"  step=\"<-nstore.step\" moveAll=\"->nstore.moveall\" assessAll=\"->nstore.evolve\" />\n  \n  <div class=\"container\">\n    <div class=\"columns\">\n      <div class=\"column col-6 labcontainer\">\n        <div class=\"labyrinth\"  >\n          <Player ui:for=\"pl of players|toArray\"  value=\"{pl.value}\" />\n          <Player value=\"<- nstore.bestplayer\" title=\"bestplayer\"/>\n          <Goal  />\n        </div>\n      </div>\n      <div class=\"column col-1\"></div>\n      <div class=\"column col-2\">\n        <h6>Options</h6>\n        <button class=\"btn btn-error control\" click=\"->nstore.reset\">Reset</button>\n        <button class=\"btn btn-error control\" click=\"->nstore.moveall\">MoveAll</button>            \n      </div>\n    </div>\n  </div>\n</component>\n\n\n<component id=\"LabyrinthPage\">\n  <h4>NEAT is neat</h4>\n  <LabyrinthStore ui:ref=\"nstore\" />\n  <Labyrinth players=\"<-nstore.players\" />\n  \n  \n  <h4>Comparation</h4>\n</component>");
 
 /***/ }),
 
@@ -2496,6 +3040,63 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ("<component id=\"UCell\">\n  <div class=\"column col-4 cell-box\">\n    <div class=\"ucell cell-{value}\" click=\"->ustore.stepcell\" \n         data-col={col} data-row={row}\n         data-subcol={subcol} data-subrow={subrow}\n         data-value={value}>         \n    </div>\n  </div>\n</component>\n\n<component id=\"USubBoard\">  \n  <div class=\"column col-4 subBoard subBoard-{available} subWin-{finished}\">  \n    <div class=\"hider\"></div>\n    <div class=\"columns\" ui:for=\"row of board\">      \n      <UCell ui:for=\"col of row.cols\" subcol={col.id} subrow={row.id} value={col.value} col={ucol} row={urow} />      \n    </div>\n    \n  </div>\n</component>\n\n<component id=\"UBoard\">  \n  <h6>{:gameStates|gameState:@finished:@step} </h6>\n  <div class=\"container\">\n    <div class=\"columns\" ui:for=\"row of board\">\n       <USubBoard \n        ui:for=\"col of row.cols\" \n        board=\"{board|subGame:@row.id:@col.id}\" \n        ucol={col.id}\n        urow={row.id} \n        available={col.available}\n        finished={col.finished}\n        uvalue={col.value} /> \n    </div>\n  </div>\n</component>\n <!-- state=\"<-ustore.state\" handler=\"->ustore.stepcell\" -->\n <component id=\"UTTTPlayer\">\n\n  <ui:tag tag=\"PlayerController{type}\" player={pplayer} type={type} state=\"<-ustore.state\" ref=\"->ustore.ref\" handler=\"->ustore.makeMoveOutside\" />\n  <div>\n    <h6>Select {name}</h6>      \n    <button ui:for=\"pl of :playersUTTT\"  class=\"btn control btn-{pl.name|equals:@type|then:primary}\" data-player={pplayer} data-type=\"{pl.type}\" click=\"-> ustore.switch\">{pl.name}</button>\n  </div>\n</component> \n\n<component id=\"UTicTacToe\">\n  <div class=\"container\">\n    <div class=\"columns\">\n      <div class=\"column col-8 board\">\n        <UBoard board=\"<- ustore.board\" step=\"<- ustore.step\" finished=\"<- ustore.finished\" /> \n      </div>\n      <!-- <div class=\"column col-1\"></div> -->\n      <div class=\"column col-2\">\n        <h6>Options</h6>\n        <button class=\"btn btn-error control\" click=\"->ustore.reset\">Reset</button>\n        <!-- <button class=\"btn btn-error control\" click=\"->ustore.mctsrequest\">AI move</button> -->\n        <UTTTPlayer pplayer=\"1\" name=\"Cross\" type=\"<- ustore.cross\" />\n        <UTTTPlayer pplayer=\"2\" name=\"Circle\" type=\"<- ustore.circle\" />               \n      </div>\n    </div>\n  </div>\n</component> \n\n\n<component id=\"UlttictactoePage\">\n  <h4>UltimateTicTacToe</h4>\n\n  <UTTTStore ui:ref=\"ustore\" />\n  <UTicTacToe />\n  \n  <h4>Comparation</h4>\n  <ui:tag tag=\"TTTStats\" ui:ref=\"stat\" handler=\"->ustore.reset\" players={:players} cross=\"<- ustore.cross\" circle=\"<-ustore.circle\" finished=\"<- ustore.finished\" />\n  <StatRow cross=\"<- stat.cross\" crossWin=\"<- stat.crossWin\" circleWin=\"<- stat.circleWin\" draw=\"<- stat.draw\" total=\"<- stat.total\" circle=\"<- stat.circle\" />\n  \n</component>");
+
+/***/ }),
+
+/***/ "./app/players/labyrinthmonitor.js":
+/*!*****************************************!*\
+  !*** ./app/players/labyrinthmonitor.js ***!
+  \*****************************************/
+/*! exports provided: LabyrinthMonitor */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LabyrinthMonitor", function() { return LabyrinthMonitor; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var LabyrinthMonitor =
+/*#__PURE__*/
+function () {
+  function LabyrinthMonitor() {
+    _classCallCheck(this, LabyrinthMonitor);
+  }
+
+  _createClass(LabyrinthMonitor, [{
+    key: "init",
+    value: function init() {
+      return {
+        cycle: 0
+      };
+    }
+  }, {
+    key: "setStep",
+    value: function setStep(step) {
+      var _this = this;
+
+      console.log(step);
+
+      if (this.cycle < 120) {
+        if (step > 230) {
+          this.cycle += 1;
+          setTimeout(function () {
+            return _this.assessAll();
+          }, 1);
+        } else {
+          setTimeout(function () {
+            return _this.moveAll();
+          }, 1);
+        }
+      }
+    }
+  }]);
+
+  return LabyrinthMonitor;
+}();
 
 /***/ }),
 
@@ -2720,8 +3321,8 @@ __webpack_require__.r(__webpack_exports__);
       name: 'UltimateTicTacToe',
       icon: 'work'
     }, {
-      id: 'neat',
-      name: 'Neat',
+      id: 'labyrinth',
+      name: 'Labyrinth',
       icon: 'work'
     }]
   },
@@ -2764,17 +3365,26 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./app/stores/neat_store.js":
-/*!**********************************!*\
-  !*** ./app/stores/neat_store.js ***!
-  \**********************************/
-/*! exports provided: NEATStore */
+/***/ "./app/stores/labyrinth_store.js":
+/*!***************************************!*\
+  !*** ./app/stores/labyrinth_store.js ***!
+  \***************************************/
+/*! exports provided: LabyrinthStore */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NEATStore", function() { return NEATStore; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LabyrinthStore", function() { return LabyrinthStore; });
 /* harmony import */ var _algorithms_neat_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../algorithms/neat.js */ "./app/algorithms/neat.js");
+/* harmony import */ var _games_labyrinth_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../games/labyrinth.js */ "./app/games/labyrinth.js");
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
@@ -2790,47 +3400,126 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 /* eslint-disable space-before-function-paren */
 
 
+
 function reset() {
+  var size = 45;
   return {
-    game: new _algorithms_neat_js__WEBPACK_IMPORTED_MODULE_0__["NEAT"]({
-      size: 10,
+    size: size,
+    neat: new _algorithms_neat_js__WEBPACK_IMPORTED_MODULE_0__["NEAT"]({
+      size: size,
       inNum: 3,
-      outNum: 4
-    })
+      outNum: 2
+    }),
+    game: new _games_labyrinth_js__WEBPACK_IMPORTED_MODULE_1__["Labyrinth"](size),
+    step: 0,
+    cycle: 0
   };
 }
 
-var NEATStore =
+var LabyrinthStore =
 /*#__PURE__*/
 function () {
-  function NEATStore() {
-    _classCallCheck(this, NEATStore);
+  function LabyrinthStore() {
+    _classCallCheck(this, LabyrinthStore);
   }
 
-  _createClass(NEATStore, [{
+  _createClass(LabyrinthStore, [{
     key: "init",
     value: function init() {
       return _objectSpread({}, reset());
     }
   }, {
-    key: "getBoard",
-    value: function getBoard() {
-      return this.game.board.data;
+    key: "move",
+    value: function move(player, individual) {
+      var args = [player.x, player.y, player.distance];
+      var direction = individual.evaluate(args);
+      return player.move(direction);
     }
   }, {
-    key: "getFinished",
-    value: function getFinished() {
-      return this.game.finished;
+    key: "moveAll",
+    value: function moveAll() {
+      for (var i = 0; i < this.size; i++) {
+        var player = this.game.players[i];
+        var individual = this.neat.population.individuals[i]; // const args = [player.x, player.y, player.distance]
+        // const direction = individual.evaluate(args)
+        // this.game.players[i] = player.move(direction)
+
+        this.game.players[i] = this.move(player, individual);
+      }
+
+      if (this.neat.population.best.id) {
+        this.game.bestPlayer = this.move(this.game.bestPlayer, this.neat.population.best);
+      }
+
+      this.game.players = _toConsumableArray(this.game.players);
+      return _objectSpread({}, this, {
+        step: this.step + 1
+      });
+    }
+  }, {
+    key: "scoreAll",
+    value: function scoreAll() {
+      for (var i = 0; i < this.size; i++) {
+        var individual = this.neat.population.individuals[i];
+        individual.setScore(this.game.players[i].distance);
+      }
+    }
+  }, {
+    key: "evolve",
+    value: function evolve() {
+      this.scoreAll();
+      console.log(this);
+      this.neat.population.evolvePopulation(6);
+      this.game.reset();
+      return _objectSpread({}, this, {
+        step: 0,
+        cycle: this.cycle + 1
+      });
+    }
+  }, {
+    key: "onEvolve",
+    value: function onEvolve() {
+      return this.evolve();
+    }
+  }, {
+    key: "onMoveall",
+    value: function onMoveall() {
+      return this.moveAll();
     }
   }, {
     key: "onReset",
     value: function onReset(_, _ref) {
       var game = _ref.game;
-      return reset();
+      return _objectSpread({}, reset());
+    }
+  }, {
+    key: "individuals",
+    get: function get() {
+      var array = this.neat.population.individuals.map(function (element, i) {
+        return {
+          id: i,
+          value: element
+        };
+      });
+      return array;
+    }
+  }, {
+    key: "players",
+    get: function get() {
+      // const array = this.game.players.map((element, i) => ({ id: i, value: element }))
+      // console.log(array)
+      return this.game.players;
+    }
+  }, {
+    key: "bestplayer",
+    get: function get() {
+      // const array = this.game.players.map((element, i) => ({ id: i, value: element }))
+      // console.log(array)
+      return this.game.bestPlayer;
     }
   }]);
 
-  return NEATStore;
+  return LabyrinthStore;
 }();
 ;
 
