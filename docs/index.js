@@ -534,10 +534,8 @@ function () {
 
     this.size = size;
     this.individuals = [];
-    this.best = {
-      id: false,
-      score: _neat_functions__WEBPACK_IMPORTED_MODULE_1__["MAX_NUM"]
-    };
+    this.best = new _neat_individual__WEBPACK_IMPORTED_MODULE_0__["Individual"](inNum, outNum, 0); // { id: false, score: MAX_NUM }
+
     this.probParams = probParams;
 
     for (var i = 0; i < size; i++) {
@@ -589,8 +587,11 @@ function () {
         if (rand < this.probParams.crossOver) {
           copy.crossOver(toReplaceValue);
         } else {
-          copy.addRandNode();
-          copy.addRandConnection();
+          if (this.probParams.addNode < Math.random()) {
+            copy.addRandNode();
+          } else {
+            copy.addRandConnection();
+          }
         }
 
         copy.id = toReplaceId;
@@ -910,8 +911,9 @@ function () {
       this.getLayer(0).forEach(function (node, i) {
         return node.activateFirst(args[i]);
       });
+      this.getMaxLayer();
 
-      for (var layer = 1; layer < this.getMaxLayer() + 1; layer++) {
+      for (var layer = 1; layer < this.maxLayer + 1; layer++) {
         this.getLayer(layer).forEach(function (node, i) {
           return node.activate();
         });
@@ -2138,6 +2140,8 @@ function () {
 
     this.x = x;
     this.y = y;
+    this.xVel = Math.random() / 10;
+    this.yVel = Math.random() / 10;
     this.goal = goal;
     this.getDistance();
   }
@@ -2149,17 +2153,23 @@ function () {
       var yDiff = this.y - this.goal.y;
       this.distance = Math.pow(xDiff, 2) + Math.pow(yDiff, 2);
       return this.distance;
-    }
+    } // changeVelocity (direction) {
+    //   const deltaVel = 0.5
+    //   const norm = _norm(direction)
+    //   this.xVel += deltaVel * direction[0] / norm
+    //   this.yVel += deltaVel * direction[1] / norm
+    // }
+
   }, {
     key: "move",
     value: function move(direction) {
-      var velocity = 1;
+      // this.changeVelocity(direction)
+      var copy = this.copy();
 
       var norm = _norm(direction);
 
-      var copy = this.copy();
-      copy.x += velocity * direction[0] / norm;
-      copy.y += velocity * direction[1] / norm;
+      copy.x += direction[0] / norm;
+      copy.y += direction[1] / norm;
       copy.getDistance();
       return copy;
     }
@@ -2167,6 +2177,8 @@ function () {
     key: "copy",
     value: function copy() {
       var copy = new Player(this.x, this.y, this.goal);
+      copy.xVel = this.xVel;
+      copy.yVel = this.yVel;
       copy.distance = this.distance;
       return copy;
     }
@@ -2181,27 +2193,36 @@ function () {
   function Labyrinth(size) {
     _classCallCheck(this, Labyrinth);
 
+    var x = 50 + Math.floor(Math.random() * 350);
+    var y = 80 + Math.floor(Math.random() * 50);
+    this.goal = new Goal(x, y);
     Object.assign(this, {
       width: 400,
       height: 600,
       size: size,
       players: [],
-      bestPlayer: new Player(200, 500, new Goal(200, 100))
+      bestPlayer: new Player(200, 500, this.goal)
     });
 
     for (var i = 0; i < size; i++) {
-      this.players.push(new Player(200, 500, new Goal(200, 100)));
+      this.players.push(new Player(200, 500, this.goal));
     }
   }
 
   _createClass(Labyrinth, [{
     key: "reset",
-    value: function reset() {
+    value: function reset(savegoal) {
+      if (!savegoal) {
+        var x = 50 + Math.floor(Math.random() * 350);
+        var y = 100 + Math.floor(Math.random() * 50);
+        this.goal = new Goal(x, y);
+      }
+
       this.players = [];
-      this.bestPlayer = new Player(200, 500, new Goal(200, 100));
+      this.bestPlayer = new Player(200, 500, this.goal);
 
       for (var i = 0; i < this.size; i++) {
-        this.players.push(new Player(200, 500, new Goal(200, 100)));
+        this.players.push(new Player(200, 500, this.goal));
       }
     }
   }]);
@@ -2962,6 +2983,10 @@ Object(arrmatura__WEBPACK_IMPORTED_MODULE_0__["launch"])({
       var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
       return x + 1;
     },
+    dec: function dec() {
+      var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+      return x - 1;
+    },
     toArray: function toArray(array) {
       return array.map(function (element, i) {
         return {
@@ -3013,7 +3038,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("\n\n<component id=\"Player\">\n  <div class=\"player {title}\" style=\"top: {value.y}px; left: {value.x}px;\"></div> \n</component>\n\n<component id=\"Goal\">\n  <div class=\"goal\" style=\"top: 100px; left: 200px;\"></div> \n</component>\n\n<component id=\"LabyrinthParams\">\n  <div class=\"slidecontainer\">\n    <input type=\"range\" min=\"1\" max=\"20\" value={maxcycle} class=\"slider\" change=\"->nstore.maxcycle\"  id=\"cycleRange\">\n    <label for=\"cycleRange\">Cycles: {maxcycle} </label> \n  </div> \n  <label>Cycle: {cycle} </label>\n  <label>Lifetime: {step}/{lifetime} </label> \n  \n</component>\n\n<component id=\"Labyrinth\">\n  <ui:tag tag=\"LabyrinthMonitor\" cycle=\"<-nstore.cycle\" lifetime=\"<-nstore.lifetime\" step=\"<-nstore.step\" maxcycle=\"<-nstore.maxcycle\" moveAll=\"->nstore.moveall\" assessAll=\"->nstore.evolve\" />\n    \n  \n  <div class=\"container\">\n    <div class=\"columns\">\n      <div class=\"column col-6 labcontainer\">\n        <div class=\"labyrinth\"  >\n          <Player ui:for=\"pl of players|toArray\"  value=\"{pl.value}\" />\n          <Player value=\"<- nstore.bestplayer\" title=\"bestplayer\"/>\n          <Goal  />\n        </div>\n      </div>\n      <div class=\"column col-1\"></div>\n      <div class=\"column col-2\">\n        <h6>Options</h6>\n        <button class=\"btn btn-error control\" click=\"->nstore.reset\">Reset</button>\n        <button class=\"btn btn-error control\" click=\"->nstore.moveall\">MoveAll</button>  \n        <button class=\"btn btn-error control\" click=\"->nstore.cycle\">Cycle</button>  \n        <LabyrinthParams  maxcycle=\"<-nstore.maxcycle\" lifetime=\"<-nstore.lifetime\" step=\"<-nstore.step\" cycle=\"<-nstore.cycle\"  />  \n      </div>\n    </div>\n  </div>\n</component>\n\n\n<component id=\"LabyrinthPage\">\n  <h4>NEAT is neat</h4>\n  <LabyrinthStore  ui:ref=\"nstore\" />\n  <Labyrinth players=\"<-nstore.players\"  />\n  \n  \n  <h4>Comparation</h4>\n</component>");
+/* harmony default export */ __webpack_exports__["default"] = ("\n\n<component id=\"Player\">\n  <div class=\"player {title}\" style=\"top: {value.y}px; left: {value.x}px;\"></div> \n</component>\n\n<component id=\"Goal\">\n  <div class=\"goal\" style=\"top: {value.y}px; left: {value.x}px;\"></div> \n</component>\n\n<component id=\"LabyrinthParams\">\n  <div class=\"slidecontainer\">\n    <input type=\"range\" min=\"2\" max=\"21\" value={maxcycle} class=\"slider\" change=\"->nstore.maxcycle\"  id=\"cycleRange\">\n    <label for=\"cycleRange\">Cycles: {maxcycle} </label> \n  </div> \n  <label>Cycle: {cycle} </label>\n  <label>Lifetime: {step}/{lifetime} </label> \n  \n</component>\n\n<component id=\"Labyrinth\">\n  <ui:tag tag=\"LabyrinthMonitor\" cycle=\"<-nstore.cycle\" lifetime=\"<-nstore.lifetime\" step=\"<-nstore.step\" maxcycle=\"<-nstore.maxcycle\" moveAll=\"->nstore.moveall\" assessAll=\"->nstore.evolve\" />\n    \n  \n  <div class=\"container\">\n    <div class=\"columns\">\n      <div class=\"column col-6 labcontainer\">\n        <div class=\"labyrinth\"  >\n          <Player ui:for=\"pl of players|toArray\"  value=\"{pl.value}\" />\n          <Player value=\"<- nstore.bestplayer\" title=\"bestplayer\"/>\n          <Goal value=\"<- nstore.goal\"  />\n        </div>\n      </div>\n      <div class=\"column col-1\"></div>\n      <div class=\"column col-2\">\n        <h6>Options</h6>\n        <button class=\"btn btn-error control\" click=\"->nstore.reset\">Reset</button>\n        <button class=\"btn btn-error control\" click=\"->nstore.moveall\">MoveAll</button>  \n        <button class=\"btn btn-error control\" click=\"->nstore.cycle\">Cycle</button>  \n        <LabyrinthParams  maxcycle=\"<-nstore.maxcycle|dec\" lifetime=\"<-nstore.lifetime\" step=\"<-nstore.step\" cycle=\"<-nstore.cycle\"  />  \n      </div>\n    </div>\n  </div>\n</component>\n\n\n<component id=\"LabyrinthPage\">\n  <h4>NEAT is neat</h4>\n  <LabyrinthStore  ui:ref=\"nstore\" />\n  <Labyrinth players=\"<-nstore.players\"  />\n  \n  \n  <h4>Comparation</h4>\n</component>");
 
 /***/ }),
 
@@ -3403,10 +3428,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 function reset() {
-  var size = 45;
+  var size = 50;
   return {
     size: size,
-    toEvolve: 6,
+    toEvolve: 7,
     neat: new _algorithms_neat_js__WEBPACK_IMPORTED_MODULE_0__["NEAT"]({
       size: size,
       inNum: 3,
@@ -3415,7 +3440,7 @@ function reset() {
     game: new _games_labyrinth_js__WEBPACK_IMPORTED_MODULE_1__["Labyrinth"](size),
     step: 0,
     lifetime: 10,
-    maxcycle: 5,
+    maxcycle: 21,
     cycle: 0
   };
 }
@@ -3469,6 +3494,8 @@ function () {
         var individual = this.neat.population.individuals[i];
         individual.setScore(this.game.players[i].distance);
       }
+
+      this.neat.population.best.setScore(this.game.bestPlayer.distance);
     }
   }, {
     key: "evolve",
@@ -3476,8 +3503,8 @@ function () {
       this.scoreAll();
       console.log(this);
       this.neat.population.evolvePopulation(this.toEvolve);
-      this.game.reset();
-      this.lifetime = Math.min(this.lifetime + 7, 600);
+      this.game.reset(this.cycle % 20);
+      this.lifetime = Math.min(this.lifetime + 3, 300);
       return _objectSpread({}, this, {
         step: 0,
         cycle: this.cycle + 1
@@ -3536,6 +3563,11 @@ function () {
       // const array = this.game.players.map((element, i) => ({ id: i, value: element }))
       // console.log(array)
       return this.game.bestPlayer;
+    }
+  }, {
+    key: "goal",
+    get: function get() {
+      return this.game.goal;
     }
   }]);
 

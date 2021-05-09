@@ -72,7 +72,8 @@ export class Individual {
   evaluate (args) {
     // first layer init
     this.getLayer(0).forEach((node, i) => node.activateFirst(args[i]))
-    for (let layer = 1; layer < this.getMaxLayer() + 1; layer++) {
+    this.getMaxLayer()
+    for (let layer = 1; layer < this.maxLayer + 1; layer++) {
       this.getLayer(layer).forEach((node, i) => node.activate())
     }
     const answ = this.getLayer(false).sort((node1, node2) => node1.id - node2.id).map((node) => node.activateLast())

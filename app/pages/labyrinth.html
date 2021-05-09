@@ -5,12 +5,12 @@
 </component>
 
 <component id="Goal">
-  <div class="goal" style="top: 100px; left: 200px;"></div> 
+  <div class="goal" style="top: {value.y}px; left: {value.x}px;"></div> 
 </component>
 
 <component id="LabyrinthParams">
   <div class="slidecontainer">
-    <input type="range" min="1" max="20" value={maxcycle} class="slider" change="->nstore.maxcycle"  id="cycleRange">
+    <input type="range" min="2" max="21" value={maxcycle} class="slider" change="->nstore.maxcycle"  id="cycleRange">
     <label for="cycleRange">Cycles: {maxcycle} </label> 
   </div> 
   <label>Cycle: {cycle} </label>
@@ -28,7 +28,7 @@
         <div class="labyrinth"  >
           <Player ui:for="pl of players|toArray"  value="{pl.value}" />
           <Player value="<- nstore.bestplayer" title="bestplayer"/>
-          <Goal  />
+          <Goal value="<- nstore.goal"  />
         </div>
       </div>
       <div class="column col-1"></div>
@@ -37,7 +37,7 @@
         <button class="btn btn-error control" click="->nstore.reset">Reset</button>
         <button class="btn btn-error control" click="->nstore.moveall">MoveAll</button>  
         <button class="btn btn-error control" click="->nstore.cycle">Cycle</button>  
-        <LabyrinthParams  maxcycle="<-nstore.maxcycle" lifetime="<-nstore.lifetime" step="<-nstore.step" cycle="<-nstore.cycle"  />  
+        <LabyrinthParams  maxcycle="<-nstore.maxcycle|dec" lifetime="<-nstore.lifetime" step="<-nstore.step" cycle="<-nstore.cycle"  />  
       </div>
     </div>
   </div>

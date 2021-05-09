@@ -2,15 +2,15 @@
 import { NEAT } from '../algorithms/neat.js'
 import { Labyrinth } from '../games/labyrinth.js'
 function reset() {
-  const size = 45
+  const size = 50
   return {
     size,
-    toEvolve: 6,
+    toEvolve: 7,
     neat: new NEAT({ size, inNum: 3, outNum: 2 }),
     game: new Labyrinth(size),
     step: 0,
     lifetime: 10,
-    maxcycle: 5,
+    maxcycle: 21,
     cycle: 0
   }
 }
@@ -40,6 +40,10 @@ export class LabyrinthStore {
     return this.game.bestPlayer
   }
 
+  get goal() {
+    return this.game.goal
+  }
+
   move(player, individual) {
     const args = [player.x, player.y, player.distance]
     const direction = individual.evaluate(args)
@@ -67,6 +71,7 @@ export class LabyrinthStore {
       const individual = this.neat.population.individuals[i]
       individual.setScore(this.game.players[i].distance)
     }
+    this.neat.population.best.setScore(this.game.bestPlayer.distance)
   }
 
   evolve() {
@@ -74,8 +79,9 @@ export class LabyrinthStore {
     console.log(this)
     this.neat.population.evolvePopulation(this.toEvolve)
 
-    this.game.reset()
-    this.lifetime = Math.min(this.lifetime + 7, 600)
+    this.game.reset(this.cycle % 20)
+
+    this.lifetime = Math.min(this.lifetime + 3, 300)
     return { ...this, step: 0, cycle: this.cycle + 1 }
   }
 

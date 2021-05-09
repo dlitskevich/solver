@@ -21,7 +21,7 @@ class Population {
   constructor ({ size, inNum, outNum, probParams }) {
     this.size = size
     this.individuals = []
-    this.best = { id: false, score: MAX_NUM }
+    this.best = new Individual(inNum, outNum, 0)// { id: false, score: MAX_NUM }
     this.probParams = probParams
 
     for (let i = 0; i < size; i++) {
@@ -57,8 +57,11 @@ class Population {
       if (rand < this.probParams.crossOver) {
         copy.crossOver(toReplaceValue)
       } else {
-        copy.addRandNode()
-        copy.addRandConnection()
+        if (this.probParams.addNode < Math.random()) {
+          copy.addRandNode()
+        } else {
+          copy.addRandConnection()
+        }
       }
       copy.id = toReplaceId
       this.individuals[toReplaceId] = copy

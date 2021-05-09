@@ -50,6 +50,7 @@ launch({
     age: () => 34,
     wrapWithKey: (v, k, r) => ({ ...r, [k]: v }),
     inc: (x = 0) => (x + 1),
+    dec: (x = 0) => (x - 1),
     toArray: (array) => array.map((element, i) => ({ id: i, value: element })),
     gameState: (states, f, step) => {
       if (f) {
