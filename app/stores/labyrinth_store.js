@@ -5,15 +5,19 @@ function reset() {
   const size = 45
   return {
     size,
+    toEvolve: 6,
     neat: new NEAT({ size, inNum: 3, outNum: 2 }),
     game: new Labyrinth(size),
     step: 0,
+    lifetime: 10,
+    maxcycle: 5,
     cycle: 0
   }
 }
 
 export class LabyrinthStore {
   init() {
+    console.log = () => {}
     return {
       ...reset()
     }
@@ -68,9 +72,10 @@ export class LabyrinthStore {
   evolve() {
     this.scoreAll()
     console.log(this)
-    this.neat.population.evolvePopulation(6)
+    this.neat.population.evolvePopulation(this.toEvolve)
 
     this.game.reset()
+    this.lifetime = Math.min(this.lifetime + 7, 600)
     return { ...this, step: 0, cycle: this.cycle + 1 }
   }
 
@@ -80,6 +85,16 @@ export class LabyrinthStore {
 
   onMoveall() {
     return this.moveAll()
+  }
+
+  onCycle() {
+    this.cycle += 1
+    return this.moveAll()
+  }
+
+  onMaxcycle({ value }) {
+    this.maxcycle = parseInt(value)
+    return this
   }
 
   onReset(_, { game }) {

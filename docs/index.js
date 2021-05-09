@@ -3013,7 +3013,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("\n\n<component id=\"Player\">\n  <div class=\"player {title}\" style=\"top: {value.y}px; left: {value.x}px;\"></div> \n</component>\n<component id=\"Goal\">\n  <div class=\"goal\" style=\"top: 100px; left: 200px;\"></div> \n</component>\n\n<component id=\"Labyrinth\">\n  <ui:tag tag=\"LabyrinthMonitor\"  step=\"<-nstore.step\" moveAll=\"->nstore.moveall\" assessAll=\"->nstore.evolve\" />\n  \n  <div class=\"container\">\n    <div class=\"columns\">\n      <div class=\"column col-6 labcontainer\">\n        <div class=\"labyrinth\"  >\n          <Player ui:for=\"pl of players|toArray\"  value=\"{pl.value}\" />\n          <Player value=\"<- nstore.bestplayer\" title=\"bestplayer\"/>\n          <Goal  />\n        </div>\n      </div>\n      <div class=\"column col-1\"></div>\n      <div class=\"column col-2\">\n        <h6>Options</h6>\n        <button class=\"btn btn-error control\" click=\"->nstore.reset\">Reset</button>\n        <button class=\"btn btn-error control\" click=\"->nstore.moveall\">MoveAll</button>            \n      </div>\n    </div>\n  </div>\n</component>\n\n\n<component id=\"LabyrinthPage\">\n  <h4>NEAT is neat</h4>\n  <LabyrinthStore ui:ref=\"nstore\" />\n  <Labyrinth players=\"<-nstore.players\" />\n  \n  \n  <h4>Comparation</h4>\n</component>");
+/* harmony default export */ __webpack_exports__["default"] = ("\n\n<component id=\"Player\">\n  <div class=\"player {title}\" style=\"top: {value.y}px; left: {value.x}px;\"></div> \n</component>\n\n<component id=\"Goal\">\n  <div class=\"goal\" style=\"top: 100px; left: 200px;\"></div> \n</component>\n\n<component id=\"LabyrinthParams\">\n  <div class=\"slidecontainer\">\n    <input type=\"range\" min=\"1\" max=\"20\" value={maxcycle} class=\"slider\" change=\"->nstore.maxcycle\"  id=\"cycleRange\">\n    <label for=\"cycleRange\">Cycles: {maxcycle} </label> \n  </div> \n  <label>Cycle: {cycle} </label>\n  <label>Lifetime: {step}/{lifetime} </label> \n  \n</component>\n\n<component id=\"Labyrinth\">\n  <ui:tag tag=\"LabyrinthMonitor\" cycle=\"<-nstore.cycle\" lifetime=\"<-nstore.lifetime\" step=\"<-nstore.step\" maxcycle=\"<-nstore.maxcycle\" moveAll=\"->nstore.moveall\" assessAll=\"->nstore.evolve\" />\n    \n  \n  <div class=\"container\">\n    <div class=\"columns\">\n      <div class=\"column col-6 labcontainer\">\n        <div class=\"labyrinth\"  >\n          <Player ui:for=\"pl of players|toArray\"  value=\"{pl.value}\" />\n          <Player value=\"<- nstore.bestplayer\" title=\"bestplayer\"/>\n          <Goal  />\n        </div>\n      </div>\n      <div class=\"column col-1\"></div>\n      <div class=\"column col-2\">\n        <h6>Options</h6>\n        <button class=\"btn btn-error control\" click=\"->nstore.reset\">Reset</button>\n        <button class=\"btn btn-error control\" click=\"->nstore.moveall\">MoveAll</button>  \n        <button class=\"btn btn-error control\" click=\"->nstore.cycle\">Cycle</button>  \n        <LabyrinthParams  maxcycle=\"<-nstore.maxcycle\" lifetime=\"<-nstore.lifetime\" step=\"<-nstore.step\" cycle=\"<-nstore.cycle\"  />  \n      </div>\n    </div>\n  </div>\n</component>\n\n\n<component id=\"LabyrinthPage\">\n  <h4>NEAT is neat</h4>\n  <LabyrinthStore  ui:ref=\"nstore\" />\n  <Labyrinth players=\"<-nstore.players\"  />\n  \n  \n  <h4>Comparation</h4>\n</component>");
 
 /***/ }),
 
@@ -3070,6 +3070,7 @@ function () {
     key: "init",
     value: function init() {
       return {
+        maxcycle: 5,
         cycle: 0
       };
     }
@@ -3080,8 +3081,8 @@ function () {
 
       console.log(step);
 
-      if (this.cycle < 120) {
-        if (step > 230) {
+      if (this.cycle % this.maxcycle) {
+        if (step > this.lifetime) {
           this.cycle += 1;
           setTimeout(function () {
             return _this.assessAll();
@@ -3405,6 +3406,7 @@ function reset() {
   var size = 45;
   return {
     size: size,
+    toEvolve: 6,
     neat: new _algorithms_neat_js__WEBPACK_IMPORTED_MODULE_0__["NEAT"]({
       size: size,
       inNum: 3,
@@ -3412,6 +3414,8 @@ function reset() {
     }),
     game: new _games_labyrinth_js__WEBPACK_IMPORTED_MODULE_1__["Labyrinth"](size),
     step: 0,
+    lifetime: 10,
+    maxcycle: 5,
     cycle: 0
   };
 }
@@ -3426,6 +3430,8 @@ function () {
   _createClass(LabyrinthStore, [{
     key: "init",
     value: function init() {
+      console.log = function () {};
+
       return _objectSpread({}, reset());
     }
   }, {
@@ -3469,8 +3475,9 @@ function () {
     value: function evolve() {
       this.scoreAll();
       console.log(this);
-      this.neat.population.evolvePopulation(6);
+      this.neat.population.evolvePopulation(this.toEvolve);
       this.game.reset();
+      this.lifetime = Math.min(this.lifetime + 7, 600);
       return _objectSpread({}, this, {
         step: 0,
         cycle: this.cycle + 1
@@ -3487,9 +3494,22 @@ function () {
       return this.moveAll();
     }
   }, {
+    key: "onCycle",
+    value: function onCycle() {
+      this.cycle += 1;
+      return this.moveAll();
+    }
+  }, {
+    key: "onMaxcycle",
+    value: function onMaxcycle(_ref) {
+      var value = _ref.value;
+      this.maxcycle = parseInt(value);
+      return this;
+    }
+  }, {
     key: "onReset",
-    value: function onReset(_, _ref) {
-      var game = _ref.game;
+    value: function onReset(_, _ref2) {
+      var game = _ref2.game;
       return _objectSpread({}, reset());
     }
   }, {
