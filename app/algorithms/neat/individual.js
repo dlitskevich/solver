@@ -103,6 +103,11 @@ export class Individual {
     this.nodes.push(newNode)
   }
 
+  mutateRandNode (params) {
+    const nodeId = Math.floor(Math.random() * this.nodes.length)
+    this.nodes[nodeId].mutate(params)
+  }
+
   crossOver (donor) {
     const nodeSeparator = this.nodes[this.outNum + Math.floor(Math.random() * (this.nodes.length - this.outNum))]
     const connSeparatorId = nodeSeparator.conns[Math.floor(Math.random() * nodeSeparator.conns.length)].id

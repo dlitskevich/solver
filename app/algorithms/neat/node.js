@@ -48,9 +48,26 @@ export class Node {
     }
   }
 
+  mutate ({ toggleConn, updBias, updActFcn, updConn }) {
+    if (toggleConn < Math.random()) {
+      this.toggleRandConnection()
+    }
+    if (updBias < Math.random()) {
+      this.updateBias()
+    }
+    if (updActFcn < Math.random()) {
+      this.updateActivationFunction()
+    }
+    if (updConn < Math.random()) {
+      this.updateRandomConnection()
+    }
+  }
+
   toggleRandConnection () {
-    const randConnId = Math.floor(Math.rand() * this.conns.length)
-    this.conns[randConnId].toggle()
+    if (this.conns.length) {
+      const randConnId = Math.floor(Math.random() * this.conns.length)
+      this.conns[randConnId].toggle()
+    }
   }
 
   updateBias () {
@@ -59,6 +76,13 @@ export class Node {
 
   updateActivationFunction () {
     this.activation = activationFunctions.randomFunc()
+  }
+
+  updateRandomConnection () {
+    if (this.conns.length) {
+      const connId = Math.floor(Math.random() * this.conns.length)
+      this.conns[connId].weight += 2 * Math.random() - 1
+    }
   }
 
   connectionExist (nodeId) {

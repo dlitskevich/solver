@@ -10,11 +10,32 @@
 
 <component id="LabyrinthParams">
   <div class="slidecontainer">
-    <input type="range" min="2" max="21" value={maxcycle} class="slider" change="->nstore.maxcycle"  id="cycleRange">
     <label for="cycleRange">Cycles: {maxcycle} </label> 
+    <input type="range" min="2" max="501" value={maxcycle} class="slider" change="->nstore.maxcycle"  id="cycleRange">
   </div> 
   <label>Cycle: {cycle} </label>
-  <label>Lifetime: {step}/{lifetime} </label> 
+  <div class="slidecontainer">
+    <label for="lifetimeRange">Lifetime: {step}/{lifetime} </label>  
+    <input type="range" min="50" max="501" value={lifetime} class="slider" change="->nstore.lifetime"  id="lifetimeRange">
+  </div> 
+  <div class="slidecontainer">
+    <label for="maxlifetimeRange">Max Lifetime: {maxlifetime} </label>  
+    <input type="range" min="100" max="300" value={maxlifetime} class="slider" change="->nstore.maxlifetime"  id="maxlifetimeRange">
+  </div> 
+  <div class="slidecontainer">
+    <label for="cyclesltconstRange">Const LT cycles: {cyclesltconst} </label>  
+    <input type="range" min="1" max="10" value={cyclesltconst} class="slider" change="->nstore.cyclesltconst"  id="cyclesltconstRange">
+  </div> 
+  <div class="slidecontainer">
+    <label for="addltRange">Const LT cycles: {addlt} </label>  
+    <input type="range" min="1" max="20" value={addlt} class="slider" change="->nstore.addlt"  id="addltRange">
+  </div> 
+
+  <div class="slidecontainer">
+    <label for="newgoalcyclesRange">New goal cycles: {newgoalcycles} </label>  
+    <input type="range" min="1" max="50" value={newgoalcycles} class="slider" change="->nstore.newgoalcycles"  id="newgoalcyclesRange">
+  </div> 
+  
   
 </component>
 
@@ -37,7 +58,19 @@
         <button class="btn btn-error control" click="->nstore.reset">Reset</button>
         <button class="btn btn-error control" click="->nstore.moveall">MoveAll</button>  
         <button class="btn btn-error control" click="->nstore.cycle">Cycle</button>  
-        <LabyrinthParams  maxcycle="<-nstore.maxcycle|dec" lifetime="<-nstore.lifetime" step="<-nstore.step" cycle="<-nstore.cycle"  />  
+        <br/>
+        <br/>
+
+        <LabyrinthParams  
+          maxcycle="<-nstore.maxcycle|dec" 
+          lifetime="<-nstore.lifetime" 
+          step="<-nstore.step" 
+          cycle="<-nstore.cycle"  
+          addlt="<-nstore.addlt"
+          cyclesltconst="<-nstore.cyclesltconst"
+          maxlifetime="<-nstore.maxlifetime"
+          newgoalcycles="<-nstore.newgoalcycles"
+          />  
       </div>
     </div>
   </div>

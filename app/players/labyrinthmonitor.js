@@ -9,11 +9,12 @@ export class LabyrinthMonitor {
   setStep (step) {
     console.log(step)
     if (this.cycle % this.maxcycle) {
+      if ((this.cycle % this.maxcycle === (this.maxcycle - 1)) && step === this.lifetime) { return }
       if (step > this.lifetime) {
         this.cycle += 1
-        setTimeout(() => this.assessAll(), 1)
+        setTimeout(() => this.assessAll(), 100)
       } else {
-        setTimeout(() => this.moveAll(), 1)
+        setTimeout(() => this.moveAll(), 5)
       }
     }
   }

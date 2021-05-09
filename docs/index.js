@@ -512,9 +512,15 @@ var NEAT = function NEAT(params) {
 
   if (!params.probParams) {
     params.probParams = {
-      crossOver: 0.3,
-      addNode: 0.3,
-      addConn: 0.4
+      crossOver: 0.2,
+      addNode: 0.2,
+      addConn: 0.7,
+      mutateNode: {
+        toggleConn: 0.3,
+        updBias: 0.5,
+        updActFcn: 0.3,
+        updConn: 0.5
+      }
     };
   }
 
@@ -587,11 +593,15 @@ function () {
         if (rand < this.probParams.crossOver) {
           copy.crossOver(toReplaceValue);
         } else {
-          if (this.probParams.addNode < Math.random()) {
+          if (Math.random() < this.probParams.addNode) {
             copy.addRandNode();
-          } else {
+          }
+
+          if (Math.random() < this.probParams.addConn) {
             copy.addRandConnection();
           }
+
+          copy.mutateRandNode(this.probParams.mutateNode);
         }
 
         copy.id = toReplaceId;
@@ -604,7 +614,7 @@ function () {
       var candidatesId = [];
       var weights = [];
       this.individuals.forEach(function (individual) {
-        if (individual.score < _neat_functions__WEBPACK_IMPORTED_MODULE_1__["MAX_NUM"]) {
+        if (individual.score !== _neat_functions__WEBPACK_IMPORTED_MODULE_1__["MAX_NUM"]) {
           candidatesId.push(individual.id);
           weights.push(1 / (1 + individual.score));
         }
@@ -617,7 +627,7 @@ function () {
       var candidatesId = [];
       var weights = [];
       this.individuals.forEach(function (individual) {
-        if (individual.score < _neat_functions__WEBPACK_IMPORTED_MODULE_1__["MAX_NUM"]) {
+        if (individual.score !== _neat_functions__WEBPACK_IMPORTED_MODULE_1__["MAX_NUM"]) {
           candidatesId.push(individual.id);
           weights.push(individual.score);
         }
@@ -956,6 +966,12 @@ function () {
       this.nodes.push(newNode);
     }
   }, {
+    key: "mutateRandNode",
+    value: function mutateRandNode(params) {
+      var nodeId = Math.floor(Math.random() * this.nodes.length);
+      this.nodes[nodeId].mutate(params);
+    }
+  }, {
     key: "crossOver",
     value: function crossOver(donor) {
       var nodeSeparator = this.nodes[this.outNum + Math.floor(Math.random() * (this.nodes.length - this.outNum))];
@@ -1134,10 +1150,36 @@ function () {
       }
     }
   }, {
+    key: "mutate",
+    value: function mutate(_ref) {
+      var toggleConn = _ref.toggleConn,
+          updBias = _ref.updBias,
+          updActFcn = _ref.updActFcn,
+          updConn = _ref.updConn;
+
+      if (toggleConn < Math.random()) {
+        this.toggleRandConnection();
+      }
+
+      if (updBias < Math.random()) {
+        this.updateBias();
+      }
+
+      if (updActFcn < Math.random()) {
+        this.updateActivationFunction();
+      }
+
+      if (updConn < Math.random()) {
+        this.updateRandomConnection();
+      }
+    }
+  }, {
     key: "toggleRandConnection",
     value: function toggleRandConnection() {
-      var randConnId = Math.floor(Math.rand() * this.conns.length);
-      this.conns[randConnId].toggle();
+      if (this.conns.length) {
+        var randConnId = Math.floor(Math.random() * this.conns.length);
+        this.conns[randConnId].toggle();
+      }
     }
   }, {
     key: "updateBias",
@@ -1148,6 +1190,14 @@ function () {
     key: "updateActivationFunction",
     value: function updateActivationFunction() {
       this.activation = _functions__WEBPACK_IMPORTED_MODULE_0__["activationFunctions"].randomFunc();
+    }
+  }, {
+    key: "updateRandomConnection",
+    value: function updateRandomConnection() {
+      if (this.conns.length) {
+        var connId = Math.floor(Math.random() * this.conns.length);
+        this.conns[connId].weight += 2 * Math.random() - 1;
+      }
     }
   }, {
     key: "connectionExist",
@@ -2130,7 +2180,45 @@ var Goal = function Goal(x, y) {
 
   this.x = x;
   this.y = y;
-};
+}; // class Player0 {
+//   constructor (x, y, goal) {
+//     this.x = x
+//     this.y = y
+//     this.xVel = Math.random() / 10
+//     this.yVel = Math.random() / 10
+//     this.goal = goal
+//     this.getDistance()
+//   }
+//   getDistance () {
+//     const xDiff = this.x - this.goal.x
+//     const yDiff = this.y - this.goal.y
+//     this.distance = xDiff ** 2 + yDiff ** 2
+//     return this.distance
+//   }
+//   // changeVelocity (direction) {
+//   //   const deltaVel = 0.5
+//   //   const norm = _norm(direction)
+//   //   this.xVel += deltaVel * direction[0] / norm
+//   //   this.yVel += deltaVel * direction[1] / norm
+//   // }
+//   move (direction) {
+//     // this.changeVelocity(direction)
+//     const copy = this.copy()
+//     const norm = _norm(direction)
+//     copy.x += direction[0] / norm
+//     copy.y += direction[1] / norm
+//     copy.getDistance()
+//     return copy
+//   }
+//   copy () {
+//     const copy = new Player(this.x, this.y, this.goal)
+//     copy.xVel = this.xVel
+//     copy.yVel = this.yVel
+//     copy.distance = this.distance
+//     return copy
+//   }
+// }
+
 
 var Player =
 /*#__PURE__*/
@@ -2140,37 +2228,37 @@ function () {
 
     this.x = x;
     this.y = y;
-    this.xVel = Math.random() / 10;
-    this.yVel = Math.random() / 10;
+    this.xVel = (Math.random() - 0.5) / 5;
+    this.yVel = (Math.random() - 0.5) / 5;
     this.goal = goal;
-    this.getDistance();
+    this.distance = getDistance(this, this.goal);
   }
 
   _createClass(Player, [{
-    key: "getDistance",
-    value: function getDistance() {
-      var xDiff = this.x - this.goal.x;
-      var yDiff = this.y - this.goal.y;
-      this.distance = Math.pow(xDiff, 2) + Math.pow(yDiff, 2);
-      return this.distance;
-    } // changeVelocity (direction) {
-    //   const deltaVel = 0.5
-    //   const norm = _norm(direction)
-    //   this.xVel += deltaVel * direction[0] / norm
-    //   this.yVel += deltaVel * direction[1] / norm
-    // }
+    key: "predictDistance",
+    value: function predictDistance() {
+      return getDistance({
+        x: this.x + this.xVel,
+        y: this.y + this.yVel
+      }, this.goal);
+    }
+  }, {
+    key: "changeVelocity",
+    value: function changeVelocity(direction) {
+      var deltaVel = 1; // const norm = _norm(direction)
 
+      this.xVel += deltaVel * direction[0]; // norm
+
+      this.yVel += deltaVel * direction[1]; // norm
+    }
   }, {
     key: "move",
     value: function move(direction) {
-      // this.changeVelocity(direction)
+      this.changeVelocity(direction);
       var copy = this.copy();
-
-      var norm = _norm(direction);
-
-      copy.x += direction[0] / norm;
-      copy.y += direction[1] / norm;
-      copy.getDistance();
+      copy.x += copy.xVel;
+      copy.y += copy.yVel;
+      copy.distance = getDistance(copy, copy.goal);
       return copy;
     }
   }, {
@@ -2182,30 +2270,47 @@ function () {
       copy.distance = this.distance;
       return copy;
     }
+  }, {
+    key: "score",
+    get: function get() {
+      if (this.x > 500 || this.x < -100 || this.y > 700 || this.y < -100) {
+        return 1e20;
+      }
+
+      return this.distance;
+    }
   }]);
 
   return Player;
 }();
 
+function resetGoal() {
+  var x = 85 + Math.floor(Math.random() * 230);
+  var y = 80 + Math.floor(Math.random() * 70);
+  return new Goal(x, y);
+}
+
 var Labyrinth =
 /*#__PURE__*/
 function () {
   function Labyrinth(size) {
+    var playerY = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {
+      return 400;
+    };
+
     _classCallCheck(this, Labyrinth);
 
-    var x = 50 + Math.floor(Math.random() * 350);
-    var y = 80 + Math.floor(Math.random() * 50);
-    this.goal = new Goal(x, y);
+    this.goal = resetGoal();
     Object.assign(this, {
       width: 400,
       height: 600,
       size: size,
       players: [],
-      bestPlayer: new Player(200, 500, this.goal)
+      bestPlayer: new Player(200, playerY(), this.goal)
     });
 
     for (var i = 0; i < size; i++) {
-      this.players.push(new Player(200, 500, this.goal));
+      this.players.push(new Player(200, playerY(), this.goal));
     }
   }
 
@@ -2213,16 +2318,14 @@ function () {
     key: "reset",
     value: function reset(savegoal) {
       if (!savegoal) {
-        var x = 50 + Math.floor(Math.random() * 350);
-        var y = 100 + Math.floor(Math.random() * 50);
-        this.goal = new Goal(x, y);
+        this.goal = resetGoal();
       }
 
       this.players = [];
-      this.bestPlayer = new Player(200, 500, this.goal);
+      this.bestPlayer = new Player(200, 400, this.goal);
 
       for (var i = 0; i < this.size; i++) {
-        this.players.push(new Player(200, 500, this.goal));
+        this.players.push(new Player(200, 400, this.goal));
       }
     }
   }]);
@@ -2231,9 +2334,15 @@ function () {
 }();
 
 function _norm(array) {
-  return array.reduce(function (acc, val) {
+  return Math.sqrt(array.reduce(function (acc, val) {
     return acc + Math.pow(val, 2);
-  }, 0);
+  }, 0));
+}
+
+function getDistance(a, b) {
+  var width = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 400;
+  var height = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 600;
+  return _norm([a.x - b.x, a.y - b.y]);
 }
 
 /***/ }),
@@ -3038,7 +3147,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("\n\n<component id=\"Player\">\n  <div class=\"player {title}\" style=\"top: {value.y}px; left: {value.x}px;\"></div> \n</component>\n\n<component id=\"Goal\">\n  <div class=\"goal\" style=\"top: {value.y}px; left: {value.x}px;\"></div> \n</component>\n\n<component id=\"LabyrinthParams\">\n  <div class=\"slidecontainer\">\n    <input type=\"range\" min=\"2\" max=\"21\" value={maxcycle} class=\"slider\" change=\"->nstore.maxcycle\"  id=\"cycleRange\">\n    <label for=\"cycleRange\">Cycles: {maxcycle} </label> \n  </div> \n  <label>Cycle: {cycle} </label>\n  <label>Lifetime: {step}/{lifetime} </label> \n  \n</component>\n\n<component id=\"Labyrinth\">\n  <ui:tag tag=\"LabyrinthMonitor\" cycle=\"<-nstore.cycle\" lifetime=\"<-nstore.lifetime\" step=\"<-nstore.step\" maxcycle=\"<-nstore.maxcycle\" moveAll=\"->nstore.moveall\" assessAll=\"->nstore.evolve\" />\n    \n  \n  <div class=\"container\">\n    <div class=\"columns\">\n      <div class=\"column col-6 labcontainer\">\n        <div class=\"labyrinth\"  >\n          <Player ui:for=\"pl of players|toArray\"  value=\"{pl.value}\" />\n          <Player value=\"<- nstore.bestplayer\" title=\"bestplayer\"/>\n          <Goal value=\"<- nstore.goal\"  />\n        </div>\n      </div>\n      <div class=\"column col-1\"></div>\n      <div class=\"column col-2\">\n        <h6>Options</h6>\n        <button class=\"btn btn-error control\" click=\"->nstore.reset\">Reset</button>\n        <button class=\"btn btn-error control\" click=\"->nstore.moveall\">MoveAll</button>  \n        <button class=\"btn btn-error control\" click=\"->nstore.cycle\">Cycle</button>  \n        <LabyrinthParams  maxcycle=\"<-nstore.maxcycle|dec\" lifetime=\"<-nstore.lifetime\" step=\"<-nstore.step\" cycle=\"<-nstore.cycle\"  />  \n      </div>\n    </div>\n  </div>\n</component>\n\n\n<component id=\"LabyrinthPage\">\n  <h4>NEAT is neat</h4>\n  <LabyrinthStore  ui:ref=\"nstore\" />\n  <Labyrinth players=\"<-nstore.players\"  />\n  \n  \n  <h4>Comparation</h4>\n</component>");
+/* harmony default export */ __webpack_exports__["default"] = ("\n\n<component id=\"Player\">\n  <div class=\"player {title}\" style=\"top: {value.y}px; left: {value.x}px;\"></div> \n</component>\n\n<component id=\"Goal\">\n  <div class=\"goal\" style=\"top: {value.y}px; left: {value.x}px;\"></div> \n</component>\n\n<component id=\"LabyrinthParams\">\n  <div class=\"slidecontainer\">\n    <label for=\"cycleRange\">Cycles: {maxcycle} </label> \n    <input type=\"range\" min=\"2\" max=\"501\" value={maxcycle} class=\"slider\" change=\"->nstore.maxcycle\"  id=\"cycleRange\">\n  </div> \n  <label>Cycle: {cycle} </label>\n  <div class=\"slidecontainer\">\n    <label for=\"lifetimeRange\">Lifetime: {step}/{lifetime} </label>  \n    <input type=\"range\" min=\"50\" max=\"501\" value={lifetime} class=\"slider\" change=\"->nstore.lifetime\"  id=\"lifetimeRange\">\n  </div> \n  <div class=\"slidecontainer\">\n    <label for=\"maxlifetimeRange\">Max Lifetime: {maxlifetime} </label>  \n    <input type=\"range\" min=\"100\" max=\"300\" value={maxlifetime} class=\"slider\" change=\"->nstore.maxlifetime\"  id=\"maxlifetimeRange\">\n  </div> \n  <div class=\"slidecontainer\">\n    <label for=\"cyclesltconstRange\">Const LT cycles: {cyclesltconst} </label>  \n    <input type=\"range\" min=\"1\" max=\"10\" value={cyclesltconst} class=\"slider\" change=\"->nstore.cyclesltconst\"  id=\"cyclesltconstRange\">\n  </div> \n  <div class=\"slidecontainer\">\n    <label for=\"addltRange\">Const LT cycles: {addlt} </label>  \n    <input type=\"range\" min=\"1\" max=\"20\" value={addlt} class=\"slider\" change=\"->nstore.addlt\"  id=\"addltRange\">\n  </div> \n\n  <div class=\"slidecontainer\">\n    <label for=\"newgoalcyclesRange\">New goal cycles: {newgoalcycles} </label>  \n    <input type=\"range\" min=\"1\" max=\"50\" value={newgoalcycles} class=\"slider\" change=\"->nstore.newgoalcycles\"  id=\"newgoalcyclesRange\">\n  </div> \n  \n  \n</component>\n\n<component id=\"Labyrinth\">\n  <ui:tag tag=\"LabyrinthMonitor\" cycle=\"<-nstore.cycle\" lifetime=\"<-nstore.lifetime\" step=\"<-nstore.step\" maxcycle=\"<-nstore.maxcycle\" moveAll=\"->nstore.moveall\" assessAll=\"->nstore.evolve\" />\n    \n  \n  <div class=\"container\">\n    <div class=\"columns\">\n      <div class=\"column col-6 labcontainer\">\n        <div class=\"labyrinth\"  >\n          <Player ui:for=\"pl of players|toArray\"  value=\"{pl.value}\" />\n          <Player value=\"<- nstore.bestplayer\" title=\"bestplayer\"/>\n          <Goal value=\"<- nstore.goal\"  />\n        </div>\n      </div>\n      <div class=\"column col-1\"></div>\n      <div class=\"column col-2\">\n        <h6>Options</h6>\n        <button class=\"btn btn-error control\" click=\"->nstore.reset\">Reset</button>\n        <button class=\"btn btn-error control\" click=\"->nstore.moveall\">MoveAll</button>  \n        <button class=\"btn btn-error control\" click=\"->nstore.cycle\">Cycle</button>  \n        <br/>\n        <br/>\n\n        <LabyrinthParams  \n          maxcycle=\"<-nstore.maxcycle|dec\" \n          lifetime=\"<-nstore.lifetime\" \n          step=\"<-nstore.step\" \n          cycle=\"<-nstore.cycle\"  \n          addlt=\"<-nstore.addlt\"\n          cyclesltconst=\"<-nstore.cyclesltconst\"\n          maxlifetime=\"<-nstore.maxlifetime\"\n          newgoalcycles=\"<-nstore.newgoalcycles\"\n          />  \n      </div>\n    </div>\n  </div>\n</component>\n\n\n<component id=\"LabyrinthPage\">\n  <h4>NEAT is neat</h4>\n  <LabyrinthStore  ui:ref=\"nstore\" />\n  <Labyrinth players=\"<-nstore.players\"  />\n  \n  \n  <h4>Comparation</h4>\n</component>");
 
 /***/ }),
 
@@ -3107,15 +3216,19 @@ function () {
       console.log(step);
 
       if (this.cycle % this.maxcycle) {
+        if (this.cycle % this.maxcycle === this.maxcycle - 1 && step === this.lifetime) {
+          return;
+        }
+
         if (step > this.lifetime) {
           this.cycle += 1;
           setTimeout(function () {
             return _this.assessAll();
-          }, 1);
+          }, 100);
         } else {
           setTimeout(function () {
             return _this.moveAll();
-          }, 1);
+          }, 5);
         }
       }
     }
@@ -3431,17 +3544,21 @@ function reset() {
   var size = 50;
   return {
     size: size,
-    toEvolve: 7,
+    toEvolve: 9,
     neat: new _algorithms_neat_js__WEBPACK_IMPORTED_MODULE_0__["NEAT"]({
       size: size,
-      inNum: 3,
+      inNum: 4,
       outNum: 2
     }),
     game: new _games_labyrinth_js__WEBPACK_IMPORTED_MODULE_1__["Labyrinth"](size),
     step: 0,
     lifetime: 10,
-    maxcycle: 21,
-    cycle: 0
+    maxcycle: 351,
+    cycle: 0,
+    newgoalcycles: 15,
+    maxlifetime: 300,
+    cyclesltconst: 5,
+    addlt: 3
   };
 }
 
@@ -3462,7 +3579,8 @@ function () {
   }, {
     key: "move",
     value: function move(player, individual) {
-      var args = [player.x, player.y, player.distance];
+      // const args = [player.x, player.y, player.xVel, player.yVel, player.predictDistance() - player.distance, player.distance]
+      var args = [player.xVel, player.yVel, player.predictDistance() - player.distance, player.distance];
       var direction = individual.evaluate(args);
       return player.move(direction);
     }
@@ -3492,10 +3610,10 @@ function () {
     value: function scoreAll() {
       for (var i = 0; i < this.size; i++) {
         var individual = this.neat.population.individuals[i];
-        individual.setScore(this.game.players[i].distance);
+        individual.setScore(this.game.players[i].score);
       }
 
-      this.neat.population.best.setScore(this.game.bestPlayer.distance);
+      this.neat.population.best.setScore(this.game.bestPlayer.score);
     }
   }, {
     key: "evolve",
@@ -3503,8 +3621,16 @@ function () {
       this.scoreAll();
       console.log(this);
       this.neat.population.evolvePopulation(this.toEvolve);
-      this.game.reset(this.cycle % 20);
-      this.lifetime = Math.min(this.lifetime + 3, 300);
+      this.game.reset(this.cycle % this.newgoalcycles);
+
+      if (!(this.cycle % this.newgoalcycles)) {
+        this.lifetime = Math.min(this.lifetime, 200);
+      }
+
+      if (!(this.cycle % this.cyclesltconst)) {
+        this.lifetime = Math.min(this.lifetime + this.addlt, this.maxlifetime);
+      }
+
       return _objectSpread({}, this, {
         step: 0,
         cycle: this.cycle + 1
@@ -3534,9 +3660,58 @@ function () {
       return this;
     }
   }, {
+    key: "onLifetime",
+    value: function onLifetime(_ref2) {
+      var value = _ref2.value;
+      this.lifetime = parseInt(value);
+      return this;
+    }
+  }, {
+    key: "onMaxlifetime",
+    value: function onMaxlifetime(_ref3) {
+      var value = _ref3.value;
+      this.maxlifetime = parseInt(value);
+      return this;
+    }
+  }, {
+    key: "onCyclesltconst",
+    value: function onCyclesltconst(_ref4) {
+      var value = _ref4.value;
+      this.cyclesltconst = parseInt(value);
+      return this;
+    }
+  }, {
+    key: "onAddlt",
+    value: function onAddlt(_ref5) {
+      var value = _ref5.value;
+      this.addlt = parseInt(value);
+      return this;
+    }
+  }, {
+    key: "onNewgoalcycles",
+    value: function onNewgoalcycles(_ref6) {
+      var value = _ref6.value;
+      this.newgoalcycles = parseInt(value);
+      return this;
+    }
+  }, {
     key: "onReset",
-    value: function onReset(_, _ref2) {
-      var game = _ref2.game;
+    value: function onReset(_, _ref7) {
+      var game = _ref7.game;
+      return _objectSpread({}, reset());
+    }
+  }, {
+    key: "onChangeGame",
+    value: function onChangeGame(type) {
+      if (type === 2) {
+        var playerY = function playerY() {
+          return Math.random() < 0.5 ? 400 : 200;
+        };
+
+        this.game = new _games_labyrinth_js__WEBPACK_IMPORTED_MODULE_1__["Labyrinth"](this.size, playerY);
+        return this;
+      }
+
       return _objectSpread({}, reset());
     }
   }, {

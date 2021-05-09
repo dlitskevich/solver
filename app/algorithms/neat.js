@@ -8,9 +8,10 @@ export class NEAT {
   constructor (params) {
     if (!params.probParams) {
       params.probParams = {
-        crossOver: 0.3,
-        addNode: 0.3,
-        addConn: 0.4
+        crossOver: 0.2,
+        addNode: 0.2,
+        addConn: 0.7,
+        mutateNode: { toggleConn: 0.3, updBias: 0.5, updActFcn: 0.3, updConn: 0.5 }
       }
     }
     this.population = new Population(params)
@@ -57,11 +58,13 @@ class Population {
       if (rand < this.probParams.crossOver) {
         copy.crossOver(toReplaceValue)
       } else {
-        if (this.probParams.addNode < Math.random()) {
+        if (Math.random() < this.probParams.addNode) {
           copy.addRandNode()
-        } else {
+        }
+        if (Math.random() < this.probParams.addConn) {
           copy.addRandConnection()
         }
+        copy.mutateRandNode(this.probParams.mutateNode)
       }
       copy.id = toReplaceId
       this.individuals[toReplaceId] = copy
@@ -72,7 +75,7 @@ class Population {
     const candidatesId = []
     const weights = []
     this.individuals.forEach((individual) => {
-      if (individual.score < MAX_NUM) {
+      if (individual.score !== MAX_NUM) {
         candidatesId.push(individual.id)
         weights.push(1 / (1 + individual.score))
       }
@@ -85,7 +88,7 @@ class Population {
     const candidatesId = []
     const weights = []
     this.individuals.forEach((individual) => {
-      if (individual.score < MAX_NUM) {
+      if (individual.score !== MAX_NUM) {
         candidatesId.push(individual.id)
         weights.push(individual.score)
       }

@@ -5,13 +5,17 @@ function reset() {
   const size = 50
   return {
     size,
-    toEvolve: 7,
-    neat: new NEAT({ size, inNum: 3, outNum: 2 }),
+    toEvolve: 9,
+    neat: new NEAT({ size, inNum: 4, outNum: 2 }),
     game: new Labyrinth(size),
     step: 0,
     lifetime: 10,
-    maxcycle: 21,
-    cycle: 0
+    maxcycle: 351,
+    cycle: 0,
+    newgoalcycles: 15,
+    maxlifetime: 300,
+    cyclesltconst: 5,
+    addlt: 3
   }
 }
 
@@ -45,7 +49,8 @@ export class LabyrinthStore {
   }
 
   move(player, individual) {
-    const args = [player.x, player.y, player.distance]
+    // const args = [player.x, player.y, player.xVel, player.yVel, player.predictDistance() - player.distance, player.distance]
+    const args = [player.xVel, player.yVel, player.predictDistance() - player.distance, player.distance]
     const direction = individual.evaluate(args)
     return player.move(direction)
   }
@@ -69,9 +74,9 @@ export class LabyrinthStore {
   scoreAll() {
     for (let i = 0; i < this.size; i++) {
       const individual = this.neat.population.individuals[i]
-      individual.setScore(this.game.players[i].distance)
+      individual.setScore(this.game.players[i].score)
     }
-    this.neat.population.best.setScore(this.game.bestPlayer.distance)
+    this.neat.population.best.setScore(this.game.bestPlayer.score)
   }
 
   evolve() {
@@ -79,9 +84,14 @@ export class LabyrinthStore {
     console.log(this)
     this.neat.population.evolvePopulation(this.toEvolve)
 
-    this.game.reset(this.cycle % 20)
+    this.game.reset(this.cycle % this.newgoalcycles)
+    if (!(this.cycle % this.newgoalcycles)) {
+      this.lifetime = Math.min(this.lifetime, 200)
+    }
+    if (!(this.cycle % this.cyclesltconst)) {
+      this.lifetime = Math.min(this.lifetime + this.addlt, this.maxlifetime)
+    }
 
-    this.lifetime = Math.min(this.lifetime + 3, 300)
     return { ...this, step: 0, cycle: this.cycle + 1 }
   }
 
@@ -103,7 +113,43 @@ export class LabyrinthStore {
     return this
   }
 
+  onLifetime({ value }) {
+    this.lifetime = parseInt(value)
+    return this
+  }
+
+  onMaxlifetime({ value }) {
+    this.maxlifetime = parseInt(value)
+    return this
+  }
+
+  onCyclesltconst({ value }) {
+    this.cyclesltconst = parseInt(value)
+    return this
+  }
+
+  onAddlt({ value }) {
+    this.addlt = parseInt(value)
+    return this
+  }
+
+  onNewgoalcycles({ value }) {
+    this.newgoalcycles = parseInt(value)
+    return this
+  }
+
   onReset(_, { game }) {
+    return {
+      ...reset()
+    }
+  }
+
+  onChangeGame(type) {
+    if (type === 2) {
+      const playerY = () => (Math.random() < 0.5 ? 400 : 200)
+      this.game = new Labyrinth(this.size, playerY)
+      return this
+    }
     return {
       ...reset()
     }
