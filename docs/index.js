@@ -3578,7 +3578,7 @@ function reset() {
     }),
     game: new _games_labyrinth_js__WEBPACK_IMPORTED_MODULE_1__["Labyrinth"](size),
     step: 0,
-    lifetime: 100,
+    lifetime: 200,
     maxcycle: 351,
     cycle: 0,
     newgoalcycles: 3,
@@ -3649,7 +3649,7 @@ function () {
       this.game.reset(this.cycle % this.newgoalcycles);
 
       if (!(this.cycle % this.newgoalcycles)) {
-        this.lifetime = Math.min(this.lifetime, 200);
+        this.lifetime = Math.min(this.lifetime, 500);
       } // if (!(this.cycle % this.cyclesltconst)) {
       //   this.lifetime = Math.min(this.lifetime + this.addlt, this.maxlifetime)
       // }
@@ -3746,6 +3746,7 @@ function () {
     key: "game2",
     value: function game2() {
       return _objectSpread({}, reset(), {
+        lifetime: 300,
         game: new _games_labyrinth_js__WEBPACK_IMPORTED_MODULE_1__["Labyrinth"](this.size, function () {
           return Math.random() < 0.5 ? 100 : 300;
         }, function () {
