@@ -67,15 +67,28 @@ class Player {
     return quality
   }
 
-  predictDistance () {
-    return getDistance({ x: this.x + this.xVel, y: this.y + this.yVel }, this.goal)
+  getDiractionX () {
+    const vx = this.goal.x - this.x
+    const vy = this.goal.y - this.y
+    return vx / _norm([vx, vy])
   }
+
+  getDiractionY () {
+    const vx = this.goal.x - this.x
+    const vy = this.goal.y - this.y
+    return vy / _norm([vx, vy])
+  }
+
+  // predictDistance () {
+  //   return getDistance({ x: this.x + this.xVel, y: this.y + this.yVel }, this.goal)
+  // }
 
   changeVelocity (direction) {
     const deltaVel = 1
     // const norm = _norm(direction)
     this.xVel += deltaVel * direction[0] // norm
     this.yVel += deltaVel * direction[1] // norm
+    // const norm = _norm([this.xVel, this.yVel])
   }
 
   move (direction) {
@@ -84,7 +97,7 @@ class Player {
     copy.x += copy.xVel
     copy.y += copy.yVel
     copy.distance = getDistance(copy, copy.goal)
-    copy.quality += this.distance
+    copy.quality = this.distance + this.quality
     return copy
   }
 
@@ -96,36 +109,43 @@ class Player {
     return copy
   }
 }
-function resetGoal () {
-  const x = 85 + Math.floor(Math.random() * 230)
-  const y = 80 + Math.floor(Math.random() * 70)
+function resetGoal (goalsParams) {
+  const x = goalsParams.x + Math.floor(Math.random() * goalsParams.dx)
+  const y = goalsParams.y + Math.floor(Math.random() * goalsParams.dy)
   return new Goal(x, y)
 }
 
 export class Labyrinth {
-  constructor (size, playerY = () => (400)) {
-    this.goal = resetGoal()
+  constructor (size,
+    playerX = () => (200),
+    playerY = () => (400),
+    goalsParams = { x: 85, y: 280, dx: 230, dy: 70 }
+  ) {
+    this.playerX = playerX
+    this.playerY = playerY
+    this.goalsParams = goalsParams
+    this.goal = resetGoal(goalsParams)
     Object.assign(this, {
       width: 400,
       height: 600,
       size,
       players: [],
-      bestPlayer: new Player(200, playerY(), this.goal)
+      bestPlayer: new Player(playerX(), playerY(), this.goal)
     })
     for (let i = 0; i < size; i++) {
-      this.players.push(new Player(200, playerY(), this.goal))
+      this.players.push(new Player(playerX(), playerY(), this.goal))
     }
   }
 
   reset (savegoal) {
     if (!savegoal) {
-      this.goal = resetGoal()
+      this.goal = resetGoal(this.goalsParams)
     }
 
     this.players = []
-    this.bestPlayer = new Player(200, 400, this.goal)
+    this.bestPlayer = new Player(this.playerX(), this.playerY(), this.goal)
     for (let i = 0; i < this.size; i++) {
-      this.players.push(new Player(200, 400, this.goal))
+      this.players.push(new Player(this.playerX(), this.playerY(), this.goal))
     }
   }
 }
@@ -134,5 +154,5 @@ function _norm (array) {
   return Math.sqrt(array.reduce((acc, val) => acc + val ** 2, 0))
 }
 function getDistance (a, b, width = 400, height = 600) {
-  return _norm([(a.x - b.x), (a.y - b.y)])
+  return _norm([(a.x - b.x), (a.y - b.y)]) / 100
 }

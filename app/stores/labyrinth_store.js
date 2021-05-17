@@ -2,20 +2,20 @@
 import { NEAT } from '../algorithms/neat.js'
 import { Labyrinth } from '../games/labyrinth.js'
 function reset() {
-  const size = 50
+  const size = 100
   return {
     size,
-    toEvolve: 9,
-    neat: new NEAT({ size, inNum: 4, outNum: 2 }),
+    toEvolve: 16,
+    neat: new NEAT({ size, inNum: 5, outNum: 2 }),
     game: new Labyrinth(size),
     step: 0,
-    lifetime: 10,
+    lifetime: 100,
     maxcycle: 351,
     cycle: 0,
     newgoalcycles: 3,
     maxlifetime: 100,
     cyclesltconst: 2,
-    addlt: 20
+    addlt: 10
   }
 }
 
@@ -50,7 +50,7 @@ export class LabyrinthStore {
 
   move(player, individual) {
     // const args = [player.x, player.y, player.xVel, player.yVel, player.predictDistance() - player.distance, player.distance]
-    const args = [player.xVel, player.yVel, player.predictDistance() - player.distance, player.distance]
+    const args = [player.xVel, player.yVel, player.getDiractionX(), player.getDiractionY(), player.distance]
     const direction = individual.evaluate(args)
     return player.move(direction)
   }
@@ -88,9 +88,9 @@ export class LabyrinthStore {
     if (!(this.cycle % this.newgoalcycles)) {
       this.lifetime = Math.min(this.lifetime, 200)
     }
-    if (!(this.cycle % this.cyclesltconst)) {
-      this.lifetime = Math.min(this.lifetime + this.addlt, this.maxlifetime)
-    }
+    // if (!(this.cycle % this.cyclesltconst)) {
+    //   this.lifetime = Math.min(this.lifetime + this.addlt, this.maxlifetime)
+    // }
 
     return { ...this, step: 0, cycle: this.cycle + 1 }
   }
@@ -144,14 +144,31 @@ export class LabyrinthStore {
     }
   }
 
-  onChangeGame(type) {
+  onChangegame({ type }) {
     if (type === 2) {
-      const playerY = () => (Math.random() < 0.5 ? 400 : 200)
-      this.game = new Labyrinth(this.size, playerY)
-      return this
+      return this.game2()
     }
     return {
       ...reset()
+    }
+  }
+
+  game1() {
+    return {
+      ...reset(),
+      game: new Labyrinth(this.size)
+    }
+  }
+
+  game2() {
+    return {
+      ...reset(),
+      game: new Labyrinth(
+        this.size,
+        () => (Math.random() < 0.5 ? 100 : 300),
+        () => (Math.random() < 0.5 ? 200 : 400),
+        { x: 200, y: 300, dx: 75, dy: 50 }
+      )
     }
   }
 };

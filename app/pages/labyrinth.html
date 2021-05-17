@@ -18,7 +18,7 @@
     <label for="lifetimeRange">Lifetime: {step}/{lifetime} </label>  
     <input type="range" min="50" max="501" value={lifetime} class="slider" change="->nstore.lifetime"  id="lifetimeRange">
   </div> 
-  <div class="slidecontainer">
+  <!-- <div class="slidecontainer">
     <label for="maxlifetimeRange">Max Lifetime: {maxlifetime} </label>  
     <input type="range" min="100" max="300" value={maxlifetime} class="slider" change="->nstore.maxlifetime"  id="maxlifetimeRange">
   </div> 
@@ -29,12 +29,16 @@
   <div class="slidecontainer">
     <label for="addltRange">Update LT by: {addlt} </label>  
     <input type="range" min="1" max="20" value={addlt} class="slider" change="->nstore.addlt"  id="addltRange">
-  </div> 
+  </div>  -->
 
   <div class="slidecontainer">
     <label for="newgoalcyclesRange">New goal cycles: {newgoalcycles} </label>  
     <input type="range" min="1" max="50" value={newgoalcycles} class="slider" change="->nstore.newgoalcycles"  id="newgoalcyclesRange">
   </div> 
+  <div class="gametypes">
+    <button class="btn" data-type="1" click="->nstore.changegame" > Game type 1 </button>
+    <button class="btn" data-type="2" click="->nstore.changegame" > Game type 2 </button>
+  </div>
   
   
 </component>

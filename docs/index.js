@@ -1245,7 +1245,7 @@ function () {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("<component id=\"App\">\n  <NavigationService ui:ref=\"nav\" />\n  <ViewPort caption=\":top.title\" sidebarWidth=\"300\">\n    <ViewPort:aside>\n      <NavTree data=\":top.sitemap\" />\n    </ViewPort:aside>\n    <PageRouter ui:props=\"<- nav.route\" />\n  </ViewPort>\n</component>\n\n<component id=\"Navbar\">\n  <header class=\"navbar bg-primary\" style=\"min-height: 48px\">\n    <section class=\"navbar-section mx-2\">\n      <h4 class=\"m-1\" style=\"vertical-align: middle\" ui:if=\"{caption}\">\n        {caption}\n      </h4>\n      <ui:slot />\n    </section>\n    <section class=\"navbar-center\" ui:if=\"{logo}\">\n      <img src=\"{logo}\" alt=\"\" height=\"40\" width=\"140\" />\n    </section>\n    <section class=\"navbar-section mx-2\">\n      <ui:slot id=\"right\" />\n      <UserAvatar ui:props=\"{user}\" ui:if=\"{user}\" />\n    </section>\n  </header>\n</component>\n\n<component id=\"SimpleList\">\n  <ul class=\"nav\">\n    <li class=\"nav-item {item.class}\" ui:for=\"item of data\">\n      <span>{item.name}</span>\n    </li>\n  </ul>\n</component>\n\n<component id=\"NavTree\">\n  <ul class=\"nav\">\n    <li class=\"nav-item {item.class}\" ui:for=\"item of data\">\n      <NavLink href=\"{item.id}\">\n        <span>{item.name}</span>\n        <span ui:if=\"{item.label}\" class=\"label label-error\">{item.label}</span>\n      </NavLink>\n      <NavTree ui:if=\"{item.subs}\" data=\"{item.subs}\" />\n    </li>\n  </ul>\n</component>\n\n<component id=\"MainPage\">\n  <Navbar caption=\"Info\" />\n  <!-- <Panel caption=\"Icons\">\n    <LoadingIndicator />\n    Using Font\n    <Icon type=\"cog\" />\n  </Panel>\n  <Panel caption=\"Buttons\">\n    <Button caption=\"Default\" trackId=\"action1\" />\n    <Button\n            icon=\"cog\"\n            caption=\"Large primary with icon\"\n            primary\n            large\n            class=\"m-2\" />\n    <Button icon=\"123\" caption=\"Link\" link />\n  </Panel>\n  <Panel caption=\"Panel\" hint=\"with hint\"> here... </Panel> -->\n\n  <button click=\"->\" data-clicked={clicked|inc}>Clicked {clicked|or:0}</button>\n\n</component>\n\n<component id=\"ArrowsPage\">\n  <Navbar caption=\"Arrows\" />\n  <Panel caption=\"Subscribe and Action\">\n    <Tabs value=\"<- store.tab\" items=\":top.sitemap\" action=\"-> store.select\" />\n    <Button\n            caption=\"<- store.tab|or:none|str.capitalize\"\n            data-id=\"other\"\n            action=\"-> store.select\" />\n  </Panel>\n</component>");
+/* harmony default export */ __webpack_exports__["default"] = ("<component id=\"App\">\n  <NavigationService ui:ref=\"nav\" />\n  <ViewPort caption=\":top.title\" sidebarWidth=\"300\">\n    <ViewPort:aside>\n      <NavTree data=\":top.sitemap\" />\n    </ViewPort:aside>\n    <PageRouter ui:props=\"<- nav.route\" />\n  </ViewPort>\n</component>\n\n<component id=\"Navbar\">\n  <header class=\"navbar bg-primary\" style=\"min-height: 48px\">\n    <section class=\"navbar-section mx-2\">\n      <h4 class=\"m-1\" style=\"vertical-align: middle\" ui:if=\"{caption}\">\n        {caption}\n      </h4>\n      <ui:slot />\n    </section>\n    <section class=\"navbar-center\" ui:if=\"{logo}\">\n      <img src=\"{logo}\" alt=\"\" height=\"40\" width=\"140\" />\n    </section>\n    <section class=\"navbar-section mx-2\">\n      <ui:slot id=\"right\" />\n      <UserAvatar ui:props=\"{user}\" ui:if=\"{user}\" />\n    </section>\n  </header>\n</component>\n\n<component id=\"SimpleList\">\n  <ul class=\"nav\">\n    <li class=\"nav-item {item.class}\" ui:for=\"item of data\">\n      <span>{item.name}</span>\n    </li>\n  </ul>\n</component>\n\n<component id=\"NavTree\">\n  <ul class=\"nav\">\n    <li class=\"nav-item {item.class}\" ui:for=\"item of data\">\n      <NavLink href=\"{item.id}\">\n        <span>{item.name}</span>\n        <span ui:if=\"{item.label}\" class=\"label label-error\">{item.label}</span>\n      </NavLink>\n      <NavTree ui:if=\"{item.subs}\" data=\"{item.subs}\" />\n    </li>\n  </ul>\n</component>\n\n<component id=\"MainPage\">\n  <Navbar caption=\"This is a demonstration of achieved during CW of Danila Litskevich\" />\n  <!-- <Panel caption=\"Icons\">\n    <LoadingIndicator />\n    Using Font\n    <Icon type=\"cog\" />\n  </Panel>\n  <Panel caption=\"Buttons\">\n    <Button caption=\"Default\" trackId=\"action1\" />\n    <Button\n            icon=\"cog\"\n            caption=\"Large primary with icon\"\n            primary\n            large\n            class=\"m-2\" />\n    <Button icon=\"123\" caption=\"Link\" link />\n  </Panel>\n  <Panel caption=\"Panel\" hint=\"with hint\"> here... </Panel> -->\n  <br/>\n  <h5>You can click that button</h5>\n  <button class=\"btn\" click=\"->\" data-clicked={clicked|inc}>Clicked {clicked|or:0}</button>\n\n</component>\n\n<component id=\"ArrowsPage\">\n  <Navbar caption=\"Arrows\" />\n  <Panel caption=\"Subscribe and Action\">\n    <Tabs value=\"<- store.tab\" items=\":top.sitemap\" action=\"-> store.select\" />\n    <Button\n            caption=\"<- store.tab|or:none|str.capitalize\"\n            data-id=\"other\"\n            action=\"-> store.select\" />\n  </Panel>\n</component>");
 
 /***/ }),
 
@@ -2231,17 +2231,27 @@ function () {
     this.xVel = (Math.random() - 0.5) / 5;
     this.yVel = (Math.random() - 0.5) / 5;
     this.goal = goal;
+    this.quality = 0;
     this.distance = getDistance(this, this.goal);
   }
 
   _createClass(Player, [{
-    key: "predictDistance",
-    value: function predictDistance() {
-      return getDistance({
-        x: this.x + this.xVel,
-        y: this.y + this.yVel
-      }, this.goal);
+    key: "getDiractionX",
+    value: function getDiractionX() {
+      var vx = this.goal.x - this.x;
+      var vy = this.goal.y - this.y;
+      return vx / _norm([vx, vy]);
     }
+  }, {
+    key: "getDiractionY",
+    value: function getDiractionY() {
+      var vx = this.goal.x - this.x;
+      var vy = this.goal.y - this.y;
+      return vy / _norm([vx, vy]);
+    } // predictDistance () {
+    //   return getDistance({ x: this.x + this.xVel, y: this.y + this.yVel }, this.goal)
+    // }
+
   }, {
     key: "changeVelocity",
     value: function changeVelocity(direction) {
@@ -2250,6 +2260,7 @@ function () {
       this.xVel += deltaVel * direction[0]; // norm
 
       this.yVel += deltaVel * direction[1]; // norm
+      // const norm = _norm([this.xVel, this.yVel])
     }
   }, {
     key: "move",
@@ -2259,6 +2270,7 @@ function () {
       copy.x += copy.xVel;
       copy.y += copy.yVel;
       copy.distance = getDistance(copy, copy.goal);
+      copy.quality = this.distance + this.quality;
       return copy;
     }
   }, {
@@ -2277,16 +2289,18 @@ function () {
         return 1e20;
       }
 
-      return this.distance;
+      var quality = this.quality;
+      this.quality = 0;
+      return quality;
     }
   }]);
 
   return Player;
 }();
 
-function resetGoal() {
-  var x = 85 + Math.floor(Math.random() * 230);
-  var y = 80 + Math.floor(Math.random() * 70);
+function resetGoal(goalsParams) {
+  var x = goalsParams.x + Math.floor(Math.random() * goalsParams.dx);
+  var y = goalsParams.y + Math.floor(Math.random() * goalsParams.dy);
   return new Goal(x, y);
 }
 
@@ -2294,23 +2308,35 @@ var Labyrinth =
 /*#__PURE__*/
 function () {
   function Labyrinth(size) {
-    var playerY = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {
+    var playerX = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {
+      return 200;
+    };
+    var playerY = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : function () {
       return 400;
+    };
+    var goalsParams = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {
+      x: 85,
+      y: 280,
+      dx: 230,
+      dy: 70
     };
 
     _classCallCheck(this, Labyrinth);
 
-    this.goal = resetGoal();
+    this.playerX = playerX;
+    this.playerY = playerY;
+    this.goalsParams = goalsParams;
+    this.goal = resetGoal(goalsParams);
     Object.assign(this, {
       width: 400,
       height: 600,
       size: size,
       players: [],
-      bestPlayer: new Player(200, playerY(), this.goal)
+      bestPlayer: new Player(playerX(), playerY(), this.goal)
     });
 
     for (var i = 0; i < size; i++) {
-      this.players.push(new Player(200, playerY(), this.goal));
+      this.players.push(new Player(playerX(), playerY(), this.goal));
     }
   }
 
@@ -2318,14 +2344,14 @@ function () {
     key: "reset",
     value: function reset(savegoal) {
       if (!savegoal) {
-        this.goal = resetGoal();
+        this.goal = resetGoal(this.goalsParams);
       }
 
       this.players = [];
-      this.bestPlayer = new Player(200, 400, this.goal);
+      this.bestPlayer = new Player(this.playerX(), this.playerY(), this.goal);
 
       for (var i = 0; i < this.size; i++) {
-        this.players.push(new Player(200, 400, this.goal));
+        this.players.push(new Player(this.playerX(), this.playerY(), this.goal));
       }
     }
   }]);
@@ -2342,7 +2368,7 @@ function _norm(array) {
 function getDistance(a, b) {
   var width = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 400;
   var height = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 600;
-  return _norm([a.x - b.x, a.y - b.y]);
+  return _norm([a.x - b.x, a.y - b.y]) / 100;
 }
 
 /***/ }),
@@ -3147,7 +3173,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("\n\n<component id=\"Player\">\n  <div class=\"player {title}\" style=\"top: {value.y}px; left: {value.x}px;\"></div> \n</component>\n\n<component id=\"Goal\">\n  <div class=\"goal\" style=\"top: {value.y}px; left: {value.x}px;\"></div> \n</component>\n\n<component id=\"LabyrinthParams\">\n  <div class=\"slidecontainer\">\n    <label for=\"cycleRange\">Cycles: {maxcycle} </label> \n    <input type=\"range\" min=\"2\" max=\"501\" value={maxcycle} class=\"slider\" change=\"->nstore.maxcycle\"  id=\"cycleRange\">\n  </div> \n  <label>Cycle: {cycle} </label>\n  <div class=\"slidecontainer\">\n    <label for=\"lifetimeRange\">Lifetime: {step}/{lifetime} </label>  \n    <input type=\"range\" min=\"50\" max=\"501\" value={lifetime} class=\"slider\" change=\"->nstore.lifetime\"  id=\"lifetimeRange\">\n  </div> \n  <div class=\"slidecontainer\">\n    <label for=\"maxlifetimeRange\">Max Lifetime: {maxlifetime} </label>  \n    <input type=\"range\" min=\"100\" max=\"300\" value={maxlifetime} class=\"slider\" change=\"->nstore.maxlifetime\"  id=\"maxlifetimeRange\">\n  </div> \n  <div class=\"slidecontainer\">\n    <label for=\"cyclesltconstRange\">Const LT cycles: {cyclesltconst} </label>  \n    <input type=\"range\" min=\"1\" max=\"10\" value={cyclesltconst} class=\"slider\" change=\"->nstore.cyclesltconst\"  id=\"cyclesltconstRange\">\n  </div> \n  <div class=\"slidecontainer\">\n    <label for=\"addltRange\">Const LT cycles: {addlt} </label>  \n    <input type=\"range\" min=\"1\" max=\"20\" value={addlt} class=\"slider\" change=\"->nstore.addlt\"  id=\"addltRange\">\n  </div> \n\n  <div class=\"slidecontainer\">\n    <label for=\"newgoalcyclesRange\">New goal cycles: {newgoalcycles} </label>  \n    <input type=\"range\" min=\"1\" max=\"50\" value={newgoalcycles} class=\"slider\" change=\"->nstore.newgoalcycles\"  id=\"newgoalcyclesRange\">\n  </div> \n  \n  \n</component>\n\n<component id=\"Labyrinth\">\n  <ui:tag tag=\"LabyrinthMonitor\" cycle=\"<-nstore.cycle\" lifetime=\"<-nstore.lifetime\" step=\"<-nstore.step\" maxcycle=\"<-nstore.maxcycle\" moveAll=\"->nstore.moveall\" assessAll=\"->nstore.evolve\" />\n    \n  \n  <div class=\"container\">\n    <div class=\"columns\">\n      <div class=\"column col-6 labcontainer\">\n        <div class=\"labyrinth\"  >\n          <Player ui:for=\"pl of players|toArray\"  value=\"{pl.value}\" />\n          <Player value=\"<- nstore.bestplayer\" title=\"bestplayer\"/>\n          <Goal value=\"<- nstore.goal\"  />\n        </div>\n      </div>\n      <div class=\"column col-1\"></div>\n      <div class=\"column col-2\">\n        <h6>Options</h6>\n        <button class=\"btn btn-error control\" click=\"->nstore.reset\">Reset</button>\n        <button class=\"btn btn-error control\" click=\"->nstore.moveall\">MoveAll</button>  \n        <button class=\"btn btn-error control\" click=\"->nstore.cycle\">Cycle</button>  \n        <br/>\n        <br/>\n\n        <LabyrinthParams  \n          maxcycle=\"<-nstore.maxcycle|dec\" \n          lifetime=\"<-nstore.lifetime\" \n          step=\"<-nstore.step\" \n          cycle=\"<-nstore.cycle\"  \n          addlt=\"<-nstore.addlt\"\n          cyclesltconst=\"<-nstore.cyclesltconst\"\n          maxlifetime=\"<-nstore.maxlifetime\"\n          newgoalcycles=\"<-nstore.newgoalcycles\"\n          />  \n      </div>\n    </div>\n  </div>\n</component>\n\n\n<component id=\"LabyrinthPage\">\n  <h4>NEAT is neat</h4>\n  <LabyrinthStore  ui:ref=\"nstore\" />\n  <Labyrinth players=\"<-nstore.players\"  />\n  \n  \n  <h4>Comparation</h4>\n</component>");
+/* harmony default export */ __webpack_exports__["default"] = ("\n\n<component id=\"Player\">\n  <div class=\"player {title}\" style=\"top: {value.y}px; left: {value.x}px;\"></div> \n</component>\n\n<component id=\"Goal\">\n  <div class=\"goal\" style=\"top: {value.y}px; left: {value.x}px;\"></div> \n</component>\n\n<component id=\"LabyrinthParams\">\n  <div class=\"slidecontainer\">\n    <label for=\"cycleRange\">Cycles: {maxcycle} </label> \n    <input type=\"range\" min=\"2\" max=\"501\" value={maxcycle} class=\"slider\" change=\"->nstore.maxcycle\"  id=\"cycleRange\">\n  </div> \n  <label>Cycle: {cycle} </label>\n  <div class=\"slidecontainer\">\n    <label for=\"lifetimeRange\">Lifetime: {step}/{lifetime} </label>  \n    <input type=\"range\" min=\"50\" max=\"501\" value={lifetime} class=\"slider\" change=\"->nstore.lifetime\"  id=\"lifetimeRange\">\n  </div> \n  <!-- <div class=\"slidecontainer\">\n    <label for=\"maxlifetimeRange\">Max Lifetime: {maxlifetime} </label>  \n    <input type=\"range\" min=\"100\" max=\"300\" value={maxlifetime} class=\"slider\" change=\"->nstore.maxlifetime\"  id=\"maxlifetimeRange\">\n  </div> \n  <div class=\"slidecontainer\">\n    <label for=\"cyclesltconstRange\">Update LT in cycles: {cyclesltconst} </label>  \n    <input type=\"range\" min=\"1\" max=\"10\" value={cyclesltconst} class=\"slider\" change=\"->nstore.cyclesltconst\"  id=\"cyclesltconstRange\">\n  </div> \n  <div class=\"slidecontainer\">\n    <label for=\"addltRange\">Update LT by: {addlt} </label>  \n    <input type=\"range\" min=\"1\" max=\"20\" value={addlt} class=\"slider\" change=\"->nstore.addlt\"  id=\"addltRange\">\n  </div>  -->\n\n  <div class=\"slidecontainer\">\n    <label for=\"newgoalcyclesRange\">New goal cycles: {newgoalcycles} </label>  \n    <input type=\"range\" min=\"1\" max=\"50\" value={newgoalcycles} class=\"slider\" change=\"->nstore.newgoalcycles\"  id=\"newgoalcyclesRange\">\n  </div> \n  <div class=\"gametypes\">\n    <button class=\"btn\" data-type=\"1\" click=\"->nstore.changegame\" > Game type 1 </button>\n    <button class=\"btn\" data-type=\"2\" click=\"->nstore.changegame\" > Game type 2 </button>\n  </div>\n  \n  \n</component>\n\n<component id=\"Labyrinth\">\n  <ui:tag tag=\"LabyrinthMonitor\" cycle=\"<-nstore.cycle\" lifetime=\"<-nstore.lifetime\" step=\"<-nstore.step\" maxcycle=\"<-nstore.maxcycle\" moveAll=\"->nstore.moveall\" assessAll=\"->nstore.evolve\" />\n    \n  \n  <div class=\"container\">\n    <div class=\"columns\">\n      <div class=\"column col-6 labcontainer\">\n        <div class=\"labyrinth\"  >\n          <Player ui:for=\"pl of players|toArray\"  value=\"{pl.value}\" />\n          <Player value=\"<- nstore.bestplayer\" title=\"bestplayer\"/>\n          <Goal value=\"<- nstore.goal\"  />\n        </div>\n      </div>\n      <div class=\"column col-1\"></div>\n      <div class=\"column col-2\">\n        <h6>Options</h6>\n        <button class=\"btn btn-error control\" click=\"->nstore.reset\">Reset</button>\n        <button class=\"btn btn-error control\" click=\"->nstore.moveall\">MoveAll</button>  \n        <button class=\"btn btn-error control\" click=\"->nstore.cycle\">Cycle</button>  \n        <br/>\n        <br/>\n\n        <LabyrinthParams  \n          maxcycle=\"<-nstore.maxcycle|dec\" \n          lifetime=\"<-nstore.lifetime\" \n          step=\"<-nstore.step\" \n          cycle=\"<-nstore.cycle\"  \n          addlt=\"<-nstore.addlt\"\n          cyclesltconst=\"<-nstore.cyclesltconst\"\n          maxlifetime=\"<-nstore.maxlifetime\"\n          newgoalcycles=\"<-nstore.newgoalcycles\"\n          />  \n      </div>\n    </div>\n  </div>\n</component>\n\n\n<component id=\"LabyrinthPage\">\n  <h4>NEAT is neat</h4>\n  <LabyrinthStore  ui:ref=\"nstore\" />\n  <Labyrinth players=\"<-nstore.players\"  />\n  \n  \n  <h4>Comparation</h4>\n</component>");
 
 /***/ }),
 
@@ -3541,24 +3567,24 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 function reset() {
-  var size = 50;
+  var size = 100;
   return {
     size: size,
-    toEvolve: 9,
+    toEvolve: 16,
     neat: new _algorithms_neat_js__WEBPACK_IMPORTED_MODULE_0__["NEAT"]({
       size: size,
-      inNum: 4,
+      inNum: 5,
       outNum: 2
     }),
     game: new _games_labyrinth_js__WEBPACK_IMPORTED_MODULE_1__["Labyrinth"](size),
     step: 0,
-    lifetime: 10,
+    lifetime: 100,
     maxcycle: 351,
     cycle: 0,
-    newgoalcycles: 15,
-    maxlifetime: 300,
-    cyclesltconst: 5,
-    addlt: 3
+    newgoalcycles: 3,
+    maxlifetime: 100,
+    cyclesltconst: 2,
+    addlt: 10
   };
 }
 
@@ -3580,7 +3606,7 @@ function () {
     key: "move",
     value: function move(player, individual) {
       // const args = [player.x, player.y, player.xVel, player.yVel, player.predictDistance() - player.distance, player.distance]
-      var args = [player.xVel, player.yVel, player.predictDistance() - player.distance, player.distance];
+      var args = [player.xVel, player.yVel, player.getDiractionX(), player.getDiractionY(), player.distance];
       var direction = individual.evaluate(args);
       return player.move(direction);
     }
@@ -3594,11 +3620,10 @@ function () {
         // this.game.players[i] = player.move(direction)
 
         this.game.players[i] = this.move(player, individual);
-      }
+      } // if (this.neat.population.best.id) {
 
-      if (this.neat.population.best.id) {
-        this.game.bestPlayer = this.move(this.game.bestPlayer, this.neat.population.best);
-      }
+
+      this.game.bestPlayer = this.move(this.game.bestPlayer, this.neat.population.best); // }
 
       this.game.players = _toConsumableArray(this.game.players);
       return _objectSpread({}, this, {
@@ -3625,11 +3650,10 @@ function () {
 
       if (!(this.cycle % this.newgoalcycles)) {
         this.lifetime = Math.min(this.lifetime, 200);
-      }
+      } // if (!(this.cycle % this.cyclesltconst)) {
+      //   this.lifetime = Math.min(this.lifetime + this.addlt, this.maxlifetime)
+      // }
 
-      if (!(this.cycle % this.cyclesltconst)) {
-        this.lifetime = Math.min(this.lifetime + this.addlt, this.maxlifetime);
-      }
 
       return _objectSpread({}, this, {
         step: 0,
@@ -3701,18 +3725,38 @@ function () {
       return _objectSpread({}, reset());
     }
   }, {
-    key: "onChangeGame",
-    value: function onChangeGame(type) {
-      if (type === 2) {
-        var playerY = function playerY() {
-          return Math.random() < 0.5 ? 400 : 200;
-        };
+    key: "onChangegame",
+    value: function onChangegame(_ref8) {
+      var type = _ref8.type;
 
-        this.game = new _games_labyrinth_js__WEBPACK_IMPORTED_MODULE_1__["Labyrinth"](this.size, playerY);
-        return this;
+      if (type === 2) {
+        return this.game2();
       }
 
       return _objectSpread({}, reset());
+    }
+  }, {
+    key: "game1",
+    value: function game1() {
+      return _objectSpread({}, reset(), {
+        game: new _games_labyrinth_js__WEBPACK_IMPORTED_MODULE_1__["Labyrinth"](this.size)
+      });
+    }
+  }, {
+    key: "game2",
+    value: function game2() {
+      return _objectSpread({}, reset(), {
+        game: new _games_labyrinth_js__WEBPACK_IMPORTED_MODULE_1__["Labyrinth"](this.size, function () {
+          return Math.random() < 0.5 ? 100 : 300;
+        }, function () {
+          return Math.random() < 0.5 ? 200 : 400;
+        }, {
+          x: 200,
+          y: 300,
+          dx: 75,
+          dy: 50
+        })
+      });
     }
   }, {
     key: "individuals",
