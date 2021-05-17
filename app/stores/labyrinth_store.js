@@ -12,10 +12,10 @@ function reset() {
     lifetime: 10,
     maxcycle: 351,
     cycle: 0,
-    newgoalcycles: 15,
-    maxlifetime: 300,
-    cyclesltconst: 5,
-    addlt: 3
+    newgoalcycles: 3,
+    maxlifetime: 100,
+    cyclesltconst: 2,
+    addlt: 20
   }
 }
 
@@ -64,9 +64,9 @@ export class LabyrinthStore {
       // this.game.players[i] = player.move(direction)
       this.game.players[i] = this.move(player, individual)
     }
-    if (this.neat.population.best.id) {
-      this.game.bestPlayer = this.move(this.game.bestPlayer, this.neat.population.best)
-    }
+    // if (this.neat.population.best.id) {
+    this.game.bestPlayer = this.move(this.game.bestPlayer, this.neat.population.best)
+    // }
     this.game.players = [...this.game.players]
     return { ...this, step: this.step + 1 }
   }

@@ -54,6 +54,7 @@ class Player {
     this.xVel = (Math.random() - 0.5) / 5
     this.yVel = (Math.random() - 0.5) / 5
     this.goal = goal
+    this.quality = 0
     this.distance = getDistance(this, this.goal)
   }
 
@@ -61,7 +62,9 @@ class Player {
     if (this.x > 500 || this.x < -100 || this.y > 700 || this.y < -100) {
       return 1e20
     }
-    return this.distance
+    const quality = this.quality
+    this.quality = 0
+    return quality
   }
 
   predictDistance () {
@@ -81,6 +84,7 @@ class Player {
     copy.x += copy.xVel
     copy.y += copy.yVel
     copy.distance = getDistance(copy, copy.goal)
+    copy.quality += this.distance
     return copy
   }
 
