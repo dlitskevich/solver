@@ -168,7 +168,7 @@ export class LabyrinthStore {
         this.size,
         () => (Math.random() < 0.5 ? 100 : 300),
         () => (Math.random() < 0.5 ? 200 : 400),
-        { x: 200, y: 300, dx: 75, dy: 50 }
+        { x: 150, y: 300, dx: 100, dy: 50 }
       )
     }
   }

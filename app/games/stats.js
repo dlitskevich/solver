@@ -5,7 +5,7 @@ function reset () {
     circleWin: 0,
     draw: 0,
     total: 0,
-    times: 100
+    times: 10
   }
 }
 // TTT stats
