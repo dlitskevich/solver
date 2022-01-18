@@ -64,9 +64,14 @@
     <Button icon="123" caption="Link" link />
   </Panel>
   <Panel caption="Panel" hint="with hint"> here... </Panel> -->
-  <br/>
-  <h5>You can click that button</h5>
-  <button class="btn" click="->" data-clicked={clicked|inc}>Clicked {clicked|or:0}</button>
+  <br />
+  <h3>You can click that button
+    <button class="btn" click="->" data-clicked={clicked|inc}>Clicked {clicked|or:0}</button>
+  </h3>
+
+  <NavTree data=":top.sitemap" />
+
+
 
 </component>
 
@@ -74,9 +79,6 @@
   <Navbar caption="Arrows" />
   <Panel caption="Subscribe and Action">
     <Tabs value="<- store.tab" items=":top.sitemap" action="-> store.select" />
-    <Button
-            caption="<- store.tab|or:none|str.capitalize"
-            data-id="other"
-            action="-> store.select" />
+    <Button caption="<- store.tab|or:none|str.capitalize" data-id="other" action="-> store.select" />
   </Panel>
 </component>
